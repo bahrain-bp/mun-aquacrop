@@ -1,6 +1,8 @@
 import { SSTConfig } from "sst";
+import {DynamoDBStack} from "./stacks/DynamoDBStack";
 import { FrontendStack } from "./stacks/FrontendStack";
 import { DBStack } from "./stacks/DBStack";
+import { StorageStack } from "./stacks/StorageStack";
 import { ApiStack } from "./stacks/ApiStack";
 import { ImageBuilderForCodeCatalyst } from "./stacks/devops/ImageBuilderForCodeCatalyst";
 import { OIDCForGitHubCI } from "./stacks/devops/OIDCForGitHubCI";
@@ -27,6 +29,8 @@ export default {
     else {
       app.stack(DBStack)
       .stack(ApiStack)
+      .stack(StorageStack)
+      .stack(DynamoDBStack)
       .stack(FrontendStack);
     }
   }
