@@ -36,7 +36,7 @@ export function FrontendStack({ stack }: StackContext) {
             },
             allowedMethods: AllowedMethods.ALLOW_ALL,
             cachedMethods: AllowedMethods.ALLOW_GET_HEAD_OPTIONS,
-          },
+          },//s
         },
       },
     }
