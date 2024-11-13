@@ -29,8 +29,8 @@ export default {
     else {
       app.stack(DBStack)
       .stack(ApiStack)
-      .stack(FrontendStack);
-      .stack(storage)
+      .stack(FrontendStack)
+      .stack(MyStack);
     }
   }
 } satisfies SSTConfig;
