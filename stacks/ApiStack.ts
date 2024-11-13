@@ -7,7 +7,7 @@ export function ApiStack({ stack }: StackContext) {
 
     const {table} = use(DBStack);
     
-    // Create the HTTP API
+    // Create the HTTP API jj
     const api = new Api(stack, "Api", {
         defaults: {
             function: {
