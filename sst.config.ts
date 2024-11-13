@@ -4,11 +4,13 @@ import { DBStack } from "./stacks/DBStack";
 import { ApiStack } from "./stacks/ApiStack";
 import { ImageBuilderForCodeCatalyst } from "./stacks/devops/ImageBuilderForCodeCatalyst";
 import { OIDCForGitHubCI } from "./stacks/devops/OIDCForGitHubCI";
+import { MyStack } from "./stacks/storage";
+
 
 export default {
   config(_input) {
     return {
-      name: "codecatalyst-sst-app",
+      name: "mun-aquacrop",
       region: "us-east-1",
     };
   },
@@ -27,7 +29,8 @@ export default {
     else {
       app.stack(DBStack)
       .stack(ApiStack)
-      .stack(FrontendStack);
+      .stack(FrontendStack)
+      .stack(MyStack);
     }
   }
 } satisfies SSTConfig;
