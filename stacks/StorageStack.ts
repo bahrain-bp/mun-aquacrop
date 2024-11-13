@@ -3,7 +3,7 @@ import * as s3 from "aws-cdk-lib/aws-s3";
 import { Duration, RemovalPolicy } from "aws-cdk-lib";
 
 export function StorageStack({ stack }: StackContext) {
-    // Create an S3 bucket with Intelligent-Tiering and CORS configuration
+    // Create an S3 bucket with Intelligent-Tiering and CORS configuration test
     const bucket = new Bucket(stack, "PhotosBucket", {
         cdk: {
             bucket: {
