@@ -10,7 +10,7 @@ export function OIDCForGitHubCI({stack }: StackContext) {
     });
 
     const organization = 'bahrain-bp'; // Use your GitHub organization
-    const repository = 'mun-aquacorp'; // Use your GitHub repository
+    const repository = 'mun-aquacrop'; // Use your GitHub repository
 
     new iam.Role(stack, 'GitHubActionsRole', {
     assumedBy: new iam.OpenIdConnectPrincipal(provider).withConditions({
