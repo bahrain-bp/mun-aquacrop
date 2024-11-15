@@ -18,29 +18,82 @@ export function DynamoDBStack({ stack }: StackContext) {
         fields: {
             CropID: "string",
             Name: "string",
-            growth_states: "map",
-            ImageS3URL: "string",
+            cropType: "string",
+            cropVariety: "string",
+            cropSeason: "string",
+            cropDuration: "number",
+            cropDescription: "string",
+            cropImageURL: "string",
         },
         primaryIndex: { partitionKey: "CropID" },
     });
 
-    // Define other tables based on your ERD structure
+    const cropCoefficientTable = new Table(stack, "CropCoefficeint", {
+        fields: {
+            CropID: "string",
+            growthState: "string",
+            Kc: "number",
+            Ks: "number",
+        },
+        primaryIndex: { partitionKey: "CropID"},
+    });
+
+
     const weatherReadingsTable = new Table(stack, "WeatherReadings", {
         fields: {
-            RID: "string",
-            SID: "string",
+            ReadingID: "string",
+            StationID: "string",
             date: "string",
-            radiation: "map",
-            Temp: "map",
+            incomingRadiation: "number",
+            outgoingRadiation: "number",
+            meanTemp: "number",
+            minTemp: "number",
+            maxTemp: "number",
             wind_speed: "number",
             humidity: "number",
         },
-        primaryIndex: { partitionKey: "RID" },
-        secondaryIndexes: {
-            stationIndex: { partitionKey: "SID" },
-        },
+        primaryIndex: { partitionKey: "ReadingID" },
+
     });
 
-    // Repeat for the remaining tables...
+    const stationTable = new Table(stack, "Station", {
+        fields: {
+            StationID: "string",
+            Name: "string",
+            Location: "string",
+        },
+        primaryIndex: { partitionKey: "SID" }
+    });
+
+    const trackerTable = new Table(stack, "tracker", {
+        fields: {
+            TrackerId: "string",
+            ReadingID: "string",
+            CropID: "string",
+            UID: "string",
+            Date: "string",
+            waterAmount: "number",
+        },
+        primaryIndex: { partitionKey: "TrackerId" }
+    });
+
+
+    stack.addOutputs({
+        UserTableName: userTable.tableName,
+        CropTableName: cropTable.tableName,
+        CropCoefficientTableName: cropCoefficientTable.tableName,
+        WeatherReadingsTableName: weatherReadingsTable.tableName,
+        StationTableName: stationTable.tableName,
+        TrackerTableName: trackerTable.tableName,
+    });
+
+    return {
+        userTable,
+        cropTable,
+        cropCoefficientTable,
+        weatherReadingsTable,
+        stationTable,
+        trackerTable,
+    };
 
 }
