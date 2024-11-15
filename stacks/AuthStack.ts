@@ -3,8 +3,8 @@ import * as cognito from "aws-cdk-lib/aws-cognito";
 
 export function AuthStack({ stack }: StackContext) {
   // Define the Lambda function for custom authentication
-  const customAuthLambda = new Function(stack, "CustomAuthLambda", {
-    handler: "src/Authentication/CustomAuthChallenge.lambda_handler",
+  const customAuthLambda = new Function(stack, "customAuthChallenges", {
+    handler: "packages/functions/src/Authentication/customAuthChallenges.lambda_handler",
     timeout: 10,  // Increase timeout to 10 seconds
   });
 
