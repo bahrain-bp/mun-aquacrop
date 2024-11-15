@@ -1,11 +1,13 @@
 import { Api, StackContext, use } from "sst/constructs";
 import { DBStack } from "./DBStack";
+import { AuthStack } from "./AuthStack"; // Adjust the path if necessary
 import { CacheHeaderBehavior, CachePolicy } from "aws-cdk-lib/aws-cloudfront";
 import { Duration } from "aws-cdk-lib/core";
 
 export function ApiStack({ stack }: StackContext) {
 
     const {table} = use(DBStack);
+    const auth = use(AuthStack);
     
     // Create the HTTP API
     const api = new Api(stack, "Api", {
@@ -26,8 +28,18 @@ export function ApiStack({ stack }: StackContext) {
                     timeout: "60 seconds",
                 }
             },
-        }
-    });
+            "GET /public": {
+                function: "packages/functions/src/Authentication/public.main",
+            },
+            "GET /private": {
+                function: {
+                    handler: "packages/functions/src/Authentication/private.main",
+                    runtime: "python3.11",
+                },
+                   
+            },
+    },
+  });
 
     // cache policy to use with cloudfront as reverse proxy to avoid cors
     // https://dev.to/larswww/real-world-serverless-part-3-cloudfront-reverse-proxy-no-cors-cgj
