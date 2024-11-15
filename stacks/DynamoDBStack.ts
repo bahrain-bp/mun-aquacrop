@@ -62,7 +62,7 @@ export function DynamoDBStack({ stack }: StackContext) {
             Name: "string",
             Location: "string",
         },
-        primaryIndex: { partitionKey: "SID" }
+        primaryIndex: { partitionKey: "StationID" }
     });
 
     const trackerTable = new Table(stack, "tracker", {

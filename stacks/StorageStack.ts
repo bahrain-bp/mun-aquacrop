@@ -1,5 +1,5 @@
 import { StackContext } from "sst/constructs";
-import {BlockPublicAccess, Bucket, HttpMethods} from "aws-cdk-lib/aws-s3";
+import { BlockPublicAccess, Bucket, HttpMethods} from "aws-cdk-lib/aws-s3";
 import { RemovalPolicy } from "aws-cdk-lib";
 
 export function S3Stack({ stack }: StackContext) {
@@ -19,8 +19,6 @@ export function S3Stack({ stack }: StackContext) {
             },
         ],
     });
-
-
 
     stack.addOutputs({
         BucketName: bucket.bucketName,
