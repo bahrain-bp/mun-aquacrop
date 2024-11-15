@@ -22,6 +22,7 @@
     "packages/*"
   ],
   "dependencies": {
+    "@aws-sdk/client-sns": "^3.693.0",
     "axios": "^1.7.7"
   }
 }
