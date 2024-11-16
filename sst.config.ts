@@ -4,11 +4,12 @@ import { DBStack } from "./stacks/DBStack";
 import { ApiStack } from "./stacks/ApiStack";
 import { ImageBuilderForCodeCatalyst } from "./stacks/devops/ImageBuilderForCodeCatalyst";
 import { OIDCForGitHubCI } from "./stacks/devops/OIDCForGitHubCI";
-
+import { MyStack } from "./stacks/s3";
+ 
 export default {
   config(_input) {
     return {
-      name: "codecatalyst-sst-app",
+      name: "MUN",
       region: "us-east-1",
     };
   },
@@ -28,7 +29,7 @@ export default {
       app.stack(DBStack)
       .stack(ApiStack)
       .stack(FrontendStack)
-      .stack(stack);
+      .stack(MyStack);
     }
   }
 } satisfies SSTConfig;
