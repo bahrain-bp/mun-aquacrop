@@ -4,7 +4,7 @@ import { RemovalPolicy } from "aws-cdk-lib";
 
 export function S3Stack({ stack }: StackContext) {
     // Create an S3 bucket with the desired removal policy and CORS configuration
-    const bucket = new Bucket(stack, "ReportBucket", {
+    const bucket = new Bucket(stack, "CropsImagesBucket", {
         versioned: true,
         removalPolicy: stack.stage === "prod" ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY,
         publicReadAccess: true,  // Sets the bucket to be publicly accessible
