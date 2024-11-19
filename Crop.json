@@ -1,0 +1,133 @@
+{
+   "sajeda-database-modify-codecatalyst-sst-app-Crop": [
+     {
+       "PutRequest": {
+         "Item": {
+           "CropID": { "S": "1" },
+           "Name": { "S": "Lettuce" },
+           "GrowthStage": {
+             "M": {
+               "ini": { "N": "10" },
+               "mid": { "N": "50" },
+               "end": { "N": "60" }
+             }
+           },
+           "ImageURL": { "S": "https://lui-codecatalyst-sst-app--cropsimagesbucket37842e6-xa99avf7vup7.s3.us-east-1.amazonaws.com/images/lettuce+wb.jpeg" }
+         }
+       }
+     },
+     {
+       "PutRequest": {
+         "Item": {
+           "CropID": { "S": "2" },
+           "Name": { "S": "Sweet corn" },
+           "GrowthStage": {
+             "M": {
+               "ini": { "N": "15" },
+               "mid": { "N": "85" },
+               "end": { "N": "100" }
+             }
+           },
+           "ImageURL": { "S": "https://lui-codecatalyst-sst-app--cropsimagesbucket37842e6-xa99avf7vup7.s3.us-east-1.amazonaws.com/images/corn+wb.jpg" }
+         }
+       }
+     },
+     {
+       "PutRequest": {
+         "Item": {
+           "CropID": { "S": "3" },
+           "Name": { "S": "Beetroot" },
+           "GrowthStage": {
+             "M": {
+               "ini": { "N": "15" },
+               "mid": { "N": "60" },
+               "end": { "N": "70" }
+             }
+           },
+           "ImageURL": { "S": "https://lui-codecatalyst-sst-app--cropsimagesbucket37842e6-xa99avf7vup7.s3.us-east-1.amazonaws.com/images/beetroot+wb.jpg" }
+         }
+       }
+     },
+     {
+       "PutRequest": {
+         "Item": {
+           "CropID": { "S": "4" },
+           "Name": { "S": "Eggplants" },
+           "GrowthStage": {
+             "M": {
+               "ini": { "N": "20" },
+               "mid": { "N": "75" },
+               "end": { "N": "90" }
+             }
+           },
+           "ImageURL": { "S": "https://lui-codecatalyst-sst-app--cropsimagesbucket37842e6-xa99avf7vup7.s3.us-east-1.amazonaws.com/images/eggplant+wb.jpg" }
+         }
+       }
+     },
+     {
+       "PutRequest": {
+         "Item": {
+           "CropID": { "S": "5" },
+           "Name": { "S": "Cauliflower" },
+           "GrowthStage": {
+             "M": {
+               "ini": { "N": "20" },
+               "SteadyStage": { "N": "80" },
+               "end": { "N": "100" }
+             }
+           },
+           "ImageURL": { "S": "https://lui-codecatalyst-sst-app--cropsimagesbucket37842e6-xa99avf7vup7.s3.us-east-1.amazonaws.com/images/cauliflower.jpeg" }
+         }
+       }
+     },
+     {
+       "PutRequest": {
+         "Item": {
+           "CropID": { "S": "6" },
+           "Name": { "S": "Cucumber" },
+           "GrowthStage": {
+             "M": {
+               "ini": { "N": "10" },
+               "mid": { "N": "50" },
+               "end": { "N": "70" }
+             }
+           },
+           "ImageURL": { "S": "https://lui-codecatalyst-sst-app--cropsimagesbucket37842e6-xa99avf7vup7.s3.us-east-1.amazonaws.com/images/cucumber+wb.jpeg" }
+         }
+       }
+     },
+     {
+       "PutRequest": {
+         "Item": {
+           "CropID": { "S": "7" },
+           "Name": { "S": "Bell pepper" },
+           "GrowthStage": {
+             "M": {
+               "ini": { "N": "20" },
+               "mid": { "N": "70" },
+               "end": { "N": "85" }
+             }
+           },
+           "ImageURL": { "S": "https://lui-codecatalyst-sst-app--cropsimagesbucket37842e6-xa99avf7vup7.s3.us-east-1.amazonaws.com/images/sweet+pepper+wb.jpg" }
+         }
+       }
+     },
+     {
+       "PutRequest": {
+         "Item": {
+           "CropID": { "S": "8" },
+           "Name": { "S": "Tomato" },
+           "GrowthStage": {
+             "M": {
+               "ini": { "N": "15" },
+               "mid": { "N": "55" },
+               "end": { "N": "80" }
+             }
+           },
+           "ImageURL": { "S": "https://lui-codecatalyst-sst-app--cropsimagesbucket37842e6-xa99avf7vup7.s3.us-east-1.amazonaws.com/images/tomato+wb.jpg" }
+         }
+       }
+     }
+   ]
+ }
+ 
