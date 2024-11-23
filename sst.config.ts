@@ -9,7 +9,7 @@ import {MobileStack} from "./stacks/MobileStack";
 export default {
   config(_input) {
     return {
-      name: "codecatalyst-sst-app",
+      name: "mun-aquacrop",
       region: "us-east-1",
     };
   },
