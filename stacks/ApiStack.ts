@@ -18,6 +18,10 @@ export function ApiStack({ stack }: StackContext) {
         routes: {
             // Sample TypeScript lambda function
             "POST /": "packages/functions/src/lambda.main",
+
+            // Penman equation Lambda function
+            "POST /penman": "packages/functions/src/penman.handler",
+
             // Sample Pyhton lambda function
             "GET /": {
                 function: {
