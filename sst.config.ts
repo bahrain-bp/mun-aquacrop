@@ -5,6 +5,7 @@ import { ApiStack } from "./stacks/ApiStack";
 import { ImageBuilderForCodeCatalyst } from "./stacks/devops/ImageBuilderForCodeCatalyst";
 import { OIDCForGitHubCI } from "./stacks/devops/OIDCForGitHubCI";
 import { AuthStack } from "./stacks/AuthStack";
+import {MobileStack} from "./stacks/MobileStack";
 
 export default {
   config(_input) {
@@ -15,10 +16,12 @@ export default {
   },
   stacks(app) {
     // Remove all resources when non-prod stages are removed
+
+
     if (app.stage !== "prod") {
       app.setDefaultRemovalPolicy("destroy");
     }
-    
+
     if (app.stage == 'devops-coca') {
       app.stack(ImageBuilderForCodeCatalyst)
     }
@@ -29,7 +32,9 @@ export default {
       app.stack(DBStack)
       .stack(AuthStack)
       .stack(ApiStack)
-      .stack(FrontendStack);
+      .stack(FrontendStack)
+      .stack(MobileStack);
+
     }
   }
 } satisfies SSTConfig;
