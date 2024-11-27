@@ -23,9 +23,11 @@
     "packages/*"
   ],
   "dependencies": {
+    "@aws-cdk/cx-api": "^2.171.0",
+    "@aws-sdk/client-cognito-identity-provider": "^3.699.0",
     "@aws-sdk/client-pinpoint": "^3.696.0",
     "@aws-sdk/client-pinpoint-sms-voice-v2": "^3.696.0",
-    "@aws-sdk/client-sns": "^3.693.0",
+    "@aws-sdk/client-sns": "^3.699.0",
     "aws-amplify": "^6.9.0",
     "axios": "^1.7.7",
     "expo-dotenv": "^0.1.0"
