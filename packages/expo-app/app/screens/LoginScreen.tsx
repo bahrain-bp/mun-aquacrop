@@ -8,7 +8,7 @@ export default function LoginScreen() {
     </View>
   );
 }
-
+// style sheet
 const styles = StyleSheet.create({
   container: {
     flex: 1,
