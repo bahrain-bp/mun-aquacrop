@@ -24,7 +24,7 @@ export function ApiStack({ stack }: StackContext) {
       "POST /penman": "packages/functions/src/penman.handler",
 
       // Sample Python lambda function
-      "GET /": {
+      "GET /hello": {
         function: {
           handler: "packages/functions/src/sample-python-lambda/lambda.main",
           runtime: "python3.11",

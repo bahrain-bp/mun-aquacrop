@@ -28,6 +28,7 @@ export const handler = async (event) => {
 
     if (response.AuthenticationResult) {
       return {
+        
         statusCode: 200,
         body: JSON.stringify({
           idToken: response.AuthenticationResult.IdToken,

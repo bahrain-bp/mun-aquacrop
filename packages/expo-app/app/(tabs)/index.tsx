@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Link } from 'expo-router';
 
+
 const HomeScreen = () => {
   return (
     <View style={styles.container}>
@@ -19,12 +20,13 @@ export default function Page() {
       <Link style={styles.link} href="/screens/SignupScreen">
         Go to Signup
       </Link>
-      <Link style={styles.link} href="/screens/LoginScreen">
-        Go to Login
+      <Link style={styles.link} href="/screens/AuthScreen">
+        Go to Auth
       </Link>
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
