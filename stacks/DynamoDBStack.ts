@@ -10,6 +10,9 @@ export function DynamoDBStack({ stack }: StackContext) {
             Mobile: "string",
             regDate: "string",
             LastLogged: "string",
+            CollectData: "number",
+            Location: "string",
+            Language: "string",
         },
         primaryIndex: { partitionKey: "UID" },
     });
@@ -17,26 +20,29 @@ export function DynamoDBStack({ stack }: StackContext) {
     const cropTable = new Table(stack, "Crop", {
         fields: {
             CropID: "string",
-            Name: "string",
+            NameEn: "string",
+            NameAr: "string",
             cropType: "string",
-            cropVariety: "string",
             cropSeason: "string",
             cropDuration: "number",
-            cropDescription: "string",
+            cropDescriptionAr: "string",
+            cropDescriptionEn: "string",
             cropImageURL: "string",
+            KC: "map",
+            growthStage: "map",
         },
         primaryIndex: { partitionKey: "CropID" },
     });
 
-    const cropCoefficientTable = new Table(stack, "CropCoefficeint", {
-        fields: {
-            CropID: "string",
-            growthState: "string",
-            Kc: "number",
-            Ks: "number",
-        },
-        primaryIndex: { partitionKey: "CropID"},
-    });
+    // const cropCoefficientTable = new Table(stack, "CropCoefficeint", {
+    //     fields: {
+    //         CropID: "string",
+    //         growthState: "string",
+    //         Kc: "number",
+    //         range: "number",
+    //     },
+    //     primaryIndex: { partitionKey: "CropID"},
+    // });
 
 
     const weatherReadingsTable = new Table(stack, "WeatherReadings", {
@@ -53,7 +59,6 @@ export function DynamoDBStack({ stack }: StackContext) {
             humidity: "number",
         },
         primaryIndex: { partitionKey: "ReadingID" },
-
     });
 
     const stationTable = new Table(stack, "Station", {
@@ -73,6 +78,9 @@ export function DynamoDBStack({ stack }: StackContext) {
             UID: "string",
             Date: "string",
             waterAmount: "number",
+            ET0: "number",
+            cropID: "string",
+            stage: "string",
         },
         primaryIndex: { partitionKey: "TrackerId" }
     });
@@ -81,7 +89,7 @@ export function DynamoDBStack({ stack }: StackContext) {
     stack.addOutputs({
         UserTableName: userTable.tableName,
         CropTableName: cropTable.tableName,
-        CropCoefficientTableName: cropCoefficientTable.tableName,
+        // CropCoefficientTableName: cropCoefficientTable.tableName,
         WeatherReadingsTableName: weatherReadingsTable.tableName,
         StationTableName: stationTable.tableName,
         TrackerTableName: trackerTable.tableName,
@@ -90,10 +98,11 @@ export function DynamoDBStack({ stack }: StackContext) {
     return {
         userTable,
         cropTable,
-        cropCoefficientTable,
+        // cropCoefficientTable,
         weatherReadingsTable,
         stationTable,
         trackerTable,
     };
 
 }
+
