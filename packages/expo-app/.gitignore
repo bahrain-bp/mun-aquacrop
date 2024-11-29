@@ -9,6 +9,7 @@ dist/
 web-build/
 expo-env.d.ts
 
+
 # Native
 *.orig.*
 *.jks
@@ -16,6 +17,7 @@ expo-env.d.ts
 *.p12
 *.key
 *.mobileprovision
+.idea
 
 # Metro
 .metro-health-check*
