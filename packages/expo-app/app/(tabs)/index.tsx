@@ -1,35 +1,49 @@
-import { StyleSheet } from 'react-native';
-
-import EditScreenInfo from '@/components/EditScreenInfo';
-import { Text, View } from '@/components/Themed';
-
-const API_URL = process.env.EXPO_PUBLIC_PROD_API_URL; // Replace with your actual API URL
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { Link } from 'expo-router';
 
 
-export default function TabOneScreen() {
+const HomeScreen = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab Ones</Text>
-      <Text style={styles.title}>{API_URL}</Text>
-      <View style={styles.separator} lightColor="#eee" darkColor="rgba(255,255,255,0.1)" />
-      <EditScreenInfo path="app/(tabs)/index.tsx" />
+      <Text style={styles.title}>Welcome to the Home Screen!</Text>
+    </View>
+  );
+};
+
+export default function Page() {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Welcome to My App!</Text>
+      
+      {/* Navigation Links */}
+      <Link style={styles.link} href="/screens/SignupScreen">
+        Go to Signup
+      </Link>
+      <Link style={styles.link} href="/screens/AuthScreen">
+        Go to Auth
+      </Link>
     </View>
   );
 }
 
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    padding: 16,
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
+    marginBottom: 20,
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+  link: {
+    fontSize: 18,
+    color: 'blue',
+    marginVertical: 10,
   },
 });
