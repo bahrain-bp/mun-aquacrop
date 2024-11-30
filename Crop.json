@@ -1,5 +1,5 @@
 {
-    "sajeda-database-modify-codecatalyst-sst-app-Crop": [
+    "prod-mun-aquacrop-Crop": [
       {
         "PutRequest": {
           "Item": {
