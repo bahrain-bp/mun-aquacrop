@@ -105,7 +105,7 @@
             "GrowthStage": {
               "M": {
                 "ini": { "N": "20" },
-                "SteadyStage": { "N": "80" },
+                "mid": { "N": "80" },
                 "end": { "N": "100" }
               }
             },
