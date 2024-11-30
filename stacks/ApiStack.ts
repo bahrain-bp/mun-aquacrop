@@ -1,5 +1,6 @@
 import { Api, StackContext, use } from "sst/constructs";
 import { DBStack } from "./DBStack";
+import { DynamoDBStack } from "./DynamoDBStack";
 import { AuthStack } from "./AuthStack"; // Adjust the path if necessary
 import { CacheHeaderBehavior, CachePolicy } from "aws-cdk-lib/aws-cloudfront";
 import { Duration } from "aws-cdk-lib/core";
@@ -7,13 +8,17 @@ import { Duration } from "aws-cdk-lib/core";
 export function ApiStack({ stack }: StackContext) {
   const { table } = use(DBStack);
   const auth = use(AuthStack);
+  const {stationTable}  = use(DynamoDBStack);
 
   // Create the HTTP API
   const api = new Api(stack, "Api", {
     defaults: {
       function: {
         // Bind the table name to our API
-        bind: [table],
+        bind: [stationTable],
+        environment: {
+          StationTableName: stationTable.tableName,
+        },
       },
     },
     routes: {
@@ -23,6 +28,8 @@ export function ApiStack({ stack }: StackContext) {
       // Penman equation Lambda function
       "POST /penman": "packages/functions/src/penman.handler",
 
+      "POST /station": "packages/functions/src/station-handler.main",
+
       // Sample Python lambda function
       "GET /hello": {
         function: {
@@ -31,7 +38,7 @@ export function ApiStack({ stack }: StackContext) {
           timeout: "60 seconds",
         },
       },
-      
+
       // Add new routes for custom authentication
       "POST /auth/InitiateAuthentication": {
         function: {
