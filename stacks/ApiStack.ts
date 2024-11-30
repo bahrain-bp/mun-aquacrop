@@ -8,16 +8,17 @@ import { Duration } from "aws-cdk-lib/core";
 export function ApiStack({ stack }: StackContext) {
   const { table } = use(DBStack);
   const auth = use(AuthStack);
-  const {stationTable}  = use(DynamoDBStack);
+  const {stationTable,cropTable}  = use(DynamoDBStack);
 
   // Create the HTTP API
   const api = new Api(stack, "Api", {
     defaults: {
       function: {
         // Bind the table name to our API
-        bind: [stationTable],
+        bind: [stationTable, cropTable],
         environment: {
           StationTableName: stationTable.tableName,
+          CropTableName: cropTable.tableName,
         },
       },
     },
@@ -27,6 +28,8 @@ export function ApiStack({ stack }: StackContext) {
 
       // Penman equation Lambda function
       "POST /penman": "packages/functions/src/penman.handler",
+
+      "GET /crops": "packages/functions/src/crops-handler.main",
 
       "POST /station": "packages/functions/src/station-handler.main",
 
