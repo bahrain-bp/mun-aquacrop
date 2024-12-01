@@ -21,7 +21,7 @@ const AuthScreen = () => {
     try {
       // Call the /auth/InitiateAuthentication endpoint
       const response = await axios.post(
-        'https://3yd00spnvj.execute-api.us-east-1.amazonaws.com/auth/InitiateAuthentication',
+        process.env.API_ENDPOINT+'/auth/InitiateAuthentication',
         {
           phoneNumber,
         }
