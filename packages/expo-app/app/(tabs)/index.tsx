@@ -20,7 +20,7 @@ export default function Page() {
       <Link style={styles.link} href="/screens/SignupScreen">
         Go to Signup
       </Link>
-      <Link style={styles.link} href="/screens/AuthScreen">
+      <Link style={styles.link} href="/screens/DashBoard">
         Go to Auth
       </Link>
     </View>
