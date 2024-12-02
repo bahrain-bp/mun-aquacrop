@@ -32,6 +32,7 @@
     "@aws-sdk/lib-dynamodb": "^3.699.0",
     "aws-amplify": "^6.9.0",
     "axios": "^1.7.7",
+    "@aws-sdk/client-dynamodb": "^3.699.0",
     "expo-dotenv": "^0.1.0"
   }
 }

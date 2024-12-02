@@ -18,7 +18,10 @@ export default function Page() {
       
       {/* Navigation Links */}
       <Link style={styles.link} href="/screens/AuthScreen">
-        Go to Auth
+        Signup
+      </Link>
+      <Link style={styles.link} href="/screens/DashBoard">
+        Skip Auth
       </Link>
     </View>
   );

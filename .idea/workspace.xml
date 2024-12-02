@@ -4,61 +4,48 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c59e464c-4467-498c-ac79-f279aef22a88" name="Changes" comment="test 1" />
+    <list default="true" id="af9a6a8a-c792-4eb4-9cce-a415c3983bc8" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/packages/expo-app/app/screens/Crop.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/packages/expo-app/app/screens/Recommendation.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/expo-app/.expo/static-tmp/_error.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/.expo/static-tmp/_error.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/expo-app/.expo/types/router.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/.expo/types/router.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/expo-app/app/(tabs)/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/app/(tabs)/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/expo-app/app/_layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/app/_layout.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/expo-app/app/screens/AuthScreen.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/app/screens/AuthScreen.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/expo-app/expo-env.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/expo-env.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/expo-app/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/package.json" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="TypeScript File" />
-      </list>
-    </option>
-  </component>
   <component name="Git.Settings">
-    <option name="RECENT_BRANCH_BY_REPOSITORY">
-      <map>
-        <entry key="$PROJECT_DIR$" value="NPX-Check" />
-      </map>
-    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory">{
-  &quot;lastFilter&quot;: {
-    &quot;state&quot;: &quot;OPEN&quot;,
-    &quot;assignee&quot;: &quot;Lui35&quot;
-  }
-}</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/bahrain-bp/mun-aquacrop.git&quot;,
-    &quot;accountId&quot;: &quot;f455a86c-8690-4709-9ed4-b215942d410e&quot;
-  }
-}</component>
-  <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 4
-}</component>
-  <component name="ProjectId" id="2pFkYyS1ViyQo66TShVGLgc28po" />
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 2
+}]]></component>
+  <component name="ProjectId" id="2pZxzNPxtbferEeJClwS5bW516R" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "ignore.virus.scanning.warn.message": "true",
+    "git-widget-placeholder": "60-formula-calculation-built-in-excel",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "npm.dev.executor": "Run",
-    "ts.external.directory.path": "C:\\Users\\PC\\WebstormProjects\\mun-aquacrop\\node_modules\\typescript\\lib",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "ts.external.directory.path": "C:\\Users\\A.Annan\\Desktop\\Final Project IT7099\\CIC\\mun-aquacrop\\node_modules\\typescript\\lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -84,45 +71,16 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="c59e464c-4467-498c-ac79-f279aef22a88" name="Changes" comment="" />
-      <created>1732369262886</created>
+      <changelist id="af9a6a8a-c792-4eb4-9cce-a415c3983bc8" name="Changes" comment="" />
+      <created>1732987665824</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1732369262886</updated>
-      <workItem from="1732369264004" duration="8345000" />
+      <updated>1732987665824</updated>
+      <workItem from="1732987668609" duration="9535000" />
     </task>
-    <task id="LOCAL-00001" summary="test 1">
-      <option name="closed" value="true" />
-      <created>1732373259788</created>
-      <option name="number" value="00001" />
-      <option name="presentableId" value="LOCAL-00001" />
-      <option name="project" value="LOCAL" />
-      <updated>1732373259788</updated>
-    </task>
-    <task id="LOCAL-00002" summary="test 1">
-      <option name="closed" value="true" />
-      <created>1732377346222</created>
-      <option name="number" value="00002" />
-      <option name="presentableId" value="LOCAL-00002" />
-      <option name="project" value="LOCAL" />
-      <updated>1732377346222</updated>
-    </task>
-    <task id="LOCAL-00003" summary="test 1">
-      <option name="closed" value="true" />
-      <created>1732377636131</created>
-      <option name="number" value="00003" />
-      <option name="presentableId" value="LOCAL-00003" />
-      <option name="project" value="LOCAL" />
-      <updated>1732377636131</updated>
-    </task>
-    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
-  </component>
-  <component name="VcsManagerConfiguration">
-    <MESSAGE value="test 1" />
-    <option name="LAST_COMMIT_MESSAGE" value="test 1" />
   </component>
 </project>
