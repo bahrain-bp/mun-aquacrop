@@ -17,9 +17,6 @@ export default function Page() {
       <Text style={styles.title}>Welcome to My App!</Text>
       
       {/* Navigation Links */}
-      <Link style={styles.link} href="/screens/SignupScreen">
-        Go to Signup
-      </Link>
       <Link style={styles.link} href="/screens/AuthScreen">
         Go to Auth
       </Link>

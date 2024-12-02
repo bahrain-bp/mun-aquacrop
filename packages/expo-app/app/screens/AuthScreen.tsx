@@ -4,15 +4,16 @@ import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
 
+const API_URL = 'https://om9882jcr2.execute-api.us-east-1.amazonaws.com'; // Replace with your actual API Gateway URL
 
-
-const API_URL = process.env.API_ENDPOINT;
 
 const AuthScreen = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
+  const [fullname, setFullname] = useState('');
   const [challengeResponse, setChallengeResponse] = useState('');
   const [isChallengeStep, setIsChallengeStep] = useState(false);
   const [session, setSession] = useState('');
+  const [sub, setSub] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -21,16 +22,18 @@ const AuthScreen = () => {
     try {
       // Call the /auth/InitiateAuthentication endpoint
       const response = await axios.post(
-        'https://3yd00spnvj.execute-api.us-east-1.amazonaws.com/auth/InitiateAuthentication',
+        `${API_URL}/auth/InitiateAuthentication`,
         {
           phoneNumber,
+          fullname,
         }
       );
 
-      const { session, challengeName } = response.data;
+      const { session, challengeName, sub } = response.data;
 
       if (challengeName === 'CUSTOM_CHALLENGE') {
         setSession(session); // Save the session to use in the challenge response
+        setSub(sub); // Save the sub to use in the challenge response
         setIsChallengeStep(true); // Move to challenge step
         Alert.alert('Challenge Sent', 'Please enter the verification code sent to your phone.');
       } else {
@@ -49,10 +52,13 @@ const AuthScreen = () => {
     try {
       // Call the /auth/VerifyChallenge endpoint
       const response = await axios.post(
-        'https://3yd00spnvj.execute-api.us-east-1.amazonaws.com/auth/VerifyChallenge',
+        `${API_URL}/auth/VerifyChallenge`,
         {
           session,
           challengeAnswer: challengeResponse,
+          sub,
+          phoneNumber,
+          fullname,
         }
       );
 
@@ -85,10 +91,17 @@ const AuthScreen = () => {
             placeholder="+1234567890"
             keyboardType="phone-pad"
           />
+          <Text style={styles.label}>Enter Fullname:</Text>
+          <TextInput
+            style={styles.input}
+            value={fullname}
+            onChangeText={setFullname}
+            placeholder="Fullname"
+          />
           <Button
             title={loading ? 'Processing...' : 'Continue'}
             onPress={handleAuthentication}
-            disabled={loading || !phoneNumber}
+            disabled={loading || !phoneNumber || !fullname}
           />
         </>
       ) : (
