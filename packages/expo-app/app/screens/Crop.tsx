@@ -1,30 +1,27 @@
 import React, { useState } from 'react';
-import { Text, View, Image, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
-import { RadioButton } from 'react-native-paper'; // Import RadioButton from react-native-paper
+import { Text, View, Image,Button, StyleSheet, TextInput, TouchableOpacity } from 'react-native';
+import { RadioButton } from 'react-native-paper';
+import { Link } from 'expo-router';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
-const Crop: React.FC = ({ navigation }) => {
+const Crop: React.FC = () => {
     // Static title and image
-    const title = "Default Crop Title";  // Set a default title or use static content
-    const imageSource = require("../../assets/images/adaptive-icon.png");  // Set a default image
+    const title = "Default Crop Title";
+    const imageSource = require("../../assets/images/adaptive-icon.png");
 
-    // State to handle location input (even though it will be disabled)
+    // State for location input (disabled)
     const [location, setLocation] = useState("Sample Location");
 
-    // State for radio buttons (Date Planted, Growth Stage)
-    const [selectedOption, setSelectedOption] = useState("datePlanted");  // Default to 'datePlanted'
-    const [day, setDay] = useState("");  // State for day input
-    const [month, setMonth] = useState("");  // State for month input
-    const [year, setYear] = useState("");  // State for year input
-    const [growthStage, setGrowthStage] = useState("");  // State for selected growth stage
+    // State for radio buttons
+    const [selectedOption, setSelectedOption] = useState("datePlanted");
+    const [day, setDay] = useState("");
+    const [month, setMonth] = useState("");
+    const [year, setYear] = useState("");
+    const [growthStage, setGrowthStage] = useState("");
 
-    // Function to handle selecting a growth stage
+    // Function to handle stage selection
     const handleStageSelection = (stage: string) => {
         setGrowthStage(stage);
-    };
-
-    // Navigate to the Recommendation page when button is pressed
-    const handleCalculatePress = () => {
-        navigation.navigate('Recommendation'); // This line navigates to the Recommendation page
     };
 
     return (
@@ -37,7 +34,7 @@ const Crop: React.FC = ({ navigation }) => {
                 style={styles.input}
                 placeholder="Enter location"
                 value={location}
-                editable={false}  // Disable the input
+                editable={false}
             />
 
             {/* Radio Buttons for Date Planted and Growth Stage */}
@@ -57,7 +54,7 @@ const Crop: React.FC = ({ navigation }) => {
                 <Text style={styles.radioLabel}>Growth Stage</Text>
             </View>
 
-            {/* Conditional Rendering */}
+            {/* Conditional Rendering for Date Planted */}
             {selectedOption === 'datePlanted' && (
                 <View style={styles.datePlantedContainer}>
                     <View style={styles.dateInputContainer}>
@@ -65,31 +62,32 @@ const Crop: React.FC = ({ navigation }) => {
                             style={styles.dateInput}
                             placeholder="DD"
                             value={day}
-                            onChangeText={setDay}  // Update day state
+                            onChangeText={setDay}
                             keyboardType="numeric"
-                            maxLength={2} // Limit to 2 digits for day
+                            maxLength={2}
                         />
                         <TextInput
                             style={styles.dateInput}
                             placeholder="MM"
                             value={month}
-                            onChangeText={setMonth}  // Update month state
+                            onChangeText={setMonth}
                             keyboardType="numeric"
-                            maxLength={2} // Limit to 2 digits for month
+                            maxLength={2}
                         />
                         <TextInput
                             style={styles.dateInput}
                             placeholder="YYYY"
                             value={year}
-                            onChangeText={setYear}  // Update year state
+                            onChangeText={setYear}
                             keyboardType="numeric"
-                            maxLength={4} // Limit to 4 digits for year
+                            maxLength={4}
                         />
                     </View>
                     {(day && month && year) && <Text>Selected Date: {day}/{month}/{year}</Text>}
                 </View>
             )}
 
+            {/* Conditional Rendering for Growth Stage */}
             {selectedOption === 'growthStage' && (
                 <View style={styles.growthStageContainer}>
                     <Text>Select Growth Stage:</Text>
@@ -97,10 +95,7 @@ const Crop: React.FC = ({ navigation }) => {
                         {['Stage 1', 'Stage 2', 'Stage 3'].map((stage) => (
                             <TouchableOpacity
                                 key={stage}
-                                style={[
-                                    styles.stageButton,
-                                    growthStage === stage && styles.selectedStageButton,
-                                ]}
+                                style={[styles.stageButton, growthStage === stage && styles.selectedStageButton]}
                                 onPress={() => handleStageSelection(stage)}
                             >
                                 <Text style={styles.stageButtonText}>{stage}</Text>
@@ -110,11 +105,22 @@ const Crop: React.FC = ({ navigation }) => {
                     {growthStage && <Text>Selected Growth Stage: {growthStage}</Text>}
                 </View>
             )}
-
-            {/* Calculate Button at the bottom */}
-            <TouchableOpacity style={styles.calculateButton} onPress={handleCalculatePress}>
-                <Text style={styles.calculateButtonText}>Calculate Wanted Need</Text>
-            </TouchableOpacity>
+            {/*<View style={styles.Test}>*/}
+            {/*    <Button title={"Show Date Piker"} />*/}
+            {/*</View>*/}
+            {/* Calculate Button */}
+            <View style={styles.bottomContainer}>
+                <Link
+                    href={{
+                        pathname: '/screens/Recommendation',
+                        params: { title: 'Broccoli', imageSource: require('../../assets/images/favicon.png') },
+                    }}
+                >
+                    <TouchableOpacity style={styles.calculateButton}>
+                        <Text style={styles.calculateButtonText}>Calculate Water Need</Text>
+                    </TouchableOpacity>
+                </Link>
+            </View>
         </View>
     );
 };
@@ -122,14 +128,15 @@ const Crop: React.FC = ({ navigation }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        justifyContent: 'flex-start',
         alignItems: 'center',
-        justifyContent: 'flex-start', // Adjust to allow space at the bottom
-        backgroundColor: '#fff',
         padding: 20,
+        backgroundColor: '#fff',
     },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
+        marginTop: 20,
     },
     image: {
         width: 200,
@@ -138,14 +145,14 @@ const styles = StyleSheet.create({
         marginTop: 20,
     },
     input: {
-        height: 30,  // Smaller height for the input field
+        height: 40,
         borderColor: '#ccc',
         borderWidth: 1,
         borderRadius: 5,
         paddingLeft: 10,
         marginTop: 20,
-        width: '30%',  // Adjusted width to make it more appropriate
-        fontSize: 12,  // Smaller text size
+        width: '30%',
+        fontSize: 16,
     },
     radioButtonWrapper: {
         flexDirection: 'row',
@@ -167,13 +174,13 @@ const styles = StyleSheet.create({
         marginTop: 10,
     },
     dateInput: {
-        height: 30,
+        height: 40,
         width: '25%',
         borderColor: '#ccc',
         borderWidth: 1,
         borderRadius: 5,
         paddingLeft: 10,
-        fontSize: 14,
+        fontSize: 16,
         marginRight: 5,
     },
     growthStageContainer: {
@@ -199,21 +206,29 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 14,
     },
-
-    // Styles for the Calculate Button
+    bottomContainer: {
+        width: '100%',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
+        marginBottom: 20,
+        marginTop: 40,
+    },
     calculateButton: {
-        position: 'absolute',  // Positioning at the bottom of the screen
-        bottom: 30,  // 30 units from the bottom edge
-        backgroundColor: 'black',  // Black background
+        backgroundColor: 'black',
         paddingVertical: 15,
         paddingHorizontal: 50,
         borderRadius: 5,
     },
     calculateButtonText: {
-        color: '#fff',  // White text
+        color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
     },
+    Test: {
+    fontSize: 24,
+        fontWeight: 'bold',
+        marginTop: 20,
+}
 });
 
 export default Crop;
