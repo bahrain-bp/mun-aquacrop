@@ -4,15 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="af9a6a8a-c792-4eb4-9cce-a415c3983bc8" name="Changes" comment="">
+    <list default="true" id="1fbcfd45-6423-413d-81fc-69769b446ca6" name="Changes" comment="Navigation to the recomendation was resloved">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/expo-app/.env" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/.env" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/expo-app/.expo/types/router.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/.expo/types/router.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/expo-app/app/(tabs)/_layout.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/app/(tabs)/_layout.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/expo-app/app/screens/Crop.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/app/screens/Crop.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/expo-app/expo-env.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/expo-env.d.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/frontend/src/sst-env.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/sst-env.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/expo-app/app/screens/DashBoard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/app/screens/DashBoard.tsx" afterDir="false" />
     </list>
+    <list id="bcd9039d-5d63-4b67-8a87-c6ca38f0c941" name="Changes by PC" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -26,42 +26,45 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 2
-}</component>
-  <component name="ProjectId" id="2pZxzNPxtbferEeJClwS5bW516R" />
+  <component name="ProjectColorInfo"><![CDATA[{
+  "associatedIndex": 6
+}]]></component>
+  <component name="ProjectId" id="2pg4WNaGun5aA9Lr5CT0CvHrgLw" />
+  <component name="ProjectLevelVcsManager">
+    <OptionsSetting value="false" id="Update" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "HTTP Request.scratch | #3.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "Frontend",
-    "last_opened_file_path": "C:/Users/A.Annan/Desktop/Final Project IT7099/CIC/mun-aquacrop",
     "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "npm.dev.executor": "Run",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
     "ts.external.directory.path": "C:\\Users\\A.Annan\\Desktop\\Final Project IT7099\\CIC\\mun-aquacrop\\node_modules\\typescript\\lib",
     "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "HTTP Request"
+    ]
   }
 }]]></component>
   <component name="RunManager">
-    <configuration name="dev" type="js.build_tools.npm" nameIsGenerated="true">
-      <package-json value="$PROJECT_DIR$/package.json" />
-      <command value="run" />
-      <scripts>
-        <script value="dev" />
-      </scripts>
-      <node-interpreter value="project" />
-      <envs />
+    <configuration name="scratch | #3" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$APPLICATION_CONFIG_DIR$/scratches/scratch.http" executionIdentifier="#3" index="3" runType="Run single request">
       <method v="2" />
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="HTTP Request.scratch | #3" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -73,17 +76,52 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="af9a6a8a-c792-4eb4-9cce-a415c3983bc8" name="Changes" comment="" />
-      <created>1732987665824</created>
+      <changelist id="1fbcfd45-6423-413d-81fc-69769b446ca6" name="Changes" comment="Navigation to the recomendation was resloved" />
+      <created>1733174423963</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1732987665824</updated>
-      <workItem from="1732987668609" duration="9535000" />
-      <workItem from="1733060454870" duration="2769000" />
+      <updated>1733174423963</updated>
+      <workItem from="1733174427081" duration="5376000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="OPEN_GENERIC_TABS">
+      <map>
+        <entry key="cd42de70-35a4-4181-87db-45a526e5c239" value="TOOL_WINDOW" />
+      </map>
+    </option>
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+        <entry key="cd42de70-35a4-4181-87db-45a526e5c239">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Navigation to the recomendation was resloved" />
+    <option name="LAST_COMMIT_MESSAGE" value="Navigation to the recomendation was resloved" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/packages/expo-app/app/screens/DashBoard.tsx</url>
+          <line>96</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>

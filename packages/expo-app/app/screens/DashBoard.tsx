@@ -1,124 +1,186 @@
-import React from 'react';
-import { Text, View, StyleSheet, TouchableOpacity, ScrollView, Image } from 'react-native';
-import { Link } from 'expo-router';
+import React, {useState, useEffect} from 'react';
+import {Text, View, StyleSheet, ScrollView, Image} from 'react-native';
+import {Link} from 'expo-router';
+import {useRouter} from 'expo-router';
 
-// Import multiple images
-const Image1 = require("../../assets/images/adaptive-icon.png");
-const Image2 = require("../../assets/images/adaptive-icon.png");
-const Image3 = require("../../assets/images/adaptive-icon.png");
-const Image4 = require("../../assets/images/adaptive-icon.png");
-const Image5 = require("../../assets/images/adaptive-icon.png");
-const Image6 = require("../../assets/images/adaptive-icon.png");
+const API_URL = process.env.EXPO_PUBLIC_PROD_API_URL;
+
+interface GrowthStage {
+    ini: { N: string };
+    mid: { N: string };
+    end: { N: string };
+}
+
+interface Kc {
+    ini: { N: string };
+    mid: { N: string };
+    end: { N: string };
+}
+
+interface Crop {
+    nameEN: { S: string };
+    nameAR: { S: string };
+    GrowthStage: { M: GrowthStage };
+    kc: { M: Kc };
+    CropID: { S: string };
+    ImageURL: { S: string };
+}
+
+// Define a function to parse the raw data into a proper Crop type
+const parseCrops = (data: any): Crop[] => {
+    return data.map((item: any): Crop => ({
+        nameEN: item.nameEN,
+        nameAR: item.nameAR,
+        GrowthStage: item.GrowthStage,
+        kc: item.kc,
+        CropID: item.CropID,
+        ImageURL: item.ImageURL
+    }));
+};
 
 const Index: React.FC = () => {
-  return (
-      <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-        <Text style={styles.text}>Home screen</Text>
+    const [crops, setCrops] = useState<Crop[]>([]); // State to store fetched crops
 
-        <View style={styles.grid}>
-          <View style={styles.row}>
-            <Card imageSource={Image1} title="Broccoli" />
-            <Card imageSource={Image2} title="Corn" />
-            <Card imageSource={Image3} title="Beetroot" />
-          </View>
-          <View style={styles.row}>
-            <Card imageSource={Image4} title="Cauliflower" />
-            <Card imageSource={Image5} title="Cucumber" />
-            <Card imageSource={Image6} title="Lettuce" />
-          </View>
-        </View>
-      </ScrollView>
-  );
+    // Fetch the crops data when the component mounts
+    useEffect(() => {
+        const fetchCrops = async () => {
+            try {
+                const response = await fetch(API_URL + '/crops');
+                const data = await response.json();
+                setCrops(parseCrops(data)); // Update state with fetched crops data
+            } catch (error) {
+                console.error("Error fetching crops:", error);
+            }
+        };
+
+        fetchCrops();
+    }, []); // Empty dependency array ensures it runs only once after initial render
+    const router = useRouter();
+
+    const handlePress = (crop: Crop) => {
+        router.push({
+            pathname: "/screens/Crop",
+            params: {crop},
+        });
+    };
+
+
+    return (
+        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+            <Text style={styles.text}>Home screen</Text>
+
+            <View style={styles.grid}>
+                {/* Dynamically generate rows of cards from the crops data */}
+                {crops.length > 0 ? (
+                    <View style={styles.row}>
+                        {crops.map((crop, index) => (
+                            <Card
+                                key={index} // Add a unique key for each card
+                                CropData={crop} // Passing the full crop data
+                            />
+                        ))}
+                    </View>
+                ) : (
+                    <Text style={styles.text}>Loading crops...</Text>
+                )}
+            </View>
+        </ScrollView>
+    );
 };
 
 interface CardProps {
-  imageSource: any; // Use 'any' for image source, or refine as needed
-  title: string;
+    CropData: Crop; // Full crop data passed from the parent component
 }
 
-const Card: React.FC<CardProps> = ({ imageSource, title }) => {
-  return (
-      <View style={styles.cardContainer}>
-        <Image source={imageSource} style={styles.image} />
-        <Text style={styles.cardTitle}>{title}</Text>
+const Card: React.FC<CardProps> = ({CropData}) => {
+    const {nameEN, nameAR, GrowthStage, kc, CropID, ImageURL} = CropData;
 
-        {/* Link to Crop page without parameters */}
+    const router = useRouter();
+    const handlePress = (crop: Crop) => {
+        router.push({
+            pathname: "/screens/Crop",
+            params: {"CropData"},
+        });
+    };
+    return (
         <Link
-            href="/screens/Crop"  // Simply navigate to the Crop page without passing params
-            style={styles.link}
+            href={{
+                pathname: "/screens/Crop",
+                params: {
+                    nameEN: nameEN.S, // Accessing the values correctly from the cropData object
+                    nameAR: nameAR.S,
+                    GrowthStage: GrowthStage,
+                    kc: kc,
+                    CropID: CropID.S,
+                    ImageURL: ImageURL.S,
+                },
+            }}
+            style={styles.cardLink}
         >
-          <TouchableOpacity style={styles.button}>
-            <Text style={styles.buttonText}>Calculate water need</Text>
-          </TouchableOpacity>
+            <View style={styles.cardContainer}>
+                <Image source={{uri: ImageURL.S}} style={styles.image}/>
+                <Text style={styles.cardTitle}>{nameEN.S}</Text>
+            </View>
         </Link>
-      </View>
-  );
+    );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#25292e',
-    padding: 20,
-  },
-  contentContainer: {
-    alignItems: 'center',
-    paddingBottom: 20,
-  },
-  text: {
-    color: '#fff',
-    fontSize: 24,
-    marginBottom: 20,
-  },
-  grid: {
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-  },
-  row: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    width: '100%',
-    marginBottom: 20,
-  },
-  cardContainer: {
-    backgroundColor: '#D3D3D3',
-    borderRadius: 10,
-    elevation: 5,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    padding: 10,
-    alignItems: 'center',
-    width: '30%',
-  },
-  image: {
-    width: 100,
-    height: 100,
-    borderRadius: 10,
-  },
-  cardTitle: {
-    marginVertical: 10,
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-  },
-  button: {
-    backgroundColor: '#007BFF',
-    borderRadius: 5,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 14,
-  },
-  link: {
-    width: '100%',
-    textAlign: 'center',
-  },
+    container: {
+        flex: 1,
+        backgroundColor: '#25292e',
+        padding: 20,
+    },
+    contentContainer: {
+        alignItems: 'center',
+        paddingBottom: 20,
+    },
+    text: {
+        color: '#fff',
+        fontSize: 24,
+        marginBottom: 20,
+    },
+    grid: {
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+    },
+    row: {
+        flexDirection: 'row',
+        justifyContent: 'space-evenly', // Even space between items
+        flexWrap: 'wrap', // Allow wrapping of cards to the next row
+        width: '100%',
+    },
+    cardContainer: {
+        backgroundColor: '#D3D3D3',
+        borderRadius: 10,
+        elevation: 5,
+        shadowColor: '#000',
+        shadowOffset: {width: 0, height: 2},
+        shadowOpacity: 0.2,
+        shadowRadius: 2,
+        padding: 10,
+        alignItems: 'center',
+        justifyContent: 'center', // Centers content vertically within the card
+        width: '30%', // This ensures each card takes up approximately 30% of the width (3 cards per row)
+        marginBottom: 20,
+    },
+    image: {
+        width: 100,
+        height: 100,
+        borderRadius: 10,
+    },
+    cardTitle: {
+        marginVertical: 10,
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#333',
+    },
+    cardLink: {
+        width: '100%',
+        textAlign: 'center',
+    },
 });
 
 export default Index;

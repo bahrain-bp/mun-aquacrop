@@ -3,14 +3,12 @@ import { Text, View, Image,Button, StyleSheet, TextInput, TouchableOpacity } fro
 import { RadioButton } from 'react-native-paper';
 import { Link } from 'expo-router';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { useRouter } from 'expo-router'; // Import useRoute to access params
 
 const Crop: React.FC = () => {
-    // Static title and image
-    const title = "Default Crop Title";
-    const imageSource = require("../../assets/images/adaptive-icon.png");
-
-    // State for location input (disabled)
-    const [location, setLocation] = useState("Sample Location");
+    // Retrieve the parameters passed from the previous screen
+    const route = useRouter();
+    const { title, imageSource } = route.params;  // Destructure the passed parameters
 
     // State for radio buttons
     const [selectedOption, setSelectedOption] = useState("datePlanted");
@@ -26,16 +24,10 @@ const Crop: React.FC = () => {
 
     return (
         <View style={styles.container}>
+            {/* Dynamically display crop title */}
             <Text style={styles.title}>{title}</Text>
-            <Image source={imageSource} style={styles.image} />
-
-            {/* Disabled Input for location */}
-            <TextInput
-                style={styles.input}
-                placeholder="Enter location"
-                value={location}
-                editable={false}
-            />
+            {/* Dynamically display crop image */}
+            <Image source={{ uri: imageSource }} style={styles.image} />
 
             {/* Radio Buttons for Date Planted and Growth Stage */}
             <View style={styles.radioButtonWrapper}>
@@ -105,9 +97,7 @@ const Crop: React.FC = () => {
                     {growthStage && <Text>Selected Growth Stage: {growthStage}</Text>}
                 </View>
             )}
-            {/*<View style={styles.Test}>*/}
-            {/*    <Button title={"Show Date Piker"} />*/}
-            {/*</View>*/}
+
             {/* Calculate Button */}
             <View style={styles.bottomContainer}>
                 <Link
@@ -143,16 +133,6 @@ const styles = StyleSheet.create({
         height: 200,
         borderRadius: 10,
         marginTop: 20,
-    },
-    input: {
-        height: 40,
-        borderColor: '#ccc',
-        borderWidth: 1,
-        borderRadius: 5,
-        paddingLeft: 10,
-        marginTop: 20,
-        width: '30%',
-        fontSize: 16,
     },
     radioButtonWrapper: {
         flexDirection: 'row',
@@ -224,11 +204,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
-    Test: {
-    fontSize: 24,
-        fontWeight: 'bold',
-        marginTop: 20,
-}
 });
 
 export default Crop;
