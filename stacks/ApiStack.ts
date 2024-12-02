@@ -54,6 +54,7 @@ export function ApiStack({ stack }: StackContext) {
         function: {
           handler: "packages/functions/src/Authentication/VerifyChallenge.handler",
           runtime: "nodejs18.x",
+          permissions: ["dynamodb:PutItem"],
         },
       },
     },

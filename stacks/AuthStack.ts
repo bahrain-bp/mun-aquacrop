@@ -29,6 +29,9 @@ export function AuthStack({ stack }: StackContext) {
           sms: true,
           otp: false,
         },
+        standardAttributes: {
+          fullname: { required: true, mutable: true,},
+        },
       },
       userPoolClient: {
         authFlows: {
