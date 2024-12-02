@@ -89,7 +89,7 @@ const createAuthChallenge = async (event: CognitoEvent): Promise<CognitoEvent> =
       };
       const command = new PublishCommand(params);
       await snsClient.send(command);
-      console.log(`Successfully sent challenge code to ${phoneNumber}`);
+      console.log(`Successfully sent challenge code to ${phoneNumber}, code: ${challengeCode}`);
     } catch (error) {
       console.error(`Failed to send challenge code: ${error}`);
     }
