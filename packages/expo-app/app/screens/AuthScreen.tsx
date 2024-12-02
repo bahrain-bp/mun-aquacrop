@@ -67,7 +67,7 @@ const AuthScreen = () => {
       if (idToken && accessToken) {
         Alert.alert('Success', 'Authentication successful!');
         // Navigate to the home screen
-        router.push('/(tabs)/two');
+        router.push('/screens/DashBoard');
       } else {
         Alert.alert('Error', 'Unexpected response. Contact support.');
       }
