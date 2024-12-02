@@ -1,7 +1,9 @@
-import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Link } from 'expo-router';
-
+import React, { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { Link, useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { jwtDecode } from 'jwt-decode';
 
 const HomeScreen = () => {
   return (
@@ -11,7 +13,89 @@ const HomeScreen = () => {
   );
 };
 
+const refreshToken = async () => {
+  try {
+    const refreshToken = await AsyncStorage.getItem('refreshToken');
+    const clientId = '2jii0mq29gg4jlam8j2a7eqtcv'; 
+    const refreshUrl = `https://cognito-idp.us-east-1.amazonaws.com/`;
+
+    if (!refreshToken) return false;
+
+    const response = await axios.post(refreshUrl, {
+      AuthParameters: {
+        REFRESH_TOKEN: refreshToken,
+      },
+      AuthFlow: 'REFRESH_TOKEN_AUTH',
+      ClientId: clientId,
+    });
+
+    const { IdToken, AccessToken } = response.data.AuthenticationResult;
+    await AsyncStorage.setItem('idToken', IdToken);
+    await AsyncStorage.setItem('accessToken', AccessToken);
+    return true;
+  } catch (e) {
+    console.error("Error refreshing token:", e);
+    return false;
+  }
+};
+
+const decodeJwt = (token: string) => {
+  try {
+    return jwtDecode(token);
+  } catch (e) {
+    console.error("Error decoding JWT:", e);
+    return null;
+  }
+};
+
+const isAuthenticated = async () => {
+  try {
+    const idToken = await AsyncStorage.getItem('idToken');
+    if (!idToken) return false;
+
+    const decodedToken = decodeJwt(idToken);
+    if (!decodedToken || !decodedToken.exp) {
+      return false;
+    }
+    const currentTime = Date.now() / 1000;
+
+    // Check if the token is expired
+    if (decodedToken.exp < currentTime) {
+      const refreshed = await refreshToken();
+      return refreshed;
+    }
+
+    return true;
+  } catch (e) {
+    console.error("Error checking authentication status:", e);
+    return false;
+  }
+};
+
 export default function Page() {
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      const authenticated = await isAuthenticated();
+      if (authenticated) {
+        router.replace('/screens/DashBoard');
+      } else {
+        setLoading(false);
+      }
+    };
+    checkAuth();
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome to My App!</Text>
@@ -26,7 +110,6 @@ export default function Page() {
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
