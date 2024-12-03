@@ -86,6 +86,43 @@ export function DynamoDBStack({ stack }: StackContext) {
     });
 
 
+    // Farm Admin Dashboard Tables Now //
+
+
+    const farmAdminTable = new Table(stack, "FarmAdmin", {
+        fields: {
+            UID: "string",
+            Email: "string",
+            Mobile: "string",
+            Name: "string",
+            regDate: "string",
+            LastLogged: "string",
+           
+        },
+        primaryIndex: { partitionKey: "UID" },
+    });
+
+    const farmTable = new Table(stack, "Farms", {
+        fields: {
+            FarmId: "string",
+            FarmName: "string",
+            ownerId: "string",
+        },
+        primaryIndex: { partitionKey: "FarmId" },
+    });
+
+    const zonesTable = new Table(stack, "Zones", {
+        fields: {
+            ZoneId: "string",
+            FarmId: "string",
+            ZoneName: "string",
+            ownerId: "string",
+        },
+        primaryIndex: { partitionKey: "ZoneId", sortKey: "FarmId" },
+    });
+
+
+
     stack.addOutputs({
         UserTableName: userTable.tableName,
         CropTableName: cropTable.tableName,
@@ -93,6 +130,9 @@ export function DynamoDBStack({ stack }: StackContext) {
         WeatherReadingsTableName: weatherReadingsTable.tableName,
         StationTableName: stationTable.tableName,
         TrackerTableName: trackerTable.tableName,
+        farmAdminTableName: farmAdminTable.tableName,
+        farmTableName: farmTable.tableName,
+        zonesTableName: zonesTable.tableName,
     });
 
     return {
@@ -102,6 +142,10 @@ export function DynamoDBStack({ stack }: StackContext) {
         weatherReadingsTable,
         stationTable,
         trackerTable,
+        // Farm Admin Dashboard Tables Now //
+        farmAdminTable,
+        farmTable,
+        zonesTable,
     };
 
 }

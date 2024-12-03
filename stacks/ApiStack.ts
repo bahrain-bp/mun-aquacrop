@@ -56,6 +56,18 @@ export function ApiStack({ stack }: StackContext) {
           runtime: "nodejs18.x",
         },
       },
+
+
+      // Admin Dashboard Routing //
+
+
+      "POST /adminDashboard/exportData": {
+        function: {
+          handler: "packages/functions/src/AdminDashboard/exportData.handler",
+          runtime: "nodejs18.x",
+          permissions: ["cognito-idp:AdminGetUser","dynamodb:PutItem"],
+        },
+      },
     },
   });
 
