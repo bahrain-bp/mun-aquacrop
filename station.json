@@ -1,0 +1,48 @@
+{
+  "SaqiDev-mun-aquacrop-Station": [
+    {
+      "PutRequest": {
+        "Item": {
+          "StationID": {
+            "S": "1"
+          },
+          "Name": {
+            "S": "Hoarat Aali"
+          },
+          "Location": {
+            "M": {
+              "Latitude": {
+                "N": "26.1760265"
+              },
+              "Longitude": {
+                "N": "50.5310762"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "StationID": {
+            "S": "2"
+          },
+          "Name": {
+            "S": "Budaiya"
+          },
+          "Location": {
+            "M": {
+              "Latitude": {
+                "N": "26.2161660"
+              },
+              "Longitude": {
+                "N": "50.4541248"
+              }
+            }
+          }
+        }
+      }
+    }
+  ]
+}

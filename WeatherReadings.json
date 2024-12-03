@@ -1,0 +1,127 @@
+{
+
+	  "SaqiDev-mun-aquacrop-WeatherReadings": [
+		{
+		  "PutRequest": {
+			"Item": {
+			  "ReadingID": { "S": "1" },
+			  "StationID": { "S": "1" },
+			  "Date": { "S": "OCT-22-2024" },
+			  "meanTemp": { "N": "29.6166666666667" },
+			  "wind_speed": { "N": "7" },
+			  "humidity": { "N": "57.9166666666667" }
+			}
+		  }
+		},
+		{
+		  "PutRequest": {
+			"Item": {
+			  "ReadingID": { "S": "2" },
+			  "StationID": { "S": "1" },
+			  "Date": { "S": "OCT-23-2024" },
+			  "meanTemp": { "N": "30.6875" },
+			  "wind_speed": { "N": "5" },
+			  "humidity": { "N": "61.4583333333333" }
+			}
+		  }
+		},
+		{
+		  "PutRequest": {
+			"Item": {
+			  "ReadingID": { "S": "3" },
+			  "StationID": { "S": "1" },
+			  "Date": { "S": "OCT-24-2024" },
+			  "meanTemp": { "N": "29.2208333333333" },
+			  "wind_speed": { "N": "9" },
+			  "humidity": { "N": "67" }
+			}
+		  }
+		},
+		{
+		  "PutRequest": {
+			"Item": {
+			  "ReadingID": { "S": "4" },
+			  "StationID": { "S": "1" },
+			  "Date": { "S": "OCT-25-2024" },
+			  "meanTemp": { "N": "27.2208333333333" },
+			  "wind_speed": { "N": "10.3333333333333" },
+			  "humidity": { "N": "51.1666666666667" }
+			}
+		  }
+		},
+		{
+		  "PutRequest": {
+			"Item": {
+			  "ReadingID": { "S": "5" },
+			  "StationID": { "S": "1" },
+			  "Date": { "S": "OCT-26-2024" },
+			  "meanTemp": { "N": "26.9583333333333" },
+			  "wind_speed": { "N": "9.625" },
+			  "humidity": { "N": "56.4166666666667" }
+			}
+		  }
+		},
+		{
+		  "PutRequest": {
+			"Item": {
+			  "ReadingID": { "S": "6" },
+			  "StationID": { "S": "1" },
+			  "Date": { "S": "OCT-27-2024" },
+			  "meanTemp": { "N": "26.4333333333333" },
+			  "wind_speed": { "N": "9.33333333333333" },
+			  "humidity": { "N": "63.4583333333333" }
+			}
+		  }
+		},
+		{
+		  "PutRequest": {
+			"Item": {
+			  "ReadingID": { "S": "7" },
+			  "StationID": { "S": "1" },
+			  "Date": { "S": "OCT-28-2024" },
+			  "meanTemp": { "N": "26.6791666666667" },
+			  "wind_speed": { "N": "8.25" },
+			  "humidity": { "N": "55.7916666666667" }
+			}
+		  }
+		},
+		{
+		  "PutRequest": {
+			"Item": {
+			  "ReadingID": { "S": "8" },
+			  "StationID": { "S": "1" },
+			  "Date": { "S": "OCT-29-2024" },
+			  "meanTemp": { "N": "26.6791666666667" },
+			  "wind_speed": { "N": "7.58333333333333" },
+			  "humidity": { "N": "48.5833333333333" }
+			}
+		  }
+		},
+		{
+		  "PutRequest": {
+			"Item": {
+			  "ReadingID": { "S": "9" },
+			  "StationID": { "S": "1" },
+			  "Date": { "S": "OCT-30-2024" },
+			  "meanTemp": { "N": "26.325" },
+			  "wind_speed": { "N": "5.20833333333333" },
+			  "humidity": { "N": "55.5" }
+			}
+		  }
+		},
+		{
+		  "PutRequest": {
+			"Item": {
+			  "ReadingID": { "S": "10" },
+			  "StationID": { "S": "1" },
+			  "Date": { "S": "OCT-31-2024" },
+			  "meanTemp": { "N": "26.8416666666667" },
+			  "wind_speed": { "N": "6.20833333333333" },
+			  "humidity": { "N": "67.9166666666667" }
+			}
+		  }
+		}
+	  ]
+	}
+
+  
