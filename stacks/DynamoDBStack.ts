@@ -17,6 +17,7 @@ export function DynamoDBStack({ stack }: StackContext) {
         primaryIndex: { partitionKey: "UID" },
     });
 
+    // @ts-ignore
     const cropTable = new Table(stack, "Crop", {
         fields: {
             CropID: "string",
@@ -28,6 +29,7 @@ export function DynamoDBStack({ stack }: StackContext) {
             cropDescriptionAr: "string",
             cropDescriptionEn: "string",
             cropImageURL: "string",
+            KC: "map",
             KC: "map",
             growthStage: "map",
         },
@@ -59,13 +61,20 @@ export function DynamoDBStack({ stack }: StackContext) {
             humidity: "number",
         },
         primaryIndex: { partitionKey: "ReadingID" },
+        globalIndexes: {
+            StationDateIndex: {
+                partitionKey: "StationID",
+                sortKey: "date",
+                projectionType: "ALL", // Adjust projection as needed
+            },
+        },
     });
 
     const stationTable = new Table(stack, "Station", {
         fields: {
             StationID: "string",
             Name: "string",
-            Location: "string",
+            Location: "map",
         },
         primaryIndex: { partitionKey: "StationID" }
     });

@@ -1,7 +1,7 @@
-import React, {useState, useEffect} from 'react';
-import {Text, View, StyleSheet, ScrollView, Image} from 'react-native';
-import {Link} from 'expo-router';
-import {useRouter} from 'expo-router';
+import React, { useState, useEffect } from 'react';
+import { Text, View, StyleSheet, ScrollView, Image } from 'react-native';
+import { Link } from 'expo-router';
+import { useRouter } from 'expo-router';
 
 const API_URL = process.env.EXPO_PUBLIC_PROD_API_URL;
 
@@ -57,14 +57,6 @@ const Index: React.FC = () => {
     }, []); // Empty dependency array ensures it runs only once after initial render
     const router = useRouter();
 
-    const handlePress = (crop: Crop) => {
-        router.push({
-            pathname: "/screens/Crop",
-            params: {crop},
-        });
-    };
-
-
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
             <Text style={styles.text}>Home screen</Text>
@@ -92,16 +84,9 @@ interface CardProps {
     CropData: Crop; // Full crop data passed from the parent component
 }
 
-const Card: React.FC<CardProps> = ({CropData}) => {
-    const {nameEN, nameAR, GrowthStage, kc, CropID, ImageURL} = CropData;
+const Card: React.FC<CardProps> = ({ CropData }) => {
+    const { nameEN, nameAR, GrowthStage, kc, CropID, ImageURL } = CropData;
 
-    const router = useRouter();
-    const handlePress = (crop: Crop) => {
-        router.push({
-            pathname: "/screens/Crop",
-            params: {"CropData"},
-        });
-    };
     return (
         <Link
             href={{
@@ -109,8 +94,8 @@ const Card: React.FC<CardProps> = ({CropData}) => {
                 params: {
                     nameEN: nameEN.S, // Accessing the values correctly from the cropData object
                     nameAR: nameAR.S,
-                    GrowthStage: GrowthStage,
-                    kc: kc,
+                    GrowthStage: JSON.stringify(GrowthStage),  // Stringify objects if necessary
+                    kc: JSON.stringify(kc),  // Stringify if necessary
                     CropID: CropID.S,
                     ImageURL: ImageURL.S,
                 },
@@ -118,7 +103,7 @@ const Card: React.FC<CardProps> = ({CropData}) => {
             style={styles.cardLink}
         >
             <View style={styles.cardContainer}>
-                <Image source={{uri: ImageURL.S}} style={styles.image}/>
+                <Image source={{ uri: ImageURL.S }} style={styles.image} />
                 <Text style={styles.cardTitle}>{nameEN.S}</Text>
             </View>
         </Link>
@@ -157,7 +142,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         elevation: 5,
         shadowColor: '#000',
-        shadowOffset: {width: 0, height: 2},
+        shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.2,
         shadowRadius: 2,
         padding: 10,

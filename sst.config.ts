@@ -32,8 +32,8 @@ export default {
             app.stack(DBStack)
                 .stack(DynamoDBStack)
                 .stack(AuthStack)
-                .stack(ApiStack)
                 .stack(S3Stack)
+                .stack(ApiStack)
                 .stack(FrontendStack)
                 .stack(MobileStack);
         }

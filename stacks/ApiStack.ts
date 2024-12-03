@@ -8,17 +8,18 @@ import { Duration } from "aws-cdk-lib/core";
 export function ApiStack({ stack }: StackContext) {
   const { table } = use(DBStack);
   const auth = use(AuthStack);
-  const {stationTable,cropTable}  = use(DynamoDBStack);
+  const {stationTable,cropTable,weatherReadingsTable}  = use(DynamoDBStack);
 
   // Create the HTTP API
   const api = new Api(stack, "Api", {
     defaults: {
       function: {
         // Bind the table name to our API
-        bind: [stationTable, cropTable],
+        bind: [stationTable, cropTable,weatherReadingsTable],
         environment: {
           StationTableName: stationTable.tableName,
           CropTableName: cropTable.tableName,
+          WeatherReadingsTableName: weatherReadingsTable.tableName,
         },
       },
     },
@@ -29,16 +30,32 @@ export function ApiStack({ stack }: StackContext) {
       // Penman equation Lambda function
       "POST /penman": "packages/functions/src/penman.handler",
 
-      "GET /crops": "packages/functions/src/crops-handler.main",
+
+
+      "GET /crops":{
+        function:{
+          handler: "packages/functions/src/crops-handler.main",
+          timeout: "30 seconds",
+          environment:{
+            CropTableName: cropTable.tableName,
+          },
+          permissions: [cropTable],
+        }
+      } ,
+
 
       "POST /station": "packages/functions/src/station-handler.main",
 
-      // Sample Python lambda function
-      "GET /hello": {
+      // route for calculating water
+      "POST /calculate/water": {
         function: {
-          handler: "packages/functions/src/sample-python-lambda/lambda.main",
-          runtime: "python3.11",
-          timeout: "60 seconds",
+          handler: "packages/functions/src/calculateWaterNeed.handler",
+          environment:{
+            cropTable: cropTable.tableName,
+            stationTable: stationTable.tableName,
+            weatherReadingsTable: weatherReadingsTable.tableName,
+          },
+          permissions: [stationTable, cropTable, weatherReadingsTable],
         },
       },
 

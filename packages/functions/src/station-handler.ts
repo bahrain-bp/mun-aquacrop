@@ -39,7 +39,7 @@ export const main = async (event: any) => {
             statusCode: 200,
             body: JSON.stringify({ message: "Station added successfully!" }),
         };
-    } catch (error) {
+    } catch (error:any) {
         console.error("Error occurred:", error); // Log the error
         return {
             statusCode: 500,
