@@ -1,7 +1,9 @@
-import { APIGatewayProxyHandler } from 'aws-lambda';
-import { DynamoDBClient, ScanCommand } from "@aws-sdk/client-dynamodb";
+import {APIGatewayProxyHandler, AttributeValue} from 'aws-lambda';
+import {DynamoDBClient, ScanCommand} from "@aws-sdk/client-dynamodb";
+import {ScanCommandOutput} from "@aws-sdk/client-dynamodb";
 
 const client = new DynamoDBClient({});
+
 
 // Helper function to convert degrees to radians
 const toRadians = (degrees: number): number => {
@@ -22,6 +24,70 @@ const haversine = (lat1: number, lon1: number, lat2: number, lon2: number): numb
     return R * c; // Distance in kilometers
 };
 
+
+function mapToWeatherReading(item: Record<string, AttributeValue>): WeatherReading {
+    return {
+        ReadingID: item.ReadingID.S!, // Use `S` for string attributes
+        StationID: item.StationID.S!,
+        date: item.Date.S!,
+        incomingRadiation: parseFloat(item.incomingRadiation.N!), // Use `N` for number attributes
+        outgoingRadiation: parseFloat(item.outgoingRadiation.N!),
+        meanTemp: parseFloat(item.meanTemp.N!),
+        minTemp: parseFloat(item.minTemp.N!),
+        maxTemp: parseFloat(item.maxTemp.N!),
+        wind_speed: parseFloat(item.wind_speed.N!),
+        humidity: parseFloat(item.humidity.N!),
+    };
+}
+
+
+const penman = (Rin: number, Rout: number, Tmin: number, Tmax: number, H: number, U: number, G: number = 0): number => {
+    // Constants
+
+    const T = (Tmax + Tmin) / 2; // Average temperature
+    const Rn = Rin - Rout; // Net radiation
+    const γ = 0.665 * 0.001 * 101.3; // Psychrometric constant
+    const esmax = 0.6108 * Math.exp((17.27 * Tmax) / (Tmax + 237.3)); // Saturation vapor pressure
+    const esmin = 0.6108 * Math.exp((17.27 * Tmin) / (Tmin + 237.3)); // Saturation vapor pressure
+    const esT = 0.6108 * Math.exp((17.27 * T) / (T + 237.3)); // Saturation vapor pressure
+    const es = (esmax + esmin) / 2; // Average saturation vapor pressure
+    const ea = es * (H / 100); // Actual vapor pressure
+    const Δ = (4098 * esT) / ((T + 237.3) ** 2); // Slope of saturation vapor pressure curve
+
+    // Penman equation
+    const ET =
+        (0.408 * Δ * (Rn - G) + γ * (900 / (T + 273)) * U * (es - ea)) /
+        (Δ + γ * (1 + 0.34 * U));
+
+    return ET;
+}
+
+// ReadingID: "string",
+//     StationID: "string",
+//     date: "string",
+//     incomingRadiation: "number",
+//     outgoingRadiation: "number",
+//     meanTemp: "number",
+//     minTemp: "number",
+//     maxTemp: "number",
+//     wind_speed: "number",
+//     humidity: "number",
+
+
+interface WeatherReading {
+    ReadingID: string;
+    StationID: string;
+    date: string;
+    incomingRadiation: number;
+    outgoingRadiation: number;
+    meanTemp: number;
+    minTemp: number;
+    maxTemp: number;
+    wind_speed: number;
+    humidity: number;
+}
+
+
 // Lambda function to find the nearest station
 export const handler: APIGatewayProxyHandler = async (event: any) => {
     try {
@@ -34,7 +100,7 @@ export const handler: APIGatewayProxyHandler = async (event: any) => {
         if (isNaN(userLat) || isNaN(userLon)) {
             return {
                 statusCode: 400,
-                body: JSON.stringify({ message: 'Invalid latitude or longitude provided.' }),
+                body: JSON.stringify({message: 'Invalid latitude or longitude provided.'}),
             };
         }
 
@@ -55,12 +121,13 @@ export const handler: APIGatewayProxyHandler = async (event: any) => {
         if (!result.Items || result.Items.length === 0) {
             return {
                 statusCode: 404,
-                body: JSON.stringify({ message: 'No stations found' }),
+                body: JSON.stringify({message: 'No stations found'}),
             };
         }
 
         let nearestStationId: string | null = null;
         let minDistance = Infinity;
+        let lastReading: string | null = null;
 
         // Iterate over stations and find the nearest one
         for (const station of result.Items) {
@@ -72,6 +139,7 @@ export const handler: APIGatewayProxyHandler = async (event: any) => {
             // Access the actual map values from DynamoDB AttributeValue
             const location = station.Location.M;
             const stationIdAttr = station.StationID.S;
+
 
             if (!location || !stationIdAttr) {
                 console.warn('Location map or StationID is undefined:', station);
@@ -102,11 +170,43 @@ export const handler: APIGatewayProxyHandler = async (event: any) => {
             if (distance < minDistance) {
                 minDistance = distance;
                 nearestStationId = stationId;
+                lastReading = station.LastReadingID.S;
             }
         }
 
+        const paramsWeather = {
+            TableName: process.env.weatherReadingsTable,
+            Key: {
+                ReadingID: lastReading,
+            },
+        };
 
 
+        // Perform the get operation
+        // const data = await db.get(paramsWeather).promise();
+
+        const commandWeather = new ScanCommand(paramsWeather);
+        const resultWeather: ScanCommandOutput = await client.send(commandWeather);
+
+
+        const item = resultWeather.Items?.[0];
+        var weatherReading: WeatherReading | null = null;
+        if (item) {
+            weatherReading = mapToWeatherReading(item as Record<string, AttributeValue>);
+            console.log(weatherReading);
+        } else {
+            console.error("No items found in the result.");
+        }
+
+        //
+        // // Rin: number, Rout: number, Tmin: number, Tmax: number, H: number, U: number, G: number = 0
+
+        if (!weatherReading) {
+            //TODO: add check
+            return;
+        }
+        const ET0 = penman(weatherReading.incomingRadiation, weatherReading.outgoingRadiation,
+            weatherReading.minTemp, weatherReading.maxTemp, weatherReading.humidity, weatherReading.wind_speed, 0);
 
 
         // Return the nearest station's ID
@@ -116,19 +216,25 @@ export const handler: APIGatewayProxyHandler = async (event: any) => {
                 body: JSON.stringify({
                     nearestStationId,
                     distance: minDistance,
+                    lastReading: lastReading,
+                    resultWeather: weatherReading,
+                    ET0: ET0
                 }),
             };
         } else {
             return {
                 statusCode: 404,
-                body: JSON.stringify({ message: 'No valid stations found' }),
+                body: JSON.stringify({message: 'No valid stations found'}),
             };
         }
-    } catch (error: any) {
+    } catch
+        (error: any) {
         console.error('Error fetching stations:', error);
         return {
             statusCode: 500,
-            body: JSON.stringify({ message: 'Internal server error', error: error.message }),
+            body: JSON.stringify({message: 'Internal server error', error: error.message}),
         };
     }
-};
+}
+
+

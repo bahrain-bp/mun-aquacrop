@@ -1,55 +1,58 @@
-// src/lambda/getLatestWeatherReading.ts
-import { DynamoDB } from "aws-sdk";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { QueryCommand } from "@aws-sdk/lib-dynamodb";
 
-const docClient = new DynamoDB.DocumentClient();
+const client = new DynamoDBClient({ region: "us-east-1" });
+
+function formatDate(date: Date): string {
+    const options: Intl.DateTimeFormatOptions = {
+        month: 'short',
+        day: '2-digit',
+        year: 'numeric'
+    };
+    return date.toLocaleDateString('en-US', options).toUpperCase().replace(',', '').replace(' ', '-');
+}
 
 export async function handler(event: any) {
-    const { stationId } = event.pathParameters; // StationID passed in URL
-    const { date } = event.queryStringParameters; // Optional date parameter
+    const body = JSON.parse(event.body);
 
-    // Helper function to format the date (if needed)
-    const formatDate = (dateString: string) => new Date(dateString).toISOString(); // Ensure it's in ISO format for comparison
+    const { stationId } = body;
 
-    const params: DynamoDB.DocumentClient.QueryInput = {
-        TableName: process.env.WEATHER_READINGS_TABLE!,
-        KeyConditionExpression: "StationID = :stationId",
-        ExpressionAttributeValues: {
-            ":stationId": stationId,
-        },
-        ScanIndexForward: false, // Get results in descending order of date (latest first)
-        Limit: 1, // Only return the closest one
-    };
-
-    if (date) {
-        // If a date is provided, search for that exact date first
-        params.KeyConditionExpression += " AND #date = :date";
-        params.ExpressionAttributeNames = { "#date": "date" };
-        params.ExpressionAttributeValues = {
-            ":stationId": stationId,
-            ":date": formatDate(date), // Ensure we pass the formatted date
+    if (!stationId) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({ message: "Missing stationId in the request body." }),
         };
     }
 
+    // Get today's date in the required format: OCT-23-2024
+    const todayFormatted = formatDate(new Date());
+
+    console.log("Querying for stationId:", stationId);
+    console.log("Formatted date:", todayFormatted);
+
+    // Define the query parameters for the global secondary index (StationDateIndex)
+    const params = {
+        TableName: process.env.weatherReadingsTable!,
+        IndexName: "StationDateIndex", // Specify the secondary index
+        KeyConditionExpression: "StationID = :stationId and #date <= :today",
+        ExpressionAttributeNames: {
+            "#date": "date",
+        },
+        ExpressionAttributeValues: {
+            ":stationId": stationId,
+            ":today": todayFormatted, // Use the formatted date
+        },
+        Limit: 1,
+        ScanIndexForward: false, // Get the latest reading first (descending order)
+    };
+
     try {
-        let result = await docClient.query(params).promise();
+        // Log the query parameters before sending the request
+        console.log("DynamoDB Query Parameters:", JSON.stringify(params, null, 2));
 
-        // If a reading exists for the exact date, return it
-        if (result.Items && result.Items.length > 0) {
-            return {
-                statusCode: 200,
-                body: JSON.stringify(result.Items[0]),
-            };
-        }
-
-        // If no exact match, look for the closest possible reading by date
-        // Remove the date filter and query for the latest reading available
-        params.KeyConditionExpression = "StationID = :stationId";
-        params.ExpressionAttributeValues = { ":stationId": stationId };
-
-        result = await docClient.query(params).promise();
+        const result = await client.send(new QueryCommand(params));
 
         if (result.Items && result.Items.length > 0) {
-            // Return the closest available reading (the first one in the list since we query in descending order)
             return {
                 statusCode: 200,
                 body: JSON.stringify(result.Items[0]),

@@ -26,6 +26,8 @@ export const main = async (event: any) => {
                 StationID: { S: body.StationID },
                 Name: { S: body.Name },
                 Location: { S: body.Location },
+                LastReadingID: { S: body.LastReadingID },
+
             },
         };
 

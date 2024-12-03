@@ -61,13 +61,6 @@ export function DynamoDBStack({ stack }: StackContext) {
             humidity: "number",
         },
         primaryIndex: { partitionKey: "ReadingID" },
-        globalIndexes: {
-            StationDateIndex: {
-                partitionKey: "StationID",
-                sortKey: "date",
-                projectionType: "ALL", // Adjust projection as needed
-            },
-        },
     });
 
     const stationTable = new Table(stack, "Station", {
@@ -75,6 +68,7 @@ export function DynamoDBStack({ stack }: StackContext) {
             StationID: "string",
             Name: "string",
             Location: "map",
+            LastReadingID: "string",//weatherReaddingID
         },
         primaryIndex: { partitionKey: "StationID" }
     });
