@@ -65,7 +65,7 @@ export function ApiStack({ stack }: StackContext) {
         function: {
           handler: "packages/functions/src/AdminDashboard/exportData.handler",
           runtime: "nodejs18.x",
-          permissions: ["cognito-idp:AdminGetUser","dynamodb:PutItem"],
+          permissions: ["cognito-idp:AdminGetUser","dynamodb:PutItem","dynamodb:GetItem","dynamodb:UpdateItem"],
         },
       },
     },
