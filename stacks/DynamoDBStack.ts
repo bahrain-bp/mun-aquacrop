@@ -104,21 +104,23 @@ export function DynamoDBStack({ stack }: StackContext) {
 
     const farmTable = new Table(stack, "Farms", {
         fields: {
-            FarmId: "string",
+            FarmID: "string",
+            OwnerID: "string",
             FarmName: "string",
-            ownerId: "string",
+            Location: "string",
         },
-        primaryIndex: { partitionKey: "FarmId" },
+        primaryIndex: { partitionKey: "FarmID", },
     });
 
     const zonesTable = new Table(stack, "Zones", {
         fields: {
-            ZoneId: "string",
-            FarmId: "string",
+            FarmID: "string",
+            ZoneID: "string",
             ZoneName: "string",
-            ownerId: "string",
+            IrrigationStatus: "string",
+            LastIrrigation: "string",
         },
-        primaryIndex: { partitionKey: "ZoneId", sortKey: "FarmId" },
+        primaryIndex: { partitionKey: "FarmID", sortKey: "ZoneID" },
     });
 
 

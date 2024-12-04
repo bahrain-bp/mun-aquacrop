@@ -1,13 +1,18 @@
 import { Api, StackContext, use } from "sst/constructs";
 import { DBStack } from "./DBStack";
 import { DynamoDBStack } from "./DynamoDBStack";
-import { AuthStack } from "./AuthStack"; // Adjust the path if necessary
+import { AuthStack } from "./AuthStack"; 
 import { CacheHeaderBehavior, CachePolicy } from "aws-cdk-lib/aws-cloudfront";
 import { Duration } from "aws-cdk-lib/core";
 
 export function ApiStack({ stack }: StackContext) {
   const { table } = use(DBStack);
   const auth = use(AuthStack);
+  // Front End User Pool
+  const userPool1 = {
+    id: "us-east-1_qAQ8SIlqm", // Replace with your first Cognito User Pool ID
+    clientIds: ["15k0htcure51j9hmuiohoebbph","4jhn6qhc7hlkftkjgvkg78mq2f"], // Replace with your first App Client ID
+  };
   const {stationTable,cropTable}  = use(DynamoDBStack);
 
   // Create the HTTP API
@@ -20,6 +25,12 @@ export function ApiStack({ stack }: StackContext) {
           StationTableName: stationTable.tableName,
           CropTableName: cropTable.tableName,
         },
+      },
+    },
+    authorizers: {
+      user_pool1: {
+        type: "user_pool",
+        userPool: userPool1,
       },
     },
     routes: {
@@ -63,11 +74,41 @@ export function ApiStack({ stack }: StackContext) {
 
       "POST /adminDashboard/exportData": {
         function: {
-          handler: "packages/functions/src/AdminDashboard/exportData.handler",
+          handler: "packages/functions/src/AdminDashboard/Auth/exportData.handler",
           runtime: "nodejs18.x",
           permissions: ["cognito-idp:AdminGetUser","dynamodb:PutItem","dynamodb:GetItem","dynamodb:UpdateItem"],
         },
       },
+      "GET /adminDashboard/Farms": {
+        function: {
+          handler: "packages/functions/src/AdminDashboard/GetFarms.handler",
+          runtime: "nodejs18.x",
+        },
+        authorizer: "user_pool1",
+      },
+      "GET /adminDashboard/Farms/{FarmID}/Zones": {
+        function: {
+          handler: "packages/functions/src/AdminDashboard/GetZones.handler",
+          runtime: "nodejs18.x",
+        },
+        authorizer: "user_pool1",
+      },
+      "POST /adminDashboard/Farms/{FarmID}/Zones/{ZoneID}/Irrigate": {
+        function: {
+          handler: "packages/functions/src/AdminDashboard/TriggerIrrigation.handler",
+          runtime: "nodejs18.x",
+        },
+        authorizer: "user_pool1",
+      },
+      "POST /adminDashboard/Farms/{FarmID}/Zones/{ZoneID}/UpdateStatus": {
+        function: {
+          handler: "packages/functions/src/AdminDashboard/UpdateZoneStatus.handler",
+          runtime: "nodejs18.x",
+        },
+        authorizer: "user_pool1",
+      },
+
+      
     },
   });
 

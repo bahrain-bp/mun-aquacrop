@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Authenticator } from '@aws-amplify/ui-react';
+import axios from 'axios';
+import { fetchAuthSession } from 'aws-amplify/auth';
 
 interface Farm {
   id: string;
@@ -9,6 +11,7 @@ interface Farm {
 interface Zone {
   id: string;
   name: string;
+  irrigationStatus: string;
 }
 
 const Dashboard: React.FC = () => {
@@ -16,26 +19,74 @@ const Dashboard: React.FC = () => {
   const [zones, setZones] = useState<Zone[]>([]);
   const [selectedFarm, setSelectedFarm] = useState<Farm | null>(null);
 
+  const fetchToken = async () => {
+    try {
+      const session = await fetchAuthSession();
+      return session?.tokens?.idToken;
+    } catch (error) {
+      console.error('Error fetching session:', error);
+      return null;
+    }
+  };
+
+  // Fetch farms from backend
   useEffect(() => {
-    // Simulating fetching farms from a backend for later integration
     const fetchFarms = async () => {
-      const fetchedFarms: Farm[] = [
-        { id: 'farm1', name: 'Farm A' },
-        { id: 'farm2', name: 'Farm B' },
-      ];
-      setFarms(fetchedFarms); // Dynamically update farms
+      try {
+        const idToken = await fetchToken();
+        if (!idToken) {
+          console.error('No ID token found');
+          return;
+        }
+
+        // Make the API request with the token
+        const response = await axios.get('https://om9882jcr2.execute-api.us-east-1.amazonaws.com/adminDashboard/Farms', {
+          headers: {
+            Authorization: `Bearer ${idToken}`,
+          },
+        });
+
+        // Map and set the farms
+        const fetchedFarms = response.data.farms.map((farm: any) => ({
+          id: farm.FarmID,
+          name: farm.FarmName,
+        }));
+        setFarms(fetchedFarms);
+      } catch (error) {
+        console.error('Error fetching farms:', error);
+      }
     };
 
     fetchFarms();
-  }, []); // Runs only once on component mount
+  }, []);
 
-  const handleFarmSelect = (farm: Farm) => {
+  const handleFarmSelect = async (farm: Farm) => {
     setSelectedFarm(farm);
-    // Simulate fetching zones for the selected farm
-    setZones([
-      { id: 'zone1', name: 'Tomato Zone' },
-      { id: 'zone2', name: 'Carrot Zone' },
-    ]);
+
+    try {
+      const idToken = await fetchToken();
+      if (!idToken) {
+        console.error('No ID token found');
+        return;
+      }
+
+      // Fetch zones for the selected farm
+      const response = await axios.get(`https://om9882jcr2.execute-api.us-east-1.amazonaws.com/adminDashboard/Farms/${farm.id}/Zones`, {
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+        },
+      });
+
+      // Map and set the zones
+      const fetchedZones = response.data.zones.map((zone: any) => ({
+        id: zone.ZoneID,
+        name: zone.ZoneName,
+        irrigationStatus: zone.IrrigationStatus,
+      }));
+      setZones(fetchedZones);
+    } catch (error) {
+      console.error('Error fetching zones:', error);
+    }
   };
 
   const handleZoneAction = (zone: Zone) => {
