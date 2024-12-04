@@ -154,7 +154,9 @@ export const handler: APIGatewayProxyHandler = async (event: any) => {
                 continue; // Skip if lat/lon are missing
             }
 
+            // @ts-ignore
             const stationLat = parseFloat(latAttr.N);
+            // @ts-ignore
             const stationLon = parseFloat(lonAttr.N);
             const stationId = stationIdAttr;
 

@@ -4,14 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="af9a6a8a-c792-4eb4-9cce-a415c3983bc8" name="Changes" comment="smei working closest station calcualtion &#10;and some other fixes">
-      <change afterPath="$PROJECT_DIR$/test.http" afterDir="false" />
+    <list default="true" id="af9a6a8a-c792-4eb4-9cce-a415c3983bc8" name="Changes" comment="mostly done with the calculation &#10;KC / determing which stage is the crop in to ge the lasxt result">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/functions/src/calculateWaterNeed.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/functions/src/calculateWaterNeed.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/functions/src/getLatestWeatherReading.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/functions/src/getLatestWeatherReading.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/functions/src/station-handler.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/functions/src/station-handler.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stacks/ApiStack.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stacks/ApiStack.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stacks/DynamoDBStack.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stacks/DynamoDBStack.ts" afterDir="false" />
     </list>
     <list id="bcd9039d-5d63-4b67-8a87-c6ca38f0c941" name="Changes by PC" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -135,7 +130,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733247131149</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="mostly done with the calculation &#10;KC / determing which stage is the crop in to ge the lasxt result">
+      <option name="closed" value="true" />
+      <created>1733258677041</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1733258677041</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -165,7 +168,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Navigation to the recomendation was resloved" />
     <MESSAGE value="smei working closest station calcualtion &#10;and some other fixes" />
-    <option name="LAST_COMMIT_MESSAGE" value="smei working closest station calcualtion &#10;and some other fixes" />
+    <MESSAGE value="mostly done with the calculation &#10;KC / determing which stage is the crop in to ge the lasxt result" />
+    <option name="LAST_COMMIT_MESSAGE" value="mostly done with the calculation &#10;KC / determing which stage is the crop in to ge the lasxt result" />
   </component>
   <component name="XDebuggerManager">
     <watches-manager>
