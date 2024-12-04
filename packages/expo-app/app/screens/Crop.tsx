@@ -1,11 +1,18 @@
+// app/screens/Crop.tsx
+
 import React, { useState } from 'react';
-import { Text, View, Image, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
+import { Text, View, Image, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
 import { RadioButton } from 'react-native-paper';
-import { useRouter } from 'expo-router';
+import { useRouter } from "expo-router";
+import {useSearchParams} from "expo-router/build/hooks"; // Corrected import
+import { useLocalSearchParams } from 'expo-router';
 
 const Crop: React.FC = () => {
-    const router = useRouter();
-    const { nameEN, nameAR, GrowthStage, kc, CropID, ImageURL } = router.params;  // Corrected to use router.params
+    const router = useRouter(); // Hook called at the top level
+    // const { nameAR, GrowthStage, kc, CropID, ImageURL } = useSearchParams(); // Hook called at the top level
+    const { nameEN ,GrowthStage, kc, CropID, ImageURL}
+        = useLocalSearchParams<{ nameEN: string,GrowthStage: string, kc : string, CropID : string, ImageURL: string }>();
+    console.log(nameEN);
 
     const [selectedOption, setSelectedOption] = useState("datePlanted");
     const [day, setDay] = useState("");
@@ -30,7 +37,7 @@ const Crop: React.FC = () => {
     };
 
     return (
-        <View style={styles.container}>
+        <ScrollView contentContainerStyle={styles.container}>
             <Text style={styles.title}>{nameEN}</Text>
             <Image source={{ uri: ImageURL }} style={styles.image} />
 
@@ -63,7 +70,7 @@ const Crop: React.FC = () => {
                     <Text>Select Growth Stage:</Text>
                     <View style={styles.stageButtonsContainer}>
                         {['Stage 1', 'Stage 2', 'Stage 3'].map((stage) => (
-                            <TouchableOpacity key={stage} onPress={() => handleStageSelection(stage)}>
+                            <TouchableOpacity key={stage} onPress={() => handleStageSelection(stage)} style={styles.stageButton}>
                                 <Text>{stage}</Text>
                             </TouchableOpacity>
                         ))}
@@ -74,13 +81,13 @@ const Crop: React.FC = () => {
             <TouchableOpacity style={styles.calculateButton} onPress={navigateToRecommendation}>
                 <Text style={styles.calculateButtonText}>Calculate Water Need</Text>
             </TouchableOpacity>
-        </View>
+        </ScrollView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flexGrow: 1,
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
@@ -106,6 +113,10 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginLeft: 10,
     },
+    datePlantedContainer: {
+        flexDirection: 'row',
+        marginTop: 20,
+    },
     dateInput: {
         height: 40,
         width: '25%',
@@ -113,6 +124,21 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderRadius: 5,
         marginRight: 5,
+        paddingHorizontal: 10,
+    },
+    growthStageContainer: {
+        marginTop: 20,
+        alignItems: 'center',
+    },
+    stageButtonsContainer: {
+        flexDirection: 'row',
+        marginTop: 10,
+    },
+    stageButton: {
+        marginHorizontal: 10,
+        padding: 10,
+        backgroundColor: '#e0e0e0',
+        borderRadius: 5,
     },
     calculateButton: {
         backgroundColor: 'black',

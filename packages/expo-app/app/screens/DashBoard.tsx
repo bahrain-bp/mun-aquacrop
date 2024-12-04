@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, ScrollView, Image } from 'react-native';
+import {Text, View, StyleSheet, ScrollView, Image, TouchableOpacity} from 'react-native';
 import { Link } from 'expo-router';
 import { useRouter } from 'expo-router';
 
@@ -55,7 +55,7 @@ const Index: React.FC = () => {
 
         fetchCrops();
     }, []); // Empty dependency array ensures it runs only once after initial render
-    const router = useRouter();
+
 
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
@@ -87,26 +87,34 @@ interface CardProps {
 const Card: React.FC<CardProps> = ({ CropData }) => {
     const { nameEN, nameAR, GrowthStage, kc, CropID, ImageURL } = CropData;
 
+    const router = useRouter();
+
+    console.log(nameEN);
+    const handlePress = () => {
+
+        // Navigate to the Crop screen with parameters
+        router.push({
+            pathname: '/screens/Crop',
+            params: {
+                nameEN: nameEN.S,
+                nameAR: nameAR.S,
+                GrowthStage: JSON.stringify(GrowthStage), // Stringify if necessary
+                kc: JSON.stringify(kc), // Stringify if necessary
+                CropID: CropID.S,
+                ImageURL: ImageURL.S,
+            },
+        });
+    };
+
+
+
     return (
-        <Link
-            href={{
-                pathname: "/screens/Crop",
-                params: {
-                    nameEN: nameEN.S, // Accessing the values correctly from the cropData object
-                    nameAR: nameAR.S,
-                    GrowthStage: JSON.stringify(GrowthStage),  // Stringify objects if necessary
-                    kc: JSON.stringify(kc),  // Stringify if necessary
-                    CropID: CropID.S,
-                    ImageURL: ImageURL.S,
-                },
-            }}
-            style={styles.cardLink}
-        >
+        <TouchableOpacity onPress={handlePress} style={styles.cardLink}>
             <View style={styles.cardContainer}>
                 <Image source={{ uri: ImageURL.S }} style={styles.image} />
                 <Text style={styles.cardTitle}>{nameEN.S}</Text>
             </View>
-        </Link>
+        </TouchableOpacity>
     );
 };
 
