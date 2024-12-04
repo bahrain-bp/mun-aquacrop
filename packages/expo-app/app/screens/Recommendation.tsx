@@ -1,16 +1,63 @@
+// app/screens/Recommendation.tsx
+
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, Image, StyleSheet } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 
 const Recommendation: React.FC = () => {
+
+
+    const {
+        title,
+        imageSource,
+        latitude,
+        longitude,
+        locationMethod,
+        selectionMethod,
+        selectedDate,
+        growthStage,
+        stageImage,
+        kc,
+        cropID
+        // @ts-ignore
+    } = useLocalSearchParams<{
+        title: string,
+        imageSource: string,
+        latitude: number,
+        longitude: number,
+        locationMethod: 'auto' | 'manual',
+        selectionMethod: 'datePlanted' | 'growthStage',
+        selectedDate?: string,
+        growthStage?: string,
+        stageImage?: string,
+        kc: string,
+        cropID: string
+    }>();
+
     return (
         <View style={styles.container}>
-            <View style={styles.card}>
-                <Text style={styles.cardTitle}>Water Recommendation</Text>
-                <Text style={styles.cardContent}>
-                   testing
-                </Text>
-                <Text style={styles.cardContent}>15 liters per day</Text>
-            </View>
+            <Text style={styles.title}>Recommendation for {title}</Text>
+            <Image source={{ uri: imageSource }} style={styles.image} />
+
+            <Text>Crop ID: {cropID}</Text>
+            <Text>Kc Value: {kc}</Text>
+
+            <Text>Location Method: {locationMethod}</Text>
+            <Text>Latitude: {latitude}</Text>
+            <Text>Longitude: {longitude}</Text>
+
+            <Text>Selection Method: {selectionMethod}</Text>
+            {selectionMethod === 'datePlanted' && (
+                <Text>Date Planted: {selectedDate}</Text>
+            )}
+            {selectionMethod === 'growthStage' && (
+                <>
+                    <Text>Growth Stage: {growthStage}</Text>
+                    {stageImage && <Image source={{ uri: stageImage }} style={styles.stageImage} />}
+                </>
+            )}
+
+            {/* Add more recommendation details as needed */}
         </View>
     );
 };
@@ -18,29 +65,26 @@ const Recommendation: React.FC = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#f8f8f8',
-    },
-    card: {
-        width: '80%',
         padding: 20,
+        alignItems: 'center',
         backgroundColor: '#fff',
-        borderRadius: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 5,
-        elevation: 5,
     },
-    cardTitle: {
-        fontSize: 20,
+    title: {
+        fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 10,
+        marginBottom: 20,
     },
-    cardContent: {
-        fontSize: 16,
-        marginBottom: 10,
+    image: {
+        width: 200,
+        height: 200,
+        borderRadius: 15,
+        marginBottom: 20,
+    },
+    stageImage: {
+        width: 100,
+        height: 100,
+        borderRadius: 10,
+        marginTop: 10,
     },
 });
 

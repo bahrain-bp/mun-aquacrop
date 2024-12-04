@@ -1,84 +1,371 @@
 // app/screens/Crop.tsx
 
-import React, { useState } from 'react';
-import { Text, View, Image, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
-import { RadioButton } from 'react-native-paper';
+import React, { useState, useEffect } from 'react';
+import {
+    Text,
+    View,
+    Image,
+    TouchableOpacity,
+    StyleSheet,
+    ScrollView,
+    Platform,
+    Alert,
+} from 'react-native';
 import { useRouter } from "expo-router";
-import {useSearchParams} from "expo-router/build/hooks"; // Corrected import
 import { useLocalSearchParams } from 'expo-router';
+import * as Location from 'expo-location';
+import { Picker } from '@react-native-picker/picker'; // Native Picker
+
+import DateTimePicker from '@react-native-community/datetimepicker'; // For iOS/Android
+import DatePicker from 'react-datepicker'; // For Web
+import 'react-datepicker/dist/react-datepicker.css'; // Required CSS for react-datepicker on Web
+import CustomRadioButton from '@/components/CustomRadioButton'; // Ensure the path is correct
+
+interface LocationOption {
+    label: string;
+    value: string;
+    latitude: number;
+    longitude: number;
+}
+
+interface GrowthStageOption {
+    label: string;
+    value: string;
+    imageSource: string;
+}
 
 const Crop: React.FC = () => {
-    const router = useRouter(); // Hook called at the top level
-    // const { nameAR, GrowthStage, kc, CropID, ImageURL } = useSearchParams(); // Hook called at the top level
-    const { nameEN ,GrowthStage, kc, CropID, ImageURL}
-        = useLocalSearchParams<{ nameEN: string,GrowthStage: string, kc : string, CropID : string, ImageURL: string }>();
-    console.log(nameEN);
+    const router = useRouter();
+    const { nameEN, GrowthStage, kc, CropID, ImageURL } = useLocalSearchParams<{
+        nameEN: string;
+        GrowthStage: string;
+        kc: string;
+        CropID: string;
+        ImageURL: string;
+    }>();
 
-    const [selectedOption, setSelectedOption] = useState("datePlanted");
-    const [day, setDay] = useState("");
-    const [month, setMonth] = useState("");
-    const [year, setYear] = useState("");
-    const [growthStage, setGrowthStage] = useState("");
+    console.log('Received Params:', { nameEN, GrowthStage, kc, CropID, ImageURL });
+
+    // State Variables
+    const [selectedOption, setSelectedOption] = useState<"datePlanted" | "growthStage">("datePlanted");
+    const [growthStage, setGrowthStage] = useState<string>("");
+    const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+    const [errorMsg, setErrorMsg] = useState<string | null>(null);
+    const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+    const [locationSelected, setLocationSelected] = useState<{ latitude: number; longitude: number } | null>(null);
+    const [locationMethod, setLocationMethod] = useState<'auto' | 'manual'>('auto'); // Toggle location method
+    const [selectedLocationValue, setSelectedLocationValue] = useState<string>(""); // Initialize to empty string
+    const [isAutoDisabled, setIsAutoDisabled] = useState<boolean>(false); // To disable 'auto' if location fetching fails
+
+    const bahrainLocations: LocationOption[] = [
+        { label: "Manama", value: "manama", latitude: 26.2041, longitude: 50.5860 },
+        { label: "Riffa", value: "riffa", latitude: 26.1500, longitude: 50.5556 },
+        { label: "Muharraq", value: "muharraq", latitude: 26.2521, longitude: 50.6233 },
+        { label: "Sitra", value: "sitra", latitude: 26.0890, longitude: 50.6135 },
+        { label: "Isa Town", value: "isa_town", latitude: 26.2069, longitude: 50.5278 },
+        // Add more locations as needed...
+    ];
+
+    const growthStages: GrowthStageOption[] = [
+        { label: "Stage 1", value: "stage1", imageSource: "https://example.com/stage1.jpg" },
+        { label: "Stage 2", value: "stage2", imageSource: "https://example.com/stage2.jpg" },
+        { label: "Stage 3", value: "stage3", imageSource: "https://example.com/stage3.jpg" },
+    ];
+
+    useEffect(() => {
+        if (locationMethod === 'auto') {
+            requestLocation();
+        } else {
+            // Clear automatic location if switching to manual
+            setLocation(null);
+            setErrorMsg(null);
+        }
+    }, [locationMethod]);
+
+    const requestLocation = async () => {
+        try {
+            if (Platform.OS === 'web') {
+                // For Web, use the browser's geolocation API
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const { latitude, longitude } = position.coords;
+                            console.log('Fetched Location:', latitude, longitude);
+                            setLocation({ latitude, longitude });
+                            setErrorMsg(null);
+                        },
+                        (error) => {
+                            setErrorMsg('Error fetching location: ' + error.message);
+                            Alert.alert('Location Error', error.message);
+                            // Disable 'auto' and switch to 'manual'
+                            setIsAutoDisabled(true);
+                            setLocationMethod('manual');
+                        }
+                    );
+                } else {
+                    setErrorMsg('Geolocation is not supported by this browser.');
+                    Alert.alert('Location Error', 'Geolocation is not supported by this browser.');
+                    // Disable 'auto' and switch to 'manual'
+                    setIsAutoDisabled(true);
+                    setLocationMethod('manual');
+                }
+            } else {
+                // For iOS/Android, use expo-location
+                let { status } = await Location.requestForegroundPermissionsAsync();
+                if (status !== 'granted') {
+                    setErrorMsg('Permission to access location was denied');
+                    Alert.alert('Permission Denied', 'Permission to access location was denied');
+                    // Disable 'auto' and switch to 'manual'
+                    setIsAutoDisabled(true);
+                    setLocationMethod('manual');
+                    return;
+                }
+
+                let loc = await Location.getCurrentPositionAsync({});
+                console.log('Fetched Location:', loc.coords.latitude, loc.coords.longitude);
+                setLocation(loc.coords);
+                setErrorMsg(null);
+            }
+        } catch (error) {
+            console.error("Error fetching location:", error);
+            setErrorMsg('Failed to fetch location');
+            Alert.alert('Location Error', 'Failed to fetch location');
+            // Disable 'auto' and switch to 'manual'
+            setIsAutoDisabled(true);
+            setLocationMethod('manual');
+        }
+    };
+
+    const handleLocationSelect = (selectedLocation: string) => {
+        console.log('Selected Location Value:', selectedLocation);
+        setSelectedLocationValue(selectedLocation);
+        const selected = bahrainLocations.find(loc => loc.value === selectedLocation);
+        if (selected) {
+            console.log('Selected Coordinates:', selected.latitude, selected.longitude);
+            setLocationSelected({ latitude: selected.latitude, longitude: selected.longitude });
+            setErrorMsg(null);
+        } else {
+            // If the user selects the placeholder, clear the locationSelected
+            setLocationSelected(null);
+        }
+    };
 
     // Handle stage selection
     const handleStageSelection = (stage: string) => {
+        console.log('Selected Growth Stage:', stage);
         setGrowthStage(stage);
     };
 
     // Navigate to Recommendation screen
     const navigateToRecommendation = () => {
+        let finalLocation: { latitude: number; longitude: number } | null = null;
+        let locationMethodUsed: 'auto' | 'manual' = locationMethod;
+        let imageLink: string | null = null; // To hold the image link
+
+        if (locationMethod === 'auto') {
+            finalLocation = location;
+        } else if (locationMethod === 'manual') {
+            finalLocation = locationSelected;
+        }
+
+        if (!finalLocation) {
+            Alert.alert('Location Missing', 'Please select a valid location.');
+            return;
+        }
+
+        // Ensure that either a date or a growth stage is selected
+        if (selectedOption === 'datePlanted' && !isDateSelected) {
+            Alert.alert('Date Missing', 'Please select a planting date.');
+            return;
+        }
+
+        if (selectedOption === 'growthStage' && !isGrowthStageSelected) {
+            Alert.alert('Growth Stage Missing', 'Please select a growth stage.');
+            return;
+        }
+
+        // Get the image link based on the selected option
+        if (selectedOption === 'growthStage') {
+            const selectedStage = growthStages.find(stage => stage.value === growthStage);
+            if (selectedStage) {
+                imageLink = selectedStage.imageSource;
+            }
+        }
+
+        let recommendationParams: any = {
+            // Data from the previous page
+            title: nameEN,
+            imageSource: ImageURL,
+
+            // New data from this page
+            latitude: finalLocation.latitude,
+            longitude: finalLocation.longitude,
+            locationMethod: locationMethodUsed, // 'auto' or 'manual'
+            // Selection method: 'datePlanted' or 'growthStage'
+            selectionMethod: selectedOption,
+            // Depending on selection method, include either selectedDate or growthStage
+            ...(selectedOption === 'datePlanted' && { selectedDate: selectedDate?.toISOString() }),
+            ...(selectedOption === 'growthStage' && { growthStage: growthStage, stageImage: imageLink }),
+            kc: kc,
+            cropID: CropID,
+        };
+
+        console.log('Recommendation Params:', recommendationParams);
+
+        // Navigate to Recommendation screen with all parameters
         router.push({
             pathname: '/screens/Recommendation',
-            params: {
-                title: nameEN,  // Dynamically set title from params
-                imageSource: ImageURL,  // Pass the imageSource here
-            },
+            params: recommendationParams,
         });
     };
+
+    const onDateChange = (event: any, selectedDate: Date | undefined) => {
+        const currentDate = selectedDate || selectedDate;
+        setSelectedDate(currentDate);
+        console.log('Selected Date:', currentDate);
+    };
+
+    // Determine if the button should be enabled
+    const isDateSelected = selectedDate && !isNaN(selectedDate.getTime());
+    const isGrowthStageSelected = growthStage !== "";
+    let isLocationAvailable = false;
+    if (locationMethod === 'auto') {
+        isLocationAvailable = location !== null;
+    } else if (locationMethod === 'manual') {
+        isLocationAvailable = locationSelected !== null;
+    }
+
+    const isButtonEnabled = (selectedOption === 'datePlanted' && isDateSelected) ||
+        (selectedOption === 'growthStage' && isGrowthStageSelected);
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <Text style={styles.title}>{nameEN}</Text>
-            <Image source={{ uri: ImageURL }} style={styles.image} />
+            {ImageURL ? (
+                <Image source={{ uri: ImageURL }} style={styles.image} />
+            ) : (
+                <View style={styles.placeholderImage}>
+                    <Text>No Image Available</Text>
+                </View>
+            )}
 
-            <View style={styles.radioButtonWrapper}>
-                <RadioButton
-                    value="datePlanted"
-                    status={selectedOption === 'datePlanted' ? 'checked' : 'unchecked'}
-                    onPress={() => setSelectedOption('datePlanted')}
-                />
-                <Text style={styles.radioLabel}>Date Planted</Text>
-
-                <RadioButton
-                    value="growthStage"
-                    status={selectedOption === 'growthStage' ? 'checked' : 'unchecked'}
-                    onPress={() => setSelectedOption('growthStage')}
-                />
-                <Text style={styles.radioLabel}>Growth Stage</Text>
+            {/* Radio buttons to choose location method */}
+            <View style={styles.locationMethodWrapper}>
+                <Text style={styles.locationMethodTitle}>Choose Location Method</Text>
+                <View style={styles.radioButtonsRow}>
+                    <CustomRadioButton
+                        label="By Location"
+                        selected={locationMethod === 'auto'}
+                        onPress={() => setLocationMethod('auto')}
+                        disabled={isAutoDisabled}
+                    />
+                    <CustomRadioButton
+                        label="By Dropdown"
+                        selected={locationMethod === 'manual'}
+                        onPress={() => setLocationMethod('manual')}
+                    />
+                </View>
             </View>
 
+            {/* Dropdown for manual location selection */}
+            {locationMethod === 'manual' && (
+                <View style={styles.pickerContainer}>
+                    <Picker
+                        selectedValue={selectedLocationValue}
+                        onValueChange={(itemValue, itemIndex) => handleLocationSelect(itemValue)}
+                        style={styles.picker}
+                        mode="dropdown" // Android specific
+                        prompt="Select your location in Bahrain" // Optional: for Android
+                    >
+                        <Picker.Item label="Select your location in Bahrain" value="" />
+                        {bahrainLocations.map((loc) => (
+                            <Picker.Item key={loc.value} label={loc.label} value={loc.value} />
+                        ))}
+                    </Picker>
+                </View>
+            )}
+
+            {/* Radio buttons for Date Planted and Growth Stage */}
+            <View style={styles.radioButtonWrapperDateGrowth}>
+                <CustomRadioButton
+                    label="Date Planted"
+                    selected={selectedOption === 'datePlanted'}
+                    onPress={() => setSelectedOption('datePlanted')}
+                />
+                <CustomRadioButton
+                    label="Growth Stage"
+                    selected={selectedOption === 'growthStage'}
+                    onPress={() => setSelectedOption('growthStage')}
+                />
+            </View>
+
+            {/* Date Picker */}
             {selectedOption === 'datePlanted' && (
                 <View style={styles.datePlantedContainer}>
-                    <TextInput style={styles.dateInput} placeholder="DD" value={day} onChangeText={setDay} />
-                    <TextInput style={styles.dateInput} placeholder="MM" value={month} onChangeText={setMonth} />
-                    <TextInput style={styles.dateInput} placeholder="YYYY" value={year} onChangeText={setYear} />
+                    {Platform.OS === 'web' ? (
+                        <DatePicker
+                            selected={selectedDate}
+                            onChange={(date: Date) => setSelectedDate(date)}
+                            dateFormat="yyyy-MM-dd"
+                            className="date-picker" // You can add custom CSS for better styling
+                            placeholderText="Select a date"
+                        />
+                    ) : (
+                        <DateTimePicker
+                            value={selectedDate || new Date()}
+                            mode="date"
+                            display="default"
+                            onChange={onDateChange}
+                        />
+                    )}
                 </View>
             )}
 
+            {/* Growth Stage Selection */}
             {selectedOption === 'growthStage' && (
                 <View style={styles.growthStageContainer}>
-                    <Text>Select Growth Stage:</Text>
-                    <View style={styles.stageButtonsContainer}>
-                        {['Stage 1', 'Stage 2', 'Stage 3'].map((stage) => (
-                            <TouchableOpacity key={stage} onPress={() => handleStageSelection(stage)} style={styles.stageButton}>
-                                <Text>{stage}</Text>
-                            </TouchableOpacity>
+                    <Text style={styles.sectionTitle}>Select Growth Stage:</Text>
+                    <ScrollView
+                        horizontal={true}
+                        contentContainerStyle={styles.growthStagesScroll}
+                        showsHorizontalScrollIndicator={false}
+                    >
+                        {growthStages.map((stage) => (
+                            <View
+                                key={stage.value}
+                                style={[
+                                    styles.stageBox,
+                                    growthStage === stage.value && styles.selectedStageBox
+                                ]}
+                            >
+                                <Text style={styles.stageLabel}>{stage.label}</Text>
+                                {stage.imageSource ? (
+                                    <Image source={{ uri: stage.imageSource }} style={styles.stageImage} />
+                                ) : (
+                                    <View style={styles.placeholderStageImage}>
+                                        <Text>No Image</Text>
+                                    </View>
+                                )}
+                                <CustomRadioButton
+                                    label=""
+                                    selected={growthStage === stage.value}
+                                    onPress={() => handleStageSelection(stage.value)}
+                                />
+                            </View>
                         ))}
-                    </View>
+                    </ScrollView>
                 </View>
             )}
 
-            <TouchableOpacity style={styles.calculateButton} onPress={navigateToRecommendation}>
+            {/* Calculate Water Need Button */}
+            <TouchableOpacity
+                style={[
+                    styles.calculateButton,
+                    (!isButtonEnabled || !isLocationAvailable) ? styles.disabledButton : {}
+                ]}
+                onPress={navigateToRecommendation}
+                disabled={!isButtonEnabled || !isLocationAvailable}
+            >
                 <Text style={styles.calculateButtonText}>Calculate Water Need</Text>
             </TouchableOpacity>
         </ScrollView>
@@ -88,64 +375,133 @@ const Crop: React.FC = () => {
 const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
-        justifyContent: 'center',
+        justifyContent: 'flex-start',
         alignItems: 'center',
         padding: 20,
-        backgroundColor: '#fff',
+        backgroundColor: '#f0f4f7',
     },
     title: {
-        fontSize: 24,
+        fontSize: 26,
         fontWeight: 'bold',
         marginTop: 20,
+        marginBottom: 10,
+        color: '#333',
     },
     image: {
-        width: 200,
-        height: 200,
-        borderRadius: 10,
+        width: 220,
+        height: 220,
+        borderRadius: 15,
         marginTop: 20,
+        marginBottom: 20,
     },
-    radioButtonWrapper: {
-        flexDirection: 'row',
-        marginTop: 30,
+    placeholderImage: {
+        width: 220,
+        height: 220,
+        borderRadius: 15,
+        marginTop: 20,
+        marginBottom: 20,
+        backgroundColor: '#ccc',
+        justifyContent: 'center',
         alignItems: 'center',
     },
-    radioLabel: {
-        fontSize: 16,
-        marginLeft: 10,
-    },
-    datePlantedContainer: {
-        flexDirection: 'row',
-        marginTop: 20,
-    },
-    dateInput: {
-        height: 40,
-        width: '25%',
-        borderColor: '#ccc',
-        borderWidth: 1,
-        borderRadius: 5,
-        marginRight: 5,
-        paddingHorizontal: 10,
-    },
-    growthStageContainer: {
-        marginTop: 20,
-        alignItems: 'center',
-    },
-    stageButtonsContainer: {
-        flexDirection: 'row',
+    locationMethodWrapper: {
+        width: '100%',
         marginTop: 10,
     },
-    stageButton: {
-        marginHorizontal: 10,
+    locationMethodTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+        marginBottom: 10,
+        color: '#555',
+    },
+    radioButtonsRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    pickerContainer: {
+        width: '80%',
+        marginTop: 20,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+    },
+    picker: {
+        height: 50,
+        width: '100%',
+    },
+    radioButtonWrapperDateGrowth: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 30,
+    },
+    datePlantedContainer: {
+        width: '80%',
+        marginTop: 20,
+    },
+    growthStageContainer: {
+        width: '100%',
+        marginTop: 20,
+        alignItems: 'center',
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: '500',
+        color: '#555',
+        marginBottom: 10,
+    },
+    growthStagesScroll: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    stageBox: {
+        width: 120,
+        alignItems: 'center',
+        marginRight: 15,
         padding: 10,
-        backgroundColor: '#e0e0e0',
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        elevation: 2, // For Android shadow
+        shadowColor: '#000', // For iOS shadow
+        shadowOffset: { width: 0, height: 2 }, // For iOS shadow
+        shadowOpacity: 0.2, // For iOS shadow
+        shadowRadius: 2, // For iOS shadow
+    },
+    selectedStageBox: {
+        borderWidth: 2,
+        borderColor: '#4CAF50',
+    },
+    stageLabel: {
+        fontSize: 16,
+        fontWeight: '600',
+        marginBottom: 5,
+        color: '#333',
+    },
+    stageImage: {
+        width: 80,
+        height: 80,
         borderRadius: 5,
+        marginBottom: 10,
+    },
+    placeholderStageImage: {
+        width: 80,
+        height: 80,
+        borderRadius: 5,
+        marginBottom: 10,
+        backgroundColor: '#ccc',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     calculateButton: {
-        backgroundColor: 'black',
+        backgroundColor: '#4CAF50',
         paddingVertical: 15,
         paddingHorizontal: 50,
         borderRadius: 5,
         marginTop: 40,
+        width: '80%',
+        alignItems: 'center',
+    },
+    disabledButton: {
+        backgroundColor: '#ccc',
     },
     calculateButtonText: {
         color: '#fff',
