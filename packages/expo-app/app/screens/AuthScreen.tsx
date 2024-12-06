@@ -4,7 +4,7 @@ import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
 
-const API_URL = 'https://om9882jcr2.execute-api.us-east-1.amazonaws.com'; // Replace with your actual API Gateway URL
+const API_URL = process.env.EXPO_PUBLIC_API_ENDPOINT; // Replace with your actual API Gateway URL
 
 
 const AuthScreen = () => {
