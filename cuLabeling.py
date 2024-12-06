@@ -2,11 +2,11 @@ import boto3
 
 # Parameters based on your inputs
 source_bucket = "cropsimagesunlabeled"  # Source S3 bucket with images
-source_prefix = "cucumber/ini/"         # Folder containing the images
+source_prefix = "cucumber/end/"         # Folder containing the images
 output_bucket = "crop-images-labeled"   # Destination S3 bucket for the manifest file
-manifest_file_name = "cuIniManifest.json"  # Name for the manifest file
-label_name = "cucumber/mid"             # Label to apply to all images
-file_extension = ".jpg"                 # File type to include
+manifest_file_name = "cuEndManifest.json"  # Name for the manifest file
+label_name = "cucumber/end"             # Label to apply to all images
+file_extension = ".JPG"                 # File type to include
 
 # Initialize S3 client
 s3 = boto3.client('s3')
