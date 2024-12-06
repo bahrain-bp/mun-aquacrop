@@ -25,12 +25,16 @@
   "dependencies": {
     "@aws-cdk/cx-api": "^2.171.0",
     "@aws-sdk/client-cognito-identity-provider": "^3.699.0",
+    "@aws-sdk/client-dynamodb": "^3.699.0",
     "@aws-sdk/client-pinpoint": "^3.696.0",
     "@aws-sdk/client-pinpoint-sms-voice-v2": "^3.696.0",
     "@aws-sdk/client-sns": "^3.699.0",
+    "@aws-sdk/lib-dynamodb": "^3.699.0",
+    "@react-native-async-storage/async-storage": "^2.1.0",
+    "@react-native-community/datetimepicker": "^8.2.0",
     "aws-amplify": "^6.9.0",
     "axios": "^1.7.7",
-    "@aws-sdk/client-dynamodb": "^3.699.0",
-    "expo-dotenv": "^0.1.0"
+    "expo-dotenv": "^0.1.0",
+    "jwt-decode": "^4.0.0"
   }
 }

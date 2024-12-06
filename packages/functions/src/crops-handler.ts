@@ -18,7 +18,7 @@ export const main = async () => {
             statusCode: 200,
             body: JSON.stringify(result.Items || []),
         };
-    } catch (error) {
+    } catch (error: any) {
         console.error("Error retrieving crops:", error);
         return {
             statusCode: 500,

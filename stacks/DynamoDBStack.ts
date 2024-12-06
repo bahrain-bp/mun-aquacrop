@@ -17,6 +17,7 @@ export function DynamoDBStack({ stack }: StackContext) {
         primaryIndex: { partitionKey: "UID" },
     });
 
+    // @ts-ignore
     const cropTable = new Table(stack, "Crop", {
         fields: {
             CropID: "string",
@@ -28,6 +29,7 @@ export function DynamoDBStack({ stack }: StackContext) {
             cropDescriptionAr: "string",
             cropDescriptionEn: "string",
             cropImageURL: "string",
+            KC: "map",
             KC: "map",
             growthStage: "map",
         },
@@ -65,7 +67,8 @@ export function DynamoDBStack({ stack }: StackContext) {
         fields: {
             StationID: "string",
             Name: "string",
-            Location: "string",
+            Location: "map",
+            LastReadingID: "string",//weatherReaddingID
         },
         primaryIndex: { partitionKey: "StationID" }
     });

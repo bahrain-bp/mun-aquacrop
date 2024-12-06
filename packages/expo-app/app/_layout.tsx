@@ -9,8 +9,7 @@ export default function Layout() {
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       
       {/* Define standalone screens */}
-      <Stack.Screen name="screens/SignupScreen" options={{ title: 'Sign Up' }} />
-      <Stack.Screen name="screens/LoginScreen" options={{ title: 'Login' }} />
+      <Stack.Screen name="screens/AuthScreen" options={{ title: 'Sign Up' }} />
         <Stack.Screen name="screens/DashBoard" options={{ title: 'DashBoard' }} />
         <Stack.Screen name="screens/Recommendation" options={{ title: 'Recommendation' }} />
         <Stack.Screen name="screens/Crop" options={{ title: 'Crop' }} />

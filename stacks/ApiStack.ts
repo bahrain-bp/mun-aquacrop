@@ -5,69 +5,86 @@ import { AuthStack } from "./AuthStack";
 import { CacheHeaderBehavior, CachePolicy } from "aws-cdk-lib/aws-cloudfront";
 import { Duration } from "aws-cdk-lib/core";
 
-export function ApiStack({ stack }: StackContext) {
-  const { table } = use(DBStack);
-  const auth = use(AuthStack);
-  // Front End User Pool
-  const userPool1 = {
-    id: "us-east-1_5LOytyLcW",
-    clientIds: ["1u4gh4icraa6q3h9sjunjjui63"], 
-  };
-  const {stationTable,cropTable}  = use(DynamoDBStack);
+export function ApiStack({stack}: StackContext) {
+    const {table} = use(DBStack);
+    const auth = use(AuthStack);
+    const {stationTable, cropTable, weatherReadingsTable} = use(DynamoDBStack);
 
-  // Create the HTTP API
-  const api = new Api(stack, "Api", {
-    defaults: {
-      function: {
-        // Bind the table name to our API
-        bind: [stationTable, cropTable],
-        environment: {
-          StationTableName: stationTable.tableName,
-          CropTableName: cropTable.tableName,
+    // Create the HTTP API
+    const api = new Api(stack, "Api", {
+        defaults: {
+            function: {
+                // Bind the table name to our API
+                bind: [stationTable, cropTable, weatherReadingsTable],
+                environment: {
+                    StationTableName: stationTable.tableName,
+                    CropTableName: cropTable.tableName,
+                    WeatherReadingsTableName: weatherReadingsTable.tableName,
+                },
+            },
         },
-      },
-    },
-    authorizers: {
-      user_pool1: {
-        type: "user_pool",
-        userPool: userPool1,
-      },
-    },
-    routes: {
-      // Sample TypeScript lambda function
-      "POST /": "packages/functions/src/lambda.main",
+        routes: {
+            // Sample TypeScript lambda function
+            "POST /": "packages/functions/src/lambda.main",
 
-      // Penman equation Lambda function
-      "POST /penman": "packages/functions/src/penman.handler",
+            // Penman equation Lambda function
+            "POST /penman": "packages/functions/src/penman.handler",
 
-      "GET /crops": "packages/functions/src/crops-handler.main",
 
-      "POST /station": "packages/functions/src/station-handler.main",
+            "GET /crops": {
+                function: {
+                    handler: "packages/functions/src/crops-handler.main",
+                    timeout: "30 seconds",
+                    environment: {
+                        CropTableName: cropTable.tableName,
+                    },
+                    permissions: [cropTable],
+                }
+            },
 
-      // Sample Python lambda function
-      "GET /hello": {
-        function: {
-          handler: "packages/functions/src/sample-python-lambda/lambda.main",
-          runtime: "python3.11",
-          timeout: "60 seconds",
-        },
-      },
+            "POST /Latest/Weather/Reading": {
+                function: {
+                    handler: "packages/functions/src/getLatestWeatherReading.handler",
+                    environment: {
+                        weatherReadingsTable: weatherReadingsTable.tableName,
+                    },
+                    permissions: [weatherReadingsTable],
+                },
+            },
 
-      // Add new routes for custom authentication
-      "POST /auth/InitiateAuthentication": {
-        function: {
-          handler: "packages/functions/src/Authentication/InitiateAuthentication.handler",
-          runtime: "nodejs18.x",
-          permissions: ["cognito-idp:AdminGetUser", "cognito-idp:AdminCreateUser"],
-        },
-      },
-      "POST /auth/VerifyChallenge": {
-        function: {
-          handler: "packages/functions/src/Authentication/VerifyChallenge.handler",
-          runtime: "nodejs18.x",
-        },
-      },
 
+
+            "POST /station": "packages/functions/src/station-handler.main",
+
+            // route for calculating water
+            "POST /calculate/water": {
+                function: {
+                    handler: "packages/functions/src/calculateWaterNeed.handler",
+                    environment: {
+                        cropTable: cropTable.tableName,
+                        stationTable: stationTable.tableName,
+                        weatherReadingsTable: weatherReadingsTable.tableName,
+                    },
+                    permissions: [stationTable, cropTable, weatherReadingsTable],
+                },
+            },
+
+            // Add new routes for custom authentication
+            "POST /auth/InitiateAuthentication": {
+                function: {
+                    handler: "packages/functions/src/Authentication/InitiateAuthentication.handler",
+                    runtime: "nodejs18.x",
+                    permissions: ["cognito-idp:AdminGetUser", "cognito-idp:AdminCreateUser"],
+                },
+            },
+            "POST /auth/VerifyChallenge": {
+                function: {
+                    handler: "packages/functions/src/Authentication/VerifyChallenge.handler",
+                    runtime: "nodejs18.x",
+                    permissions: ["dynamodb:PutItem"],
+                },
+            },
+    
 
       // Admin Dashboard Routing //
 
@@ -110,19 +127,19 @@ export function ApiStack({ stack }: StackContext) {
 
       
     },
-  });
+    });
 
-  // Cache policy to use with CloudFront as reverse proxy to avoid CORS
-  const apiCachePolicy = new CachePolicy(stack, "CachePolicy", {
-    minTtl: Duration.seconds(0), // No cache by default unless backend decides otherwise
-    defaultTtl: Duration.seconds(0),
-    headerBehavior: CacheHeaderBehavior.allowList(
-      "Accept",
-      "Authorization",
-      "Content-Type",
-      "Referer"
-    ),
-  });
+    // Cache policy to use with CloudFront as reverse proxy to avoid CORS
+    const apiCachePolicy = new CachePolicy(stack, "CachePolicy", {
+        minTtl: Duration.seconds(0), // No cache by default unless backend decides otherwise
+        defaultTtl: Duration.seconds(0),
+        headerBehavior: CacheHeaderBehavior.allowList(
+            "Accept",
+            "Authorization",
+            "Content-Type",
+            "Referer"
+        ),
+    });
 
-  return { api, apiCachePolicy };
+    return {api, apiCachePolicy};
 }

@@ -26,6 +26,8 @@ export const main = async (event: any) => {
                 StationID: { S: body.StationID },
                 Name: { S: body.Name },
                 Location: { S: body.Location },
+                LastReadingID: { S: body.LastReadingID },
+
             },
         };
 
@@ -39,7 +41,7 @@ export const main = async (event: any) => {
             statusCode: 200,
             body: JSON.stringify({ message: "Station added successfully!" }),
         };
-    } catch (error) {
+    } catch (error:any) {
         console.error("Error occurred:", error); // Log the error
         return {
             statusCode: 500,
