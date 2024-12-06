@@ -12,7 +12,7 @@ const Login: React.FC = () => {
       initialState="signIn"
       formFields={{
         signUp: {
-          email: {
+          username: {
             label: "Email",
             placeholder: "Enter your email address",
             isRequired: true,

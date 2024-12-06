@@ -10,8 +10,8 @@ export function ApiStack({ stack }: StackContext) {
   const auth = use(AuthStack);
   // Front End User Pool
   const userPool1 = {
-    id: "us-east-1_qAQ8SIlqm", // Replace with your first Cognito User Pool ID
-    clientIds: ["15k0htcure51j9hmuiohoebbph","4jhn6qhc7hlkftkjgvkg78mq2f"], // Replace with your first App Client ID
+    id: "us-east-1_5LOytyLcW",
+    clientIds: ["1u4gh4icraa6q3h9sjunjjui63"], 
   };
   const {stationTable,cropTable}  = use(DynamoDBStack);
 

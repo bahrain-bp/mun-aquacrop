@@ -38,6 +38,37 @@ export function AuthStack({ stack }: StackContext) {
     },
   });
 
+  const webAuth = new Cognito(stack, "WebAuth", {
+    login: ["email"], // Use email and password for login
+    cdk: {
+      userPool: {
+        selfSignUpEnabled: true,
+        signInAliases: { email: true },
+        standardAttributes: {
+          email: {
+            required: true,
+            mutable: true,
+          },
+          phoneNumber: {
+            required: true,
+            mutable: true,
+          },
+          fullname: {
+            required: true,
+            mutable: true,
+          },
+        },
+      },
+      userPoolClient: {
+        authFlows: {
+          adminUserPassword: true, // Allow admin-created accounts with password
+          userPassword: true, // Allow user login with email and password
+          userSrp: true, // Allows the user to sign from website
+        },
+      },
+    },
+  });
+
   // Output User Pool details for easy access in other parts of the stack
   stack.addOutputs({
     UserPoolId: auth.userPoolId,
