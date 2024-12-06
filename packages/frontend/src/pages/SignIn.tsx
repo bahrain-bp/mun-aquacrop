@@ -60,7 +60,7 @@ const AuthenticatorContent: React.FC = () => {
   const sendUserIdToApi = async (userId: string) => {
     try {
       const response = await axios.post(
-        'https://om9882jcr2.execute-api.us-east-1.amazonaws.com/adminDashboard/exportData',
+        'https://vuor0sdlpf.execute-api.us-east-1.amazonaws.com/adminDashboard/exportData',
         { userId }, // Payload
         {
           headers: {

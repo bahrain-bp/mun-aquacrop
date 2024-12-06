@@ -40,7 +40,7 @@ const Dashboard: React.FC = () => {
         }
 
         // Make the API request with the token
-        const response = await axios.get('https://om9882jcr2.execute-api.us-east-1.amazonaws.com/adminDashboard/Farms', {
+        const response = await axios.get('https://vuor0sdlpf.execute-api.us-east-1.amazonaws.com/adminDashboard/Farms', {
           headers: {
             Authorization: `Bearer ${idToken}`,
           },
@@ -71,7 +71,7 @@ const Dashboard: React.FC = () => {
       }
 
       // Fetch zones for the selected farm
-      const response = await axios.get(`https://om9882jcr2.execute-api.us-east-1.amazonaws.com/adminDashboard/Farms/${farm.id}/Zones`, {
+      const response = await axios.get(`https://vuor0sdlpf.execute-api.us-east-1.amazonaws.com/adminDashboard/Farms/${farm.id}/Zones`, {
         headers: {
           Authorization: `Bearer ${idToken}`,
         },

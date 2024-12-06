@@ -15,9 +15,19 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 Amplify.configure({
   Auth: {
     Cognito:{
-    userPoolId: 'us-east-1_5LOytyLcW',
-    userPoolClientId: '1u4gh4icraa6q3h9sjunjjui63',
+    userPoolId: 'us-east-1_rMGU0HI6v',
+    userPoolClientId: '1nj7cq6ubj4291t4jqqd798kab',
   },
+},
+API: {
+  REST: {
+    YourAPIName: {
+      endpoint:
+        'https://vuor0sdlpf.execute-api.us-east-1.amazonaws.com/',
+      region: 'us-east-1'
+    }
+  }
 }
+
 }
 );

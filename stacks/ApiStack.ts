@@ -10,6 +10,11 @@ export function ApiStack({stack}: StackContext) {
     const auth = use(AuthStack);
     const {stationTable, cropTable, weatherReadingsTable} = use(DynamoDBStack);
 
+    const authApi = {
+      userPoolId: "us-east-1_rMGU0HI6v", // Replace with your Cognito User Pool ID
+      userPoolClientId: "1nj7cq6ubj4291t4jqqd798kab", // Replace with your Cognito App Client ID
+    };
+
     // Create the HTTP API
     const api = new Api(stack, "Api", {
         defaults: {
@@ -22,6 +27,15 @@ export function ApiStack({stack}: StackContext) {
                     WeatherReadingsTableName: weatherReadingsTable.tableName,
                 },
             },
+        },
+        authorizers: {
+          authApi: { 
+            type: "user_pool",
+            userPool: {
+              id: authApi.userPoolId,
+              clientIds: [authApi.userPoolClientId],
+            },
+          },
         },
         routes: {
             // Sample TypeScript lambda function
@@ -100,29 +114,33 @@ export function ApiStack({stack}: StackContext) {
         function: {
           handler: "packages/functions/src/AdminDashboard/GetFarms.handler",
           runtime: "nodejs18.x",
+          permissions: ["dynamodb:Query"],
         },
-        authorizer: "user_pool1",
+        authorizer: "authApi",
       },
       "GET /adminDashboard/Farms/{FarmID}/Zones": {
         function: {
           handler: "packages/functions/src/AdminDashboard/GetZones.handler",
           runtime: "nodejs18.x",
+          permissions: ["dynamodb:Query"],
         },
-        authorizer: "user_pool1",
+        authorizer: "authApi",
       },
       "POST /adminDashboard/Farms/{FarmID}/Zones/{ZoneID}/Irrigate": {
         function: {
           handler: "packages/functions/src/AdminDashboard/TriggerIrrigation.handler",
           runtime: "nodejs18.x",
+          
         },
-        authorizer: "user_pool1",
+        authorizer: "authApi",
       },
       "POST /adminDashboard/Farms/{FarmID}/Zones/{ZoneID}/UpdateStatus": {
         function: {
           handler: "packages/functions/src/AdminDashboard/UpdateZoneStatus.handler",
           runtime: "nodejs18.x",
+          
         },
-        authorizer: "user_pool1",
+        authorizer: "authApi",
       },
 
       

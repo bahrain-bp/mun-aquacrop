@@ -2,19 +2,25 @@ import { DynamoDBDocumentClient, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 
 const dynamoDBClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
-const TABLE_NAME = "SaqiDev-mun-aquacrop-Farms"; // Replace with your actual table name
+const TABLE_NAME = "SaqiDev-mun-aquacrop-Farms"; // Replace with your table name
 
 export const handler = async (event) => {
   try {
-    // Get authenticated user's ID from the event
-    const ownerId = event.requestContext.authorizer.claims.sub;
+    console.log("Full Event:", JSON.stringify(event, null, 2));
 
-    if (!ownerId) {
+    // Extract claims from the authorizer
+    const claims = event.requestContext?.authorizer?.jwt?.claims;
+    if (!claims || !claims.sub) {
       return {
         statusCode: 401,
-        body: JSON.stringify({ message: "Unauthorized: OwnerID is missing" }),
+        body: JSON.stringify({ message: "Unauthorized: Missing claims or sub" }),
       };
     }
+
+    // Extract the authenticated user's ID (sub) from the claims
+    const ownerId = claims.sub;
+
+    console.log("Authenticated User ID:", ownerId);
 
     // Query DynamoDB for farms owned by this admin
     const response = await dynamoDBClient.send(
