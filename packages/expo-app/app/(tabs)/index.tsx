@@ -16,7 +16,7 @@ const HomeScreen = () => {
 const refreshToken = async () => {
   try {
     const refreshToken = await AsyncStorage.getItem('refreshToken');
-    const clientId = '2jii0mq29gg4jlam8j2a7eqtcv'; 
+    const clientId = process.env.EXPO_PUBLIC_AWS_USERPOOL_CLIENTID; 
     const refreshUrl = `https://cognito-idp.us-east-1.amazonaws.com/`;
 
     if (!refreshToken) return false;

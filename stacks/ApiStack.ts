@@ -1,14 +1,19 @@
-import {Api, StackContext, use} from "sst/constructs";
-import {DBStack} from "./DBStack";
-import {DynamoDBStack} from "./DynamoDBStack";
-import {AuthStack} from "./AuthStack"; // Adjust the path if necessary
-import {CacheHeaderBehavior, CachePolicy} from "aws-cdk-lib/aws-cloudfront";
-import {Duration} from "aws-cdk-lib/core";
+import { Api, StackContext, use } from "sst/constructs";
+import { DBStack } from "./DBStack";
+import { DynamoDBStack } from "./DynamoDBStack";
+import { AuthStack } from "./AuthStack"; 
+import { CacheHeaderBehavior, CachePolicy } from "aws-cdk-lib/aws-cloudfront";
+import { Duration } from "aws-cdk-lib/core";
 
 export function ApiStack({stack}: StackContext) {
     const {table} = use(DBStack);
     const auth = use(AuthStack);
     const {stationTable, cropTable, weatherReadingsTable} = use(DynamoDBStack);
+
+    const authApi = {
+      userPoolId: "us-east-1_hnWEMUtuF", // Replace with your Cognito User Pool ID
+      userPoolClientId: "5r4hef17hqa4rkr39qgsds3ta3", // Replace with your Cognito App Client ID
+    };
 
     // Create the HTTP API
     const api = new Api(stack, "Api", {
@@ -22,6 +27,15 @@ export function ApiStack({stack}: StackContext) {
                     WeatherReadingsTableName: weatherReadingsTable.tableName,
                 },
             },
+        },
+        authorizers: {
+          authApi: { 
+            type: "user_pool",
+            userPool: {
+              id: authApi.userPoolId,
+              clientIds: [authApi.userPoolClientId],
+            },
+          },
         },
         routes: {
             // Sample TypeScript lambda function
@@ -84,7 +98,53 @@ export function ApiStack({stack}: StackContext) {
                     permissions: ["dynamodb:PutItem"],
                 },
             },
+    
+
+      // Admin Dashboard Routing //
+
+
+      "POST /adminDashboard/exportData": {
+        function: {
+          handler: "packages/functions/src/AdminDashboard/Auth/exportData.handler",
+          runtime: "nodejs18.x",
+          permissions: ["cognito-idp:AdminGetUser","dynamodb:PutItem","dynamodb:GetItem","dynamodb:UpdateItem"],
         },
+      },
+      "GET /adminDashboard/Farms": {
+        function: {
+          handler: "packages/functions/src/AdminDashboard/GetFarms.handler",
+          runtime: "nodejs18.x",
+          permissions: ["dynamodb:Query","dynamodb:GetItem"],
+        },
+        authorizer: "authApi",
+      },
+      "GET /adminDashboard/Farms/{FarmID}/Zones": {
+        function: {
+          handler: "packages/functions/src/AdminDashboard/GetZones.handler",
+          runtime: "nodejs18.x",
+          permissions: ["dynamodb:Query","dynamodb:GetItem"],
+        },
+        authorizer: "authApi",
+      },
+      "POST /adminDashboard/Farms/{FarmID}/Zones/{ZoneID}/Irrigate": {
+        function: {
+          handler: "packages/functions/src/AdminDashboard/TriggerIrrigation.handler",
+          runtime: "nodejs18.x",
+          
+        },
+        authorizer: "authApi",
+      },
+      "POST /adminDashboard/Farms/{FarmID}/Zones/{ZoneID}/UpdateStatus": {
+        function: {
+          handler: "packages/functions/src/AdminDashboard/UpdateZoneStatus.handler",
+          runtime: "nodejs18.x",
+          
+        },
+        authorizer: "authApi",
+      },
+
+      
+    },
     });
 
     // Cache policy to use with CloudFront as reverse proxy to avoid CORS
