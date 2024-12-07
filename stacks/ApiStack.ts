@@ -122,7 +122,7 @@ export function ApiStack({stack}: StackContext) {
         function: {
           handler: "packages/functions/src/AdminDashboard/GetZones.handler",
           runtime: "nodejs18.x",
-          permissions: ["dynamodb:Query","dynamodb:GetItem"],
+          permissions: ["dynamodb:Query","dynamodb:GetItem","s3:GetObject","s3:ListBucket"],
         },
         authorizer: "authApi",
       },
