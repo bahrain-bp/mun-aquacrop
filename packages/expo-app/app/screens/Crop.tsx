@@ -214,29 +214,85 @@ const Crop: React.FC = () => {
             }
         }
 
-        let kcForCrop;
+        let cropKC;
+
+        interface Growth {
+            ini: { N: string };
+            mid: { N: string };
+            end: { N: string };
+        }
+
+        interface Kc {
+            ini: { N: string };
+            mid: { N: string };
+            end: { N: string };
+        }
+
+        const parsedGrowth = JSON.parse(GrowthStage);
+
+        const parsedKc = JSON.parse(kc);
+
+
+        const kcZones: Growth = {
+            ini: {N: parsedKc.M.ini.N},
+            mid: {N: parsedKc.M.mid.N},
+            end: {N: parsedKc.M.end.N},
+        };
+
+        const StageTime: Growth = {
+            ini: {N: parsedGrowth.M.ini.N},
+            mid: {N: parsedGrowth.M.mid.N},
+            end: {N: parsedGrowth.M.end.N},
+        };
 
 
         if (selectedOption == 'datePlanted') {
-            selectedDate?.toISOString()
-        } else if (selectedOption == 'growthStage'){
+            if (selectedDate) {
+                // Calculate number of days between selectedDate and today
+                const today = new Date();
+                const plantedDate = new Date(selectedDate); // Ensure selectedDate is something like a string date or Date object
+                const timeDiff = today.getTime() - plantedDate.getTime();
+                const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+
+                // Compare daysDiff against StageTime thresholds
+                const iniDays = parseInt(StageTime.ini.N, 10);
+                const midDays = parseInt(StageTime.mid.N, 10);
+                const endDays = parseInt(StageTime.end.N, 10);
+
+                // Determine stage based on daysDiff
+                if (daysDiff <= iniDays) {
+                    // We are within the initial stage
+                    cropKC = kcZones.ini.N;
+                } else if (daysDiff <= midDays) {
+                    // We are past ini but before mid threshold
+                    cropKC = kcZones.mid.N;
+                } else if (daysDiff <= endDays) {
+                    // We are past mid but before end threshold
+                    cropKC = kcZones.end.N;
+                } else {
+                    // If we are beyond the last defined threshold,
+                    // decide what should happen. Possibly still use end stage:
+                    cropKC = kcZones.end.N;
+                }
+            }
+
+
+        } else if (selectedOption == 'growthStage') {
 
             if (growthStage == 'stage1') {
-                kcForCrop = GrowthStage;
+                cropKC = kcZones?.ini?.N;
             } else if (growthStage == 'stage2') {
-                kcForCrop = GrowthStage?.M?.mid?.N;
+                cropKC = kcZones?.mid?.N;
             } else if (growthStage == 'stage3') {
-                kcForCrop = GrowthStage?.M?.end?.N;
+                cropKC = kcZones?.end?.N;
             }
-            console.log('kcForCrop:', kcForCrop);
-            console.log('kcForCrops at mt endoint');
         }
 
         let recommendationParams: any = {
             // Data from the previous page
             title: nameEN,
             imageSource: ImageURL,
-            kcForCrop: kcForCrop,
+            kcForCrop: cropKC,
             // New data from this page
             latitude: finalLocation.latitude,
             longitude: finalLocation.longitude,

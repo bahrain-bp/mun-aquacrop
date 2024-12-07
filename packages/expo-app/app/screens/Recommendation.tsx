@@ -32,7 +32,7 @@ const Recommendation: React.FC = () => {
         stageImage?: string;
         kc: string;
         cropID: string;
-        kcForCrop: string;
+        kcForCrop: number;
     }>();
 
     const [isLoading, setIsLoading] = useState(true);
@@ -47,7 +47,8 @@ const Recommendation: React.FC = () => {
                     lon:longitude,
                 });
                 // Extract ET0 from the response
-                const { ET0 } = response.data;
+                var { ET0 } = response.data;
+                ET0 = ET0 * kcForCrop;
                 setET0(ET0);
             } catch (error) {
                 console.error('Error fetching ET0:', error);
