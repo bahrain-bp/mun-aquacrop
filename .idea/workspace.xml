@@ -4,16 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5651235c-5b64-4f9d-9785-c963d997a38a" name="Changes" comment="Fetcing from database to Dashboard">
+    <list default="true" id="af9a6a8a-c792-4eb4-9cce-a415c3983bc8" name="Changes" comment="mostly done with the calculation &#10;KC / determing which stage is the crop in to ge the lasxt result">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/expo-app/.env" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/.env" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/expo-app/.expo/static-tmp/_error.js" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/.expo/static-tmp/_error.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/expo-app/.expo/types/router.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/.expo/types/router.d.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/expo-app/app/screens/Crop.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/app/screens/Crop.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/expo-app/app/screens/DashBoard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/app/screens/DashBoard.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/expo-app/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/expo-app/app/screens/Recommendation.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/app/screens/Recommendation.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/functions/src/calculateWaterNeed.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/functions/src/calculateWaterNeed.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test.http" beforeDir="false" afterPath="$PROJECT_DIR$/test.http" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,15 +18,33 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 6
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "Lui35"
+  }
 }]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/bahrain-bp/mun-aquacrop.git",
+    "accountId": "f455a86c-8690-4709-9ed4-b215942d410e"
+  }
+}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 6
+}</component>
   <component name="ProjectId" id="2pqzQcZ3MAmS8u69cYD8ksTnD6n" />
   <component name="ProjectLevelVcsManager">
     <OptionsSetting value="false" id="Update" />
+    <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -37,18 +52,81 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "HTTP Request.test | #1.executor": "Run",
+    "HTTP Request.test | #2 (1).executor": "Run",
+    "HTTP Request.test | #3.executor": "Run",
+    "HTTP Request.test | #4.executor": "Run",
+    "HTTP Request.test | #5.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "Frontend",
+    "ignore.virus.scanning.warn.message": "true",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "ts.external.directory.path": "C:\\Users\\A.Annan\\Desktop\\Final Project IT7099\\CIC\\mun-aquacrop\\node_modules\\typescript\\lib",
+    "npm.dev.executor": "Run",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "ts.external.directory.path": "C:\\Users\\PC\\WebstormProjects\\mun-aquacrop\\node_modules\\typescript\\lib",
     "vue.rearranger.settings.migration": "true"
+  },
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "HTTP Request"
+    ]
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\PC\WebstormProjects\mun-aquacrop\packages\expo-app\components" />
+      <recent name="C:\Users\PC\WebstormProjects\mun-aquacrop\packages\functions\src" />
+    </key>
+  </component>
+  <component name="RunManager" selected="npm.dev">
+    <configuration name="test | #1" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/test.http" executionIdentifier="#1" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="test | #2 (1)" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/test.http" executionIdentifier="#2" index="2" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="test | #3" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/test.http" executionIdentifier="#3" index="3" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="test | #4" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/test.http" executionIdentifier="#4" index="4" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="test | #5" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/test.http" executionIdentifier="#5" index="5" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="dev" type="js.build_tools.npm" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="HTTP Request.test | #5" />
+      <item itemvalue="HTTP Request.test | #1" />
+      <item itemvalue="HTTP Request.test | #2 (1)" />
+      <item itemvalue="HTTP Request.test | #3" />
+      <item itemvalue="HTTP Request.test | #4" />
+      <item itemvalue="npm.dev" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="HTTP Request.test | #5" />
+        <item itemvalue="HTTP Request.test | #4" />
+        <item itemvalue="HTTP Request.test | #3" />
+        <item itemvalue="HTTP Request.test | #1" />
+        <item itemvalue="HTTP Request.test | #2 (1)" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -59,12 +137,24 @@
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="5651235c-5b64-4f9d-9785-c963d997a38a" name="Changes" comment="Fetcing from database to Dashboard" />
+      <changelist id="af9a6a8a-c792-4eb4-9cce-a415c3983bc8" name="Changes" comment="mostly done with the calculation &#10;KC / determing which stage is the crop in to ge the lasxt result" />
       <created>1733508386110</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1733508386110</updated>
-      <workItem from="1733508394967" duration="18113000" />
+      <updated>1733055029455</updated>
+      <workItem from="1733055031230" duration="4728000" />
+      <workItem from="1733060454870" duration="2769000" />
+      <workItem from="1733341169282" duration="27000" />
+      <workItem from="1733341201993" duration="7693000" />
+      <workItem from="1733596019086" duration="3011000" />
+    </task>
+    <task id="LOCAL-00001" summary="smei working closest station calcualtion &#10;and some other fixes">
+      <option name="closed" value="true" />
+      <created>1733247131149</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1733247131149</updated>
     </task>
     <servers />
   </component>
