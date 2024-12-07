@@ -21,6 +21,10 @@ import DatePicker from 'react-datepicker'; // For Web
 import 'react-datepicker/dist/react-datepicker.css'; // Required CSS for react-datepicker on Web
 import CustomRadioButton from '@/components/CustomRadioButton'; // Ensure the path is correct
 
+// Testing
+import { SelectList } from 'react-native-dropdown-select-list'
+// Testing end
+
 interface LocationOption {
     label: string;
     value: string;
@@ -67,7 +71,7 @@ const Crop: React.FC = () => {
     ];
 
     const growthStages: GrowthStageOption[] = [
-        { label: "Stage 1", value: "stage1", imageSource: "https://example.com/stage1.jpg" },
+        { label: "Stage 1", value: "stage1", imageSource: "s3://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua/images/Plant Intial Stage.png" },
         { label: "Stage 2", value: "stage2", imageSource: "https://example.com/stage2.jpg" },
         { label: "Stage 3", value: "stage3", imageSource: "https://example.com/stage3.jpg" },
     ];
@@ -238,6 +242,12 @@ const Crop: React.FC = () => {
     const isButtonEnabled = (selectedOption === 'datePlanted' && isDateSelected) ||
         (selectedOption === 'growthStage' && isGrowthStageSelected);
 
+    // testing
+    const [selected, setSelected] = React.useState("");
+
+
+    // testing end
+
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <Text style={styles.title}>{nameEN}</Text>
@@ -251,52 +261,83 @@ const Crop: React.FC = () => {
 
             {/* Radio buttons to choose location method */}
             <View style={styles.locationMethodWrapper}>
-                <Text style={styles.locationMethodTitle}>Choose Location Method</Text>
+
+                <View style={styles.locationMethodWrapperText}>
+                    <Text style={styles.locationMethodTitle}>Choose Location Method</Text>
+                </View>
+
                 <View style={styles.radioButtonsRow}>
-                    <CustomRadioButton
-                        label="By Location"
-                        selected={locationMethod === 'auto'}
-                        onPress={() => setLocationMethod('auto')}
-                        disabled={isAutoDisabled}
-                    />
-                    <CustomRadioButton
-                        label="By Dropdown"
-                        selected={locationMethod === 'manual'}
-                        onPress={() => setLocationMethod('manual')}
-                    />
+                    <View style={styles.radioButtons}>
+                        <CustomRadioButton
+                            label="By Location"
+                            selected={locationMethod === 'auto'}
+                            onPress={() => setLocationMethod('auto')}
+                            disabled={isAutoDisabled}
+                        />
+                    </View>
+                    <View style={styles.radioButtons}>
+                        <CustomRadioButton
+                            label="By Dropdown"
+                            selected={locationMethod === 'manual'}
+                            onPress={() => setLocationMethod('manual')}
+                        />
+                    </View>
                 </View>
             </View>
 
             {/* Dropdown for manual location selection */}
             {locationMethod === 'manual' && (
                 <View style={styles.pickerContainer}>
-                    <Picker
-                        selectedValue={selectedLocationValue}
-                        onValueChange={(itemValue, itemIndex) => handleLocationSelect(itemValue)}
-                        style={styles.picker}
-                        mode="dropdown" // Android specific
-                        prompt="Select your location in Bahrain" // Optional: for Android
-                    >
-                        <Picker.Item label="Select your location in Bahrain" value="" />
-                        {bahrainLocations.map((loc) => (
-                            <Picker.Item key={loc.value} label={loc.label} value={loc.value} />
-                        ))}
-                    </Picker>
+                    {/*<Picker*/}
+                    {/*    selectedValue={selectedLocationValue}*/}
+                    {/*    onValueChange={(itemValue, itemIndex) => handleLocationSelect(itemValue)}*/}
+                    {/*    style={styles.picker}*/}
+                    {/*    mode="dropdown" // Android specific*/}
+                    {/*    prompt="Select your location in Bahrain" // Optional: for Android*/}
+                    {/*>*/}
+                    {/*    <Picker.Item label="Select your location in Bahrain" value="" />*/}
+                    {/*    {bahrainLocations.map((loc) => (*/}
+                    {/*        <Picker.Item key={loc.value} label={loc.label} value={loc.value} />*/}
+                    {/*    ))}*/}
+                    {/*</Picker>*/}
+
+                    {/*Testing*/}
+                    <SelectList
+                        data={bahrainLocations}
+                        setSelected={setSelected}
+                        // dropdownStyles={{backgroundColor: '#000080'}}
+                        // dropdownItemStyles={{marginHorizontal:10}}
+                        // dropdownTextStyles={{color: 'white'}}
+                        placeholder="Select your location in Bahrain"
+                    />
+
+
                 </View>
             )}
 
             {/* Radio buttons for Date Planted and Growth Stage */}
             <View style={styles.radioButtonWrapperDateGrowth}>
-                <CustomRadioButton
-                    label="Date Planted"
-                    selected={selectedOption === 'datePlanted'}
-                    onPress={() => setSelectedOption('datePlanted')}
-                />
-                <CustomRadioButton
-                    label="Growth Stage"
-                    selected={selectedOption === 'growthStage'}
-                    onPress={() => setSelectedOption('growthStage')}
-                />
+
+                <View style={styles.radioButtonsRow} >
+
+                    <View style={styles.radioButtons}>
+                        <CustomRadioButton
+                            label="Date Planted"
+                            selected={selectedOption === 'datePlanted'}
+                            onPress={() => setSelectedOption('datePlanted')}
+                        />
+                    </View>
+
+                    <View style={styles.radioButtons}>
+                        <CustomRadioButton
+                            label="Growth Stage"
+                            selected={selectedOption === 'growthStage'}
+                            onPress={() => setSelectedOption('growthStage')}
+                        />
+                    </View>
+
+                </View>
+
             </View>
 
             {/* Date Picker */}
@@ -374,8 +415,6 @@ const Crop: React.FC = () => {
 
 const styles = StyleSheet.create({
     container: {
-        flexGrow: 1,
-        justifyContent: 'flex-start',
         alignItems: 'center',
         padding: 20,
         backgroundColor: '#f0f4f7',
@@ -405,8 +444,11 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     locationMethodWrapper: {
-        width: '100%',
-        marginTop: 10,
+        // flex: 1,
+        // justifyContent: 'space-between',
+    },
+    locationMethodWrapperText:{
+        alignItems: 'center',
     },
     locationMethodTitle: {
         fontSize: 18,
@@ -417,9 +459,21 @@ const styles = StyleSheet.create({
     radioButtonsRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: 'center',
+        // width: '100%', // Full width for each component
+        // padding: 20,
+        // backgroundColor: '#D3D3D3',
+        // alignItems: 'center', // Center text inside the box
+        // marginBottom: 10,
+    },
+    radioButtons:{
+        padding: 20,
+        paddingBottom: 0,
+        paddingTop: 0,
+        margin: 10,
     },
     pickerContainer: {
-        width: '80%',
+        width: '35%',
         marginTop: 20,
         borderWidth: 1,
         borderColor: '#ccc',
@@ -430,13 +484,13 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     radioButtonWrapperDateGrowth: {
-        flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 30,
     },
     datePlantedContainer: {
         width: '80%',
         marginTop: 20,
+        alignItems: 'center',
     },
     growthStageContainer: {
         width: '100%',

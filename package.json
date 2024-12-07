@@ -23,6 +23,7 @@
     "packages/*"
   ],
   "dependencies": {
+    "@ant-design/icons-react-native": "^2.3.2",
     "@aws-cdk/cx-api": "^2.171.0",
     "@aws-sdk/client-cognito-identity-provider": "^3.699.0",
     "@aws-sdk/client-dynamodb": "^3.699.0",
@@ -35,6 +36,9 @@
     "aws-amplify": "^6.9.0",
     "axios": "^1.7.7",
     "expo-dotenv": "^0.1.0",
-    "jwt-decode": "^4.0.0"
+    "jwt-decode": "^4.0.0",
+    "react-native-dropdown-picker": "^5.4.6",
+    "react-native-dropdown-select-list": "^2.0.5",
+    "react-native-element-dropdown": "^2.12.2"
   }
 }
