@@ -11,8 +11,8 @@ export function ApiStack({stack}: StackContext) {
     const {stationTable, cropTable, weatherReadingsTable} = use(DynamoDBStack);
 
     const authApi = {
-      userPoolId: "us-east-1_rMGU0HI6v", // Replace with your Cognito User Pool ID
-      userPoolClientId: "1nj7cq6ubj4291t4jqqd798kab", // Replace with your Cognito App Client ID
+      userPoolId: "us-east-1_hnWEMUtuF", // Replace with your Cognito User Pool ID
+      userPoolClientId: "5r4hef17hqa4rkr39qgsds3ta3", // Replace with your Cognito App Client ID
     };
 
     // Create the HTTP API
@@ -114,7 +114,7 @@ export function ApiStack({stack}: StackContext) {
         function: {
           handler: "packages/functions/src/AdminDashboard/GetFarms.handler",
           runtime: "nodejs18.x",
-          permissions: ["dynamodb:Query"],
+          permissions: ["dynamodb:Query","dynamodb:GetItem"],
         },
         authorizer: "authApi",
       },
@@ -122,7 +122,7 @@ export function ApiStack({stack}: StackContext) {
         function: {
           handler: "packages/functions/src/AdminDashboard/GetZones.handler",
           runtime: "nodejs18.x",
-          permissions: ["dynamodb:Query"],
+          permissions: ["dynamodb:Query","dynamodb:GetItem"],
         },
         authorizer: "authApi",
       },

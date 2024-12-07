@@ -6,7 +6,7 @@ const TABLE_NAME = "SaqiDev-mun-aquacrop-Farms"; // Replace with your table name
 
 export const handler = async (event) => {
   try {
-    console.log("Full Event:", JSON.stringify(event, null, 2));
+
 
     // Extract claims from the authorizer
     const claims = event.requestContext?.authorizer?.jwt?.claims;
