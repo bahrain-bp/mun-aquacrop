@@ -140,7 +140,7 @@ export function ApiStack({stack}: StackContext) {
           runtime: "nodejs18.x",
           
         },
-        authorizer: "authApi",
+        authorizer: "authApi", 
       },
 
       
