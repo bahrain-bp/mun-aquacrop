@@ -1,0 +1,39 @@
+POST https://uyc0g735b2.execute-api.us-east-1.amazonaws.com/Latest/Weather/Reading
+Content-Type: application/json
+
+{
+  "stationId": "2"
+}
+###
+POST https://uyc0g735b2.execute-api.us-east-1.amazonaws.com/calculate/water
+content-type: application/json
+
+{
+  "lat": 40.7128,
+  "lon": -74.0060
+}
+
+
+
+###
+POST https://uyc0g735b2.execute-api.us-east-1.amazonaws.com/Latest/Weather/Reading
+content-type: application/json
+
+{
+  "pathParameters": 2
+  //  "queryStringParameters": -74.0060
+}
+
+
+
+
+
+
+###
+GET https://uyc0g735b2.execute-api.us-east-1.amazonaws.com/crops
+
+<> 2024-12-03T202405.200.txt
+<> 2024-12-03T202142.200.txt
+
+
+
