@@ -211,15 +211,17 @@ export const handler: APIGatewayProxyHandler = async (event: any) => {
             weatherReading.minTemp, weatherReading.maxTemp, weatherReading.humidity, weatherReading.wind_speed, 0);
 
 
+        // nearestStationId,
+        //     distance: minDistance,
+        //     lastReading: lastReading,
+        //     resultWeather: weatherReading,
+        //     ET0: ET0
+
         // Return the nearest station's ID
         if (nearestStationId) {
             return {
                 statusCode: 200,
                 body: JSON.stringify({
-                    nearestStationId,
-                    distance: minDistance,
-                    lastReading: lastReading,
-                    resultWeather: weatherReading,
                     ET0: ET0
                 }),
             };
