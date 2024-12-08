@@ -48,7 +48,7 @@ const Recommendation: React.FC = () => {
                 });
                 // Extract ET0 from the response
                 var { ET0 } = response.data;
-                ET0 = ET0 * kcForCrop;
+                 ET0 = ET0 * kcForCrop;
                 setET0(ET0);
             } catch (error) {
                 console.error('Error fetching ET0:', error);
@@ -82,26 +82,26 @@ const Recommendation: React.FC = () => {
                         </View>
                     )}
 
-                    <View style={styles.infoContainer}>
-                        <Text style={styles.infoText}>kcForCrop : {kcForCrop}</Text>
-                        <Text style={styles.infoText}>Crop ID: {cropID}</Text>
-                        <Text style={styles.infoText}>Kc Value: {kc}</Text>
-                        <Text style={styles.infoText}>Location Method: {locationMethod}</Text>
-                        <Text style={styles.infoText}>Latitude: {latitude}</Text>
-                        <Text style={styles.infoText}>Longitude: {longitude}</Text>
-                        <Text style={styles.infoText}>Selection Method: {selectionMethod}</Text>
-                        {selectionMethod === 'datePlanted' && (
-                            <Text style={styles.infoText}>Date Planted: {selectedDate}</Text>
-                        )}
-                        {selectionMethod === 'growthStage' && (
-                            <>
-                                <Text style={styles.infoText}>Growth Stage: {growthStage}</Text>
-                                {stageImage && (
-                                    <Image source={{ uri: stageImage }} style={styles.stageImage} />
-                                )}
-                            </>
-                        )}
-                    </View>
+                    {/*<View style={styles.infoContainer}>*/}
+                    {/*    <Text style={styles.infoText}>kcForCrop : {kcForCrop}</Text>*/}
+                    {/*    <Text style={styles.infoText}>Crop ID: {cropID}</Text>*/}
+                    {/*    <Text style={styles.infoText}>Kc Value: {kc}</Text>*/}
+                    {/*    <Text style={styles.infoText}>Location Method: {locationMethod}</Text>*/}
+                    {/*    <Text style={styles.infoText}>Latitude: {latitude}</Text>*/}
+                    {/*    <Text style={styles.infoText}>Longitude: {longitude}</Text>*/}
+                    {/*    <Text style={styles.infoText}>Selection Method: {selectionMethod}</Text>*/}
+                    {/*    {selectionMethod === 'datePlanted' && (*/}
+                    {/*        <Text style={styles.infoText}>Date Planted: {selectedDate}</Text>*/}
+                    {/*    )}*/}
+                    {/*    {selectionMethod === 'growthStage' && (*/}
+                    {/*        <>*/}
+                    {/*            <Text style={styles.infoText}>Growth Stage: {growthStage}</Text>*/}
+                    {/*            {stageImage && (*/}
+                    {/*                <Image source={{ uri: stageImage }} style={styles.stageImage} />*/}
+                    {/*            )}*/}
+                    {/*        </>*/}
+                    {/*    )}*/}
+                    {/*</View>*/}
                 </>
             )}
         </View>

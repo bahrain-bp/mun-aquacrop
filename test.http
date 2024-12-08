@@ -1,11 +1,11 @@
-POST https://26yve06bzk.execute-api.us-east-1.amazonaws.com/Latest/Weather/Reading
+POST https://vuor0sdlpf.execute-api.us-east-1.amazonaws.com/Latest/Weather/Reading
 Content-Type: application/json
 
 {
   "stationId": "2"
 }
 ###
-POST https://26yve06bzk.execute-api.us-east-1.amazonaws.com/calculate/water
+POST https://vuor0sdlpf.execute-api.us-east-1.amazonaws.com/calculate/water
 content-type: application/json
 
 {
@@ -13,7 +13,7 @@ content-type: application/json
   "lon": -74.0060
 }
 ###
-POST https://26yve06bzk.execute-api.us-east-1.amazonaws.com/calculate/water
+POST https://vuor0sdlpf.execute-api.us-east-1.amazonaws.com/calculate/water
 content-type: application/json
 
 {
@@ -22,7 +22,7 @@ content-type: application/json
 }
 
 ###
-POST https://26yve06bzk.execute-api.us-east-1.amazonaws.com/Latest/Weather/Reading
+POST https://vuor0sdlpf.execute-api.us-east-1.amazonaws.com/Latest/Weather/Reading
 content-type: application/json
 
 {
@@ -32,7 +32,7 @@ content-type: application/json
 
 
 ###
-GET  https://26yve06bzk.execute-api.us-east-1.amazonaws.com/crops
+GET  https://vuor0sdlpf.execute-api.us-east-1.amazonaws.com/crops
 
 <> 2024-12-03T202405.200.txt
 <> 2024-12-03T202142.200.txt
