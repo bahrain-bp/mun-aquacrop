@@ -15,8 +15,8 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 Amplify.configure({
   Auth: {
     Cognito:{
-    userPoolId: 'us-east-1_hnWEMUtuF',
-    userPoolClientId: '5r4hef17hqa4rkr39qgsds3ta3',
+    userPoolId: 'us-east-1_pgaytsnVv',
+    userPoolClientId: 'pbia0bkmcsbjmmgmu8b72ducm',
   },
 },
 API: {
