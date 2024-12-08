@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {Text, View, StyleSheet, ScrollView, Image, TouchableOpacity} from 'react-native';
-import { Link } from 'expo-router';
+import { Text, View, StyleSheet, ScrollView, Image, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 
 const API_URL = process.env.EXPO_PUBLIC_PROD_API_URL;
@@ -26,7 +25,6 @@ interface Crop {
     ImageURL: { S: string };
 }
 
-// Define a function to parse the raw data into a proper Crop type
 const parseCrops = (data: any): Crop[] => {
     return data.map((item: any): Crop => ({
         nameEN: item.nameEN,
@@ -39,37 +37,31 @@ const parseCrops = (data: any): Crop[] => {
 };
 
 const Index: React.FC = () => {
-    const [crops, setCrops] = useState<Crop[]>([]); // State to store fetched crops
+    const [crops, setCrops] = useState<Crop[]>([]);
+    const { width } = useWindowDimensions(); // Get the current window width
 
-    // Fetch the crops data when the component mounts
     useEffect(() => {
         const fetchCrops = async () => {
             try {
                 const response = await fetch(API_URL + '/crops');
                 const data = await response.json();
-                setCrops(parseCrops(data)); // Update state with fetched crops data
+                setCrops(parseCrops(data));
             } catch (error) {
                 console.error("Error fetching crops:", error);
             }
         };
 
         fetchCrops();
-    }, []); // Empty dependency array ensures it runs only once after initial render
-
+    }, []);
 
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
             <Text style={styles.text}>Home screen</Text>
-
             <View style={styles.grid}>
-                {/* Dynamically generate rows of cards from the crops data */}
                 {crops.length > 0 ? (
                     <View style={styles.row}>
                         {crops.map((crop, index) => (
-                            <Card
-                                key={index} // Add a unique key for each card
-                                CropData={crop} // Passing the full crop data
-                            />
+                            <Card key={index} CropData={crop} />
                         ))}
                     </View>
                 ) : (
@@ -81,32 +73,26 @@ const Index: React.FC = () => {
 };
 
 interface CardProps {
-    CropData: Crop; // Full crop data passed from the parent component
+    CropData: Crop;
 }
 
 const Card: React.FC<CardProps> = ({ CropData }) => {
     const { nameEN, nameAR, GrowthStage, kc, CropID, ImageURL } = CropData;
-
     const router = useRouter();
 
-    console.log(nameEN);
     const handlePress = () => {
-
-        // Navigate to the Crop screen with parameters
         router.push({
             pathname: '/screens/Crop',
             params: {
                 nameEN: nameEN.S,
                 nameAR: nameAR.S,
-                GrowthStage: JSON.stringify(GrowthStage), // Stringify if necessary
-                kc: JSON.stringify(kc), // Stringify if necessary
+                GrowthStage: JSON.stringify(GrowthStage),
+                kc: JSON.stringify(kc),
                 CropID: CropID.S,
                 ImageURL: ImageURL.S,
             },
         });
     };
-
-
 
     return (
         <TouchableOpacity onPress={handlePress} style={styles.cardLink}>
@@ -120,7 +106,6 @@ const Card: React.FC<CardProps> = ({ CropData }) => {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
         backgroundColor: '#25292e',
         padding: 20,
     },
@@ -134,16 +119,18 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     grid: {
-        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        width: '100%',
     },
     row: {
-        flexDirection: 'row',
-        justifyContent: 'space-evenly', // Even space between items
-        flexWrap: 'wrap', // Allow wrapping of cards to the next row
-        width: '100%',
+        flexDirection: 'row',  // Align the cards horizontally
+        flexWrap: 'wrap',      // Allow cards to wrap to the next row
+        justifyContent: 'space-between',  // Distribute cards evenly across rows
+        width: '100%',  // Ensure the row takes the full width of the parent container
+    },
+    cardLink: {
+        width: '48%',  // 2 cards per row with 2% margin for spacing
+        marginBottom: 20,
     },
     cardContainer: {
         backgroundColor: '#D3D3D3',
@@ -155,9 +142,8 @@ const styles = StyleSheet.create({
         shadowRadius: 2,
         padding: 10,
         alignItems: 'center',
-        justifyContent: 'center', // Centers content vertically within the card
-        width: '30%', // This ensures each card takes up approximately 30% of the width (3 cards per row)
-        marginBottom: 20,
+        justifyContent: 'center',
+        width: '100%',  // Ensure the card takes the full width of the parent container
     },
     image: {
         width: 100,
@@ -169,10 +155,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         color: '#333',
-    },
-    cardLink: {
-        width: '100%',
-        textAlign: 'center',
     },
 });
 

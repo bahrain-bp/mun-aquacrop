@@ -1,6 +1,6 @@
 // app/screens/Crop.tsx
 
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect} from 'react';
 import {
     Text,
     View,
@@ -11,15 +11,19 @@ import {
     Platform,
     Alert,
 } from 'react-native';
-import { useRouter } from "expo-router";
-import { useLocalSearchParams } from 'expo-router';
+import {useRouter} from "expo-router";
+import {useLocalSearchParams} from 'expo-router';
 import * as Location from 'expo-location';
-import { Picker } from '@react-native-picker/picker'; // Native Picker
-
+import {Picker} from '@react-native-picker/picker'; // Native Picker (not used after switch to SelectList)
 import DateTimePicker from '@react-native-community/datetimepicker'; // For iOS/Android
 import DatePicker from 'react-datepicker'; // For Web
 import 'react-datepicker/dist/react-datepicker.css'; // Required CSS for react-datepicker on Web
 import CustomRadioButton from '@/components/CustomRadioButton'; // Ensure the path is correct
+
+// Testing
+import {SelectList} from 'react-native-dropdown-select-list'
+
+// Testing end
 
 interface LocationOption {
     label: string;
@@ -36,7 +40,7 @@ interface GrowthStageOption {
 
 const Crop: React.FC = () => {
     const router = useRouter();
-    const { nameEN, GrowthStage, kc, CropID, ImageURL } = useLocalSearchParams<{
+    const {nameEN, GrowthStage, kc, CropID, ImageURL} = useLocalSearchParams<{
         nameEN: string;
         GrowthStage: string;
         kc: string;
@@ -44,7 +48,7 @@ const Crop: React.FC = () => {
         ImageURL: string;
     }>();
 
-    console.log('Received Params:', { nameEN, GrowthStage, kc, CropID, ImageURL });
+    console.log('Received Params:', {nameEN, GrowthStage, kc, CropID, ImageURL});
 
     // State Variables
     const [selectedOption, setSelectedOption] = useState<"datePlanted" | "growthStage">("datePlanted");
@@ -58,19 +62,36 @@ const Crop: React.FC = () => {
     const [isAutoDisabled, setIsAutoDisabled] = useState<boolean>(false); // To disable 'auto' if location fetching fails
 
     const bahrainLocations: LocationOption[] = [
-        { label: "Manama", value: "manama", latitude: 26.2041, longitude: 50.5860 },
-        { label: "Riffa", value: "riffa", latitude: 26.1500, longitude: 50.5556 },
-        { label: "Muharraq", value: "muharraq", latitude: 26.2521, longitude: 50.6233 },
-        { label: "Sitra", value: "sitra", latitude: 26.0890, longitude: 50.6135 },
-        { label: "Isa Town", value: "isa_town", latitude: 26.2069, longitude: 50.5278 },
+        {label: "Manama", value: "manama", latitude: 26.2041, longitude: 50.5860},
+        {label: "Riffa", value: "riffa", latitude: 26.1500, longitude: 50.5556},
+        {label: "Muharraq", value: "muharraq", latitude: 26.2521, longitude: 50.6233},
+        {label: "Sitra", value: "sitra", latitude: 26.0890, longitude: 50.6135},
+        {label: "Isa Town", value: "isa_town", latitude: 26.2069, longitude: 50.5278},
         // Add more locations as needed...
     ];
 
     const growthStages: GrowthStageOption[] = [
-        { label: "Stage 1", value: "stage1", imageSource: "https://example.com/stage1.jpg" },
-        { label: "Stage 2", value: "stage2", imageSource: "https://example.com/stage2.jpg" },
-        { label: "Stage 3", value: "stage3", imageSource: "https://example.com/stage3.jpg" },
+        {
+            label: "Stage 1",
+            value: "stage1",
+            imageSource: "https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/Plant+Intial+Stage.png"
+        },
+        {
+            label: "Stage 2",
+            value: "stage2",
+            imageSource: "https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/Plant+Middle+Stage.png"
+        },
+        {
+            label: "Stage 3",
+            value: "stage3",
+            imageSource: "https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/Plant+End+Stage.png"
+        },
     ];
+
+    const locationDataForSelect = bahrainLocations.map(loc => ({
+        key: loc.value,
+        value: loc.label
+    }));
 
     useEffect(() => {
         if (locationMethod === 'auto') {
@@ -89,9 +110,9 @@ const Crop: React.FC = () => {
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(
                         (position) => {
-                            const { latitude, longitude } = position.coords;
+                            const {latitude, longitude} = position.coords;
                             console.log('Fetched Location:', latitude, longitude);
-                            setLocation({ latitude, longitude });
+                            setLocation({latitude, longitude});
                             setErrorMsg(null);
                         },
                         (error) => {
@@ -111,7 +132,7 @@ const Crop: React.FC = () => {
                 }
             } else {
                 // For iOS/Android, use expo-location
-                let { status } = await Location.requestForegroundPermissionsAsync();
+                let {status} = await Location.requestForegroundPermissionsAsync();
                 if (status !== 'granted') {
                     setErrorMsg('Permission to access location was denied');
                     Alert.alert('Permission Denied', 'Permission to access location was denied');
@@ -142,7 +163,7 @@ const Crop: React.FC = () => {
         const selected = bahrainLocations.find(loc => loc.value === selectedLocation);
         if (selected) {
             console.log('Selected Coordinates:', selected.latitude, selected.longitude);
-            setLocationSelected({ latitude: selected.latitude, longitude: selected.longitude });
+            setLocationSelected({latitude: selected.latitude, longitude: selected.longitude});
             setErrorMsg(null);
         } else {
             // If the user selects the placeholder, clear the locationSelected
@@ -158,6 +179,7 @@ const Crop: React.FC = () => {
 
     // Navigate to Recommendation screen
     const navigateToRecommendation = () => {
+        debugger;
         let finalLocation: { latitude: number; longitude: number } | null = null;
         let locationMethodUsed: 'auto' | 'manual' = locationMethod;
         let imageLink: string | null = null; // To hold the image link
@@ -192,20 +214,93 @@ const Crop: React.FC = () => {
             }
         }
 
+        let cropKC;
+
+        interface Growth {
+            ini: { N: string };
+            mid: { N: string };
+            end: { N: string };
+        }
+
+        interface Kc {
+            ini: { N: string };
+            mid: { N: string };
+            end: { N: string };
+        }
+
+        const parsedGrowth = JSON.parse(GrowthStage);
+
+        const parsedKc = JSON.parse(kc);
+
+
+        const kcZones: Growth = {
+            ini: {N: parsedKc.M.ini.N},
+            mid: {N: parsedKc.M.mid.N},
+            end: {N: parsedKc.M.end.N},
+        };
+
+        const StageTime: Growth = {
+            ini: {N: parsedGrowth.M.ini.N},
+            mid: {N: parsedGrowth.M.mid.N},
+            end: {N: parsedGrowth.M.end.N},
+        };
+
+
+        if (selectedOption == 'datePlanted') {
+            if (selectedDate) {
+                // Calculate number of days between selectedDate and today
+                const today = new Date();
+                const plantedDate = new Date(selectedDate); // Ensure selectedDate is something like a string date or Date object
+                const timeDiff = today.getTime() - plantedDate.getTime();
+                const daysDiff = Math.floor(timeDiff / (1000 * 60 * 60 * 24));
+
+                // Compare daysDiff against StageTime thresholds
+                const iniDays = parseInt(StageTime.ini.N, 10);
+                const midDays = parseInt(StageTime.mid.N, 10);
+                const endDays = parseInt(StageTime.end.N, 10);
+
+                // Determine stage based on daysDiff
+                if (daysDiff <= iniDays) {
+                    // We are within the initial stage
+                    cropKC = kcZones.ini.N;
+                } else if (daysDiff <= midDays) {
+                    // We are past ini but before mid threshold
+                    cropKC = kcZones.mid.N;
+                } else if (daysDiff <= endDays) {
+                    // We are past mid but before end threshold
+                    cropKC = kcZones.end.N;
+                } else {
+                    // If we are beyond the last defined threshold,
+                    // decide what should happen. Possibly still use end stage:
+                    cropKC = kcZones.end.N;
+                }
+            }
+
+
+        } else if (selectedOption == 'growthStage') {
+
+            if (growthStage == 'stage1') {
+                cropKC = kcZones?.ini?.N;
+            } else if (growthStage == 'stage2') {
+                cropKC = kcZones?.mid?.N;
+            } else if (growthStage == 'stage3') {
+                cropKC = kcZones?.end?.N;
+            }
+        }
+
         let recommendationParams: any = {
             // Data from the previous page
             title: nameEN,
             imageSource: ImageURL,
-
+            kcForCrop: cropKC,
             // New data from this page
             latitude: finalLocation.latitude,
             longitude: finalLocation.longitude,
             locationMethod: locationMethodUsed, // 'auto' or 'manual'
             // Selection method: 'datePlanted' or 'growthStage'
             selectionMethod: selectedOption,
-            // Depending on selection method, include either selectedDate or growthStage
-            ...(selectedOption === 'datePlanted' && { selectedDate: selectedDate?.toISOString() }),
-            ...(selectedOption === 'growthStage' && { growthStage: growthStage, stageImage: imageLink }),
+            ...(selectedOption === 'datePlanted' && {selectedDate: selectedDate?.toISOString()}),
+            ...(selectedOption === 'growthStage' && {growthStage: growthStage, stageImage: imageLink}),
             kc: kc,
             cropID: CropID,
         };
@@ -219,8 +314,8 @@ const Crop: React.FC = () => {
         });
     };
 
-    const onDateChange = (event: any, selectedDate: Date | undefined) => {
-        const currentDate = selectedDate || selectedDate;
+    const onDateChange = (event: any, chosenDate: Date | undefined) => {
+        const currentDate = chosenDate || selectedDate;
         setSelectedDate(currentDate);
         console.log('Selected Date:', currentDate);
     };
@@ -238,11 +333,17 @@ const Crop: React.FC = () => {
     const isButtonEnabled = (selectedOption === 'datePlanted' && isDateSelected) ||
         (selectedOption === 'growthStage' && isGrowthStageSelected);
 
+    // testing
+    const [selected, setSelected] = React.useState("");
+
+
+    // testing end
+
     return (
         <ScrollView contentContainerStyle={styles.container}>
             <Text style={styles.title}>{nameEN}</Text>
             {ImageURL ? (
-                <Image source={{ uri: ImageURL }} style={styles.image} />
+                <Image source={{uri: ImageURL}} style={styles.image}/>
             ) : (
                 <View style={styles.placeholderImage}>
                     <Text>No Image Available</Text>
@@ -251,52 +352,63 @@ const Crop: React.FC = () => {
 
             {/* Radio buttons to choose location method */}
             <View style={styles.locationMethodWrapper}>
-                <Text style={styles.locationMethodTitle}>Choose Location Method</Text>
+
+                <View style={styles.locationMethodWrapperText}>
+                    <Text style={styles.locationMethodTitle}>Choose Location Method</Text>
+                </View>
+
                 <View style={styles.radioButtonsRow}>
-                    <CustomRadioButton
-                        label="By Location"
-                        selected={locationMethod === 'auto'}
-                        onPress={() => setLocationMethod('auto')}
-                        disabled={isAutoDisabled}
-                    />
-                    <CustomRadioButton
-                        label="By Dropdown"
-                        selected={locationMethod === 'manual'}
-                        onPress={() => setLocationMethod('manual')}
-                    />
+                    <View style={styles.radioButtons}>
+                        <CustomRadioButton
+                            label="By Location"
+                            selected={locationMethod === 'auto'}
+                            onPress={() => setLocationMethod('auto')}
+                            disabled={isAutoDisabled}
+                        />
+                    </View>
+                    <View style={styles.radioButtons}>
+                        <CustomRadioButton
+                            label="By Dropdown"
+                            selected={locationMethod === 'manual'}
+                            onPress={() => setLocationMethod('manual')}
+                        />
+                    </View>
                 </View>
             </View>
 
             {/* Dropdown for manual location selection */}
             {locationMethod === 'manual' && (
                 <View style={styles.pickerContainer}>
-                    <Picker
-                        selectedValue={selectedLocationValue}
-                        onValueChange={(itemValue, itemIndex) => handleLocationSelect(itemValue)}
-                        style={styles.picker}
-                        mode="dropdown" // Android specific
-                        prompt="Select your location in Bahrain" // Optional: for Android
-                    >
-                        <Picker.Item label="Select your location in Bahrain" value="" />
-                        {bahrainLocations.map((loc) => (
-                            <Picker.Item key={loc.value} label={loc.label} value={loc.value} />
-                        ))}
-                    </Picker>
+                    <SelectList
+                        data={locationDataForSelect}
+                        setSelected={(val) => {
+                            setSelected(val);
+                            handleLocationSelect(val);
+                        }}
+                        placeholder="Select your location in Bahrain"
+                    />
                 </View>
             )}
 
             {/* Radio buttons for Date Planted and Growth Stage */}
             <View style={styles.radioButtonWrapperDateGrowth}>
-                <CustomRadioButton
-                    label="Date Planted"
-                    selected={selectedOption === 'datePlanted'}
-                    onPress={() => setSelectedOption('datePlanted')}
-                />
-                <CustomRadioButton
-                    label="Growth Stage"
-                    selected={selectedOption === 'growthStage'}
-                    onPress={() => setSelectedOption('growthStage')}
-                />
+                <View style={styles.radioButtonsRow}>
+                    <View style={styles.radioButtons}>
+                        <CustomRadioButton
+                            label="Date Planted"
+                            selected={selectedOption === 'datePlanted'}
+                            onPress={() => setSelectedOption('datePlanted')}
+                        />
+                    </View>
+
+                    <View style={styles.radioButtons}>
+                        <CustomRadioButton
+                            label="Growth Stage"
+                            selected={selectedOption === 'growthStage'}
+                            onPress={() => setSelectedOption('growthStage')}
+                        />
+                    </View>
+                </View>
             </View>
 
             {/* Date Picker */}
@@ -307,7 +419,7 @@ const Crop: React.FC = () => {
                             selected={selectedDate}
                             onChange={(date: Date) => setSelectedDate(date)}
                             dateFormat="yyyy-MM-dd"
-                            className="date-picker" // You can add custom CSS for better styling
+                            className="date-picker"
                             placeholderText="Select a date"
                         />
                     ) : (
@@ -340,7 +452,7 @@ const Crop: React.FC = () => {
                             >
                                 <Text style={styles.stageLabel}>{stage.label}</Text>
                                 {stage.imageSource ? (
-                                    <Image source={{ uri: stage.imageSource }} style={styles.stageImage} />
+                                    <Image source={{uri: stage.imageSource}} style={styles.stageImage}/>
                                 ) : (
                                     <View style={styles.placeholderStageImage}>
                                         <Text>No Image</Text>
@@ -374,8 +486,6 @@ const Crop: React.FC = () => {
 
 const styles = StyleSheet.create({
     container: {
-        flexGrow: 1,
-        justifyContent: 'flex-start',
         alignItems: 'center',
         padding: 20,
         backgroundColor: '#f0f4f7',
@@ -404,9 +514,9 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
     },
-    locationMethodWrapper: {
-        width: '100%',
-        marginTop: 10,
+    locationMethodWrapper: {},
+    locationMethodWrapperText: {
+        alignItems: 'center',
     },
     locationMethodTitle: {
         fontSize: 18,
@@ -417,9 +527,16 @@ const styles = StyleSheet.create({
     radioButtonsRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    radioButtons: {
+        padding: 20,
+        paddingBottom: 0,
+        paddingTop: 0,
+        margin: 10,
     },
     pickerContainer: {
-        width: '80%',
+        width: '35%',
         marginTop: 20,
         borderWidth: 1,
         borderColor: '#ccc',
@@ -430,13 +547,13 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     radioButtonWrapperDateGrowth: {
-        flexDirection: 'row',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 30,
     },
     datePlantedContainer: {
         width: '80%',
         marginTop: 20,
+        alignItems: 'center',
     },
     growthStageContainer: {
         width: '100%',
@@ -462,7 +579,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         elevation: 2, // For Android shadow
         shadowColor: '#000', // For iOS shadow
-        shadowOffset: { width: 0, height: 2 }, // For iOS shadow
+        shadowOffset: {width: 0, height: 2}, // For iOS shadow
         shadowOpacity: 0.2, // For iOS shadow
         shadowRadius: 2, // For iOS shadow
     },
@@ -497,7 +614,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 50,
         borderRadius: 5,
         marginTop: 40,
-        width: '80%',
         alignItems: 'center',
     },
     disabledButton: {
@@ -507,6 +623,7 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
+
     },
 });
 
