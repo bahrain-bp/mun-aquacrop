@@ -43,7 +43,7 @@ const Dashboard: React.FC = () => {
         }
 
         // Fetch farms
-        const farmsResponse = await axios.get('https://vuor0sdlpf.execute-api.us-east-1.amazonaws.com/adminDashboard/Farms', {
+        const farmsResponse = await axios.get('https://vuor0sdlpf.execute-api.us-east-1.amazonaws.com/managerDashboard/Farms', {
           headers: { Authorization: `Bearer ${idToken}` },
         });
 
@@ -56,7 +56,7 @@ const Dashboard: React.FC = () => {
         const prefetchZonesPromises = fetchedFarms.map(async (farm) => {
           try {
             const zonesResponse = await axios.get(
-              `https://vuor0sdlpf.execute-api.us-east-1.amazonaws.com/adminDashboard/Farms/${farm.id}/Zones`,
+              `https://vuor0sdlpf.execute-api.us-east-1.amazonaws.com/managerDashboard/Farms/${farm.id}/Zones`,
               {
                 headers: { Authorization: `Bearer ${idToken}` },
               }
@@ -95,7 +95,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <Authenticator>
-      {({ signOut }) => (
+      {({ signOut }) => ( 
         <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h1>Dashboard</h1>
