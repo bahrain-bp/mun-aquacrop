@@ -7,7 +7,7 @@ const cognitoClient = new CognitoIdentityProviderClient({});
 const dynamoDBClient = DynamoDBDocumentClient.from(new DynamoDBClient({}));
 
 // Define User Pool ID & DB table
-const USER_POOL_ID = "us-east-1_pgaytsnVv"; // Replace with your actual Cognito User Pool ID
+const USER_POOL_ID = "us-east-1_yn913oCJF"; // Replace with your actual Cognito User Pool ID
 const DYNAMO_TABLE_NAME = "SaqiDev-mun-aquacrop-FarmAdmin"; // Replace with your actual DynamoDB table name
 
 export const handler = async (event) => {

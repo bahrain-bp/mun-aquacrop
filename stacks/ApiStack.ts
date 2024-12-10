@@ -11,8 +11,8 @@ export function ApiStack({stack}: StackContext) {
     const {stationTable, cropTable, weatherReadingsTable} = use(DynamoDBStack);
 
     const authApi = {
-      userPoolId: "us-east-1_pgaytsnVv", // Replace with your Cognito User Pool ID
-      userPoolClientId: "1gakbad0bm9akq2toac3p6gmj9", // Replace with your Cognito App Client ID
+      userPoolId: "us-east-1_yn913oCJF", // Replace with your Cognito User Pool ID
+      userPoolClientId: "35nso14b45f4m802im3ifg5se2", // Replace with your Cognito App Client ID
     };
 
     // Create the HTTP API
