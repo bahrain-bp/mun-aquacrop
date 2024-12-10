@@ -120,6 +120,7 @@ export function DynamoDBStack({ stack }: StackContext) {
             FarmID: "string",
             ZoneID: "string",
             ZoneName: "string",
+            CropID: "string",
             IrrigationStatus: "string",
             LastIrrigation: "string",
         },

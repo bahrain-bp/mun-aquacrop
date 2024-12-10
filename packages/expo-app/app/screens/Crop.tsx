@@ -74,17 +74,17 @@ const Crop: React.FC = () => {
         {
             label: "Stage 1",
             value: "stage1",
-            imageSource: "https://www.saferbrand.com/media/wysiwyg/Articles/Safer-Brand/sb-article-plant-growth-stage-1.png"
+            imageSource: "https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/Plant+Intial+Stage.png"
         },
         {
             label: "Stage 2",
             value: "stage2",
-            imageSource: "https://www.saferbrand.com/media/wysiwyg/Articles/Safer-Brand/sb-article-plant-growth-stage-2.png"
+            imageSource: "https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/Plant+Middle+Stage.png"
         },
         {
             label: "Stage 3",
             value: "stage3",
-            imageSource: "https://www.saferbrand.com/media/wysiwyg/Articles/Safer-Brand/sb-article-plant-growth-stage-3.png"
+            imageSource: "https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/Plant+End+Stage.png"
         },
     ];
 
@@ -614,7 +614,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 50,
         borderRadius: 5,
         marginTop: 40,
-        width: '80%',
         alignItems: 'center',
     },
     disabledButton: {
@@ -624,6 +623,7 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 16,
         fontWeight: 'bold',
+
     },
 });
 
