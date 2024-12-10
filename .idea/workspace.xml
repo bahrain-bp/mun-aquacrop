@@ -4,9 +4,19 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="af9a6a8a-c792-4eb4-9cce-a415c3983bc8" name="Changes" comment="fixed some bugs related to drop down &#10;added recommendation &#10;added api for the calclation">
+    <list default="true" id="af9a6a8a-c792-4eb4-9cce-a415c3983bc8" name="Changes" comment="recomendatiuon looks for ks now">
+      <change afterPath="$PROJECT_DIR$/packages/functions/src/GenerateUploadUrl.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/packages/functions/src/csvProcessor.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/expo-app/app/screens/Crop.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/app/screens/Crop.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/functions/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/functions/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stacks/ApiStack.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stacks/ApiStack.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/stacks/StorageStack.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stacks/StorageStack.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test.http" beforeDir="false" afterPath="$PROJECT_DIR$/test.http" afterDir="false" />
+    </list>
+    <list id="c803716f-e674-4dd3-bb6e-fa9d5d6d2e32" name="Changes by sayed" comment="Changes by sayed">
+      <change afterPath="$PROJECT_DIR$/.expo/README.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.expo/devices.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/dev/UpdateAWSCredentials.ps1" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,18 +31,18 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "Lui35"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Lui35&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/bahrain-bp/mun-aquacrop.git",
-    "accountId": "f455a86c-8690-4709-9ed4-b215942d410e"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/bahrain-bp/mun-aquacrop.git&quot;,
+    &quot;accountId&quot;: &quot;f455a86c-8690-4709-9ed4-b215942d410e&quot;
   }
-}]]></component>
+}</component>
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 6
@@ -46,44 +56,49 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "HTTP Request.test | #1.executor": "Run",
-    "HTTP Request.test | #2 (1).executor": "Run",
-    "HTTP Request.test | #3.executor": "Run",
-    "HTTP Request.test | #4.executor": "Run",
-    "HTTP Request.test | #5.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "Frontend",
-    "ignore.virus.scanning.warn.message": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "npm.dev.executor": "Run",
-    "settings.editor.selected.configurable": "preferences.pluginManager",
-    "ts.external.directory.path": "C:\\Users\\PC\\WebstormProjects\\mun-aquacrop\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;HTTP Request.test | #1.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.test | #2 (1).executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.test | #3.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.test | #4.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.test | #5.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.test | #6.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;Frontend&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;npm.dev.executor&quot;: &quot;Debug&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\PC\\WebstormProjects\\mun-aquacrop\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
-      "HTTP Request"
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;HTTP Request&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\PC\WebstormProjects\mun-aquacrop\packages\expo-app\components" />
       <recent name="C:\Users\PC\WebstormProjects\mun-aquacrop\packages\functions\src" />
+      <recent name="C:\Users\PC\WebstormProjects\mun-aquacrop\packages\expo-app\components" />
     </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="excludedTypes">
+      <set>
+        <option value="HttpClient.HttpRequestRunConfigurationType" />
+      </set>
+    </option>
   </component>
   <component name="RunManager" selected="npm.dev">
     <configuration name="test | #1" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/test.http" executionIdentifier="#1" runType="Run single request">
-      <method v="2" />
-    </configuration>
-    <configuration name="test | #2 (1)" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/test.http" executionIdentifier="#2" index="2" runType="Run single request">
       <method v="2" />
     </configuration>
     <configuration name="test | #3" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/test.http" executionIdentifier="#3" index="3" runType="Run single request">
@@ -108,7 +123,6 @@
     <list>
       <item itemvalue="HTTP Request.test | #5" />
       <item itemvalue="HTTP Request.test | #1" />
-      <item itemvalue="HTTP Request.test | #2 (1)" />
       <item itemvalue="HTTP Request.test | #3" />
       <item itemvalue="HTTP Request.test | #4" />
       <item itemvalue="npm.dev" />
@@ -119,7 +133,6 @@
         <item itemvalue="HTTP Request.test | #4" />
         <item itemvalue="HTTP Request.test | #3" />
         <item itemvalue="HTTP Request.test | #1" />
-        <item itemvalue="HTTP Request.test | #2 (1)" />
       </list>
     </recent_temporary>
   </component>
@@ -142,7 +155,12 @@
       <workItem from="1733060454870" duration="2769000" />
       <workItem from="1733341169282" duration="27000" />
       <workItem from="1733341201993" duration="7693000" />
-      <workItem from="1733596019086" duration="4863000" />
+      <workItem from="1733596019086" duration="7212000" />
+      <workItem from="1733764693217" duration="5960000" />
+      <workItem from="1733771086687" duration="1853000" />
+      <workItem from="1733809642326" duration="1204000" />
+      <workItem from="1733854026565" duration="3613000" />
+      <workItem from="1733857769461" duration="6052000" />
     </task>
     <task id="LOCAL-00001" summary="fixed some bugs related to drop down &#10;added recommendation &#10;added api for the calclation">
       <option name="closed" value="true" />
@@ -152,7 +170,15 @@
       <option name="project" value="LOCAL" />
       <updated>1733601386404</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="recomendatiuon looks for ks now">
+      <option name="closed" value="true" />
+      <created>1733603465258</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1733603465258</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -161,6 +187,30 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Fetcing from database to Dashboard" />
     <MESSAGE value="fixed some bugs related to drop down &#10;added recommendation &#10;added api for the calclation" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed some bugs related to drop down &#10;added recommendation &#10;added api for the calclation" />
+    <MESSAGE value="recomendatiuon looks for ks now" />
+    <option name="LAST_COMMIT_MESSAGE" value="recomendatiuon looks for ks now" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/packages/functions/src/calculateWaterNeed.ts</url>
+          <line>94</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="js.build_tools.npm">
+        <watch expression="response" language="TypeScript" />
+        <watch expression="records[i].StationID" language="TypeScript" />
+        <watch expression="records[1].StationID" language="TypeScript" />
+        <watch expression="rawRecords" language="TypeScript" />
+        <watch expression="records" language="TypeScript" />
+        <watch expression="records[&quot;0&quot;].humidity" />
+        <watch expression="records" language="TypeScript" />
+        <watch expression="records[1]" language="TypeScript" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>

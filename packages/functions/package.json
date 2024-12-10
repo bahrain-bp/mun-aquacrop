@@ -13,6 +13,7 @@
     "vitest": "^0.34.4"
   },
   "dependencies": {
+    "csv-parser": "^3.0.0",
     "mathjs": "^14.0.0"
   }
 }
