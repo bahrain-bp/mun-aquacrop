@@ -12,7 +12,7 @@ export function ApiStack({stack}: StackContext) {
 
     const authApi = {
       userPoolId: "us-east-1_yn913oCJF", // Replace with your Cognito User Pool ID
-      userPoolClientId: "35nso14b45f4m802im3ifg5se2", // Replace with your Cognito App Client ID
+      userPoolClientId: "6330hslmlvljuj2sh78pn13to", // Replace with your Cognito App Client ID
     };
 
     // Create the HTTP API
