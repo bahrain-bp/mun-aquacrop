@@ -161,14 +161,14 @@ export function ApiStack({stack}: StackContext) {
 
       // Admin Dashboard Routing //
 
-      "POST /adminDashboard/farms": {
-        function: {
-          handler: "packages/functions/src/AdminDashboard/AddFarm.handler",
-          runtime: "nodejs18.x",
-          permissions: ["dynamodb:PutItem"],
-        },
-        authorizer: "adminAuthApi",
-      },
+      // "POST /adminDashboard/farms": {
+      //   function: {
+      //     handler: "packages/functions/src/AdminDashboard/AddFarm.handler",
+      //     runtime: "nodejs18.x",
+      //     permissions: ["dynamodb:PutItem"],
+      //   },
+      //   authorizer: "adminAuthApi",
+      // },
       "DELETE /adminDashboard/farms/{FarmID}": {
         function: {
           handler: "packages/functions/src/AdminDashboard/DeleteFarm.handler",
