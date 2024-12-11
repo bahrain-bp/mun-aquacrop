@@ -177,14 +177,14 @@ export function ApiStack({stack}: StackContext) {
         },
         authorizer: "adminAuthApi",
       },
-      "POST /adminDashboard/farms/{FarmID}/zones": {
-        function: {
-          handler: "packages/functions/src/AdminDashboard/AddZone.handler",
-          runtime: "nodejs18.x",
-          permissions: ["dynamodb:PutItem"],
-        },
-        authorizer: "adminAuthApi",
-      },
+      // "POST /adminDashboard/farms/{FarmID}/zones": {
+      //   function: {
+      //     handler: "packages/functions/src/AdminDashboard/AddZone.handler",
+      //     runtime: "nodejs18.x",
+      //     permissions: ["dynamodb:PutItem"],
+      //   },
+      //   authorizer: "adminAuthApi",
+      // },
       "DELETE /adminDashboard/farms/{FarmID}/zones/{ZoneID}": {
         function: {
           handler: "packages/functions/src/AdminDashboard/DeleteZone.handler",
