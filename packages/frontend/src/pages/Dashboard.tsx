@@ -99,18 +99,18 @@ const Sidebar: React.FC<{ isCollapsed: boolean; toggleSidebar: () => void }> = (
     );
 };
 
-const sidebarButtonStyle = {
-  backgroundColor: '#34495E',
-  border: 'none',
-  padding: '10px',
-  margin: '10px 0',
-  color: 'white',
-  fontSize: '16px',
-  borderRadius: '5px',
-  cursor: 'pointer',
-  textAlign: 'left' as 'left',
-  width: '100%',
-};
+// const sidebarButtonStyle = {
+//   backgroundColor: '#34495E',
+//   border: 'none',
+//   padding: '10px',
+//   margin: '10px 0',
+//   color: 'white',
+//   fontSize: '16px',
+//   borderRadius: '5px',
+//   cursor: 'pointer',
+//   textAlign: 'left' as 'left',
+//   width: '100%',
+// };
 
 const Dashboard: React.FC = () => {
   const [farms, setFarms] = useState<Farm[]>([]);
