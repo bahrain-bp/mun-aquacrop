@@ -68,14 +68,33 @@ export function AuthStack({ stack }: StackContext) {
           userPassword: true, // Allow user login with email and password
           userSrp: true, // Allows the user to sign from website
         },
+        oAuth: {
+          scopes: [cognito.OAuthScope.custom('aws.cognito.signin.user.admin')],
+        },
+        generateSecret: false,
       },
     },
+  });
+
+   // Create Cognito Groups
+  const adminGroup = new cognito.CfnUserPoolGroup(stack, "AdminGroup", {
+    userPoolId: webAuth.cdk.userPool.userPoolId,
+    groupName: "Admin",
+    description: "Administrator group with full permissions (Admins of the System)",
+  });
+
+  const farmAdminGroup = new cognito.CfnUserPoolGroup(stack, "FarmAdminGroup", {
+    userPoolId: webAuth.cdk.userPool.userPoolId,
+    groupName: "FarmAdmin",
+    description: "Farm admin group (Farm Managers)",
   });
 
   // Output User Pool details for easy access in other parts of the stack
   stack.addOutputs({
     UserPoolId: auth.userPoolId,
     UserPoolClientId: auth.userPoolClientId,
+    WebAuthUserPoolId: webAuth.cdk.userPool.userPoolId,
+    WebAuthUserPoolClientId: webAuth.cdk.userPoolClient.userPoolClientId,
   });
 
   return auth;

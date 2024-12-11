@@ -46,6 +46,7 @@
     "jwt-decode": "^4.0.0",
     "react-native-dropdown-picker": "^5.4.6",
     "react-native-dropdown-select-list": "^2.0.5",
-    "react-native-element-dropdown": "^2.12.2"
+    "react-native-element-dropdown": "^2.12.2",
+    "react-router-dom": "^7.0.2"
   }
 }

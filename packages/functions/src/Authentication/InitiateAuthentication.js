@@ -17,8 +17,8 @@ export const handler = async (event) => {
     };
   }
 
-  const userPoolId = "us-east-1_Px1s1UyGD"; // Replace with your User Pool ID
-  const clientId = "2elcs7olcp15b23tg498p3p62c"; // Replace with your ClientId
+  const userPoolId = "us-east-1_x1TCD411J"; // Replace with your User Pool ID
+  const clientId = "32hncgshhd5c88g95c5ie3gi61"; // Replace with your ClientId
 
   // Params for initiating authentication
   const authParams = {
