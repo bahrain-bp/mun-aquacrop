@@ -5,8 +5,15 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6d941bf6-94e6-48a8-87a6-1900945c4909" name="Changes" comment="mostly done with the calculation &#10;KC / determing which stage is the crop in to ge the lasxt result">
+      <change afterPath="$PROJECT_DIR$/packages/frontend/src/pages/Farms.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/packages/frontend/src/pages/Layout.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/expo-app/.expo/types/router.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/.expo/types/router.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/frontend/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/frontend/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/frontend/src/pages/Dashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/pages/Dashboard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/frontend/src/sst-env.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/sst-env.d.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,11 +34,12 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "git-widget-placeholder": "Frontend",
+    "git-widget-placeholder": "Admin-DashBoard",
+    "node.js.selected.package.tslint": "(autodetect)",
     "ts.external.directory.path": "C:\\Users\\A.Annan\\Desktop\\Final Project IT7099\\CIC\\mun-aquacrop\\node_modules\\typescript\\lib"
   }
 }]]></component>
-  <component name="RunManager">
+  <component name="RunManager" selected="HTTP Request.test | #2 (1)">
     <configuration name="test | #1" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/test.http" executionIdentifier="#1" runType="Run single request">
       <method v="2" />
     </configuration>
