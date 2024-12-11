@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d941bf6-94e6-48a8-87a6-1900945c4909" name="Changes" comment="mostly done with the calculation &#10;KC / determing which stage is the crop in to ge the lasxt result">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/expo-app/.expo/types/router.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/.expo/types/router.d.ts" afterDir="false" />
+    <list default="true" id="6d941bf6-94e6-48a8-87a6-1900945c4909" name="Changes" comment="fixed the palcing of the files &#10;removed addFarm because file is not there &#10;please make sure to push working code">
+      <change beforePath="$PROJECT_DIR$/stacks/ApiStack.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stacks/ApiStack.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -16,7 +15,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="Frontend" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -45,12 +44,18 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;git-widget-placeholder&quot;: &quot;Frontend&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\A.Annan\\Desktop\\Final Project IT7099\\CIC\\mun-aquacrop\\node_modules\\typescript\\lib&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "git-widget-placeholder": "#93 on Admin-DashBoard",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "ts.external.directory.path": "/Users/alilui/Desktop/Demo CIC/mun-aquacrop/node_modules/typescript/lib"
   }
-}</component>
+}]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/packages/functions/src" />
+    </key>
+  </component>
   <component name="RunManager" selected="HTTP Request.test | #1">
     <configuration name="test | #1" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/test.http" executionIdentifier="#1" runType="Run single request">
       <method v="2" />
@@ -92,8 +97,25 @@
       <updated>1733650740765</updated>
       <workItem from="1733650741780" duration="89000" />
       <workItem from="1733650879491" duration="415000" />
-      <workItem from="1733651434571" duration="4777000" />
+      <workItem from="1733651434571" duration="5149000" />
     </task>
+    <task id="LOCAL-00001" summary="mostly done with the calculation &#10;KC / determing which stage is the crop in to ge the lasxt result">
+      <option name="closed" value="true" />
+      <created>1733920101916</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1733920101916</updated>
+    </task>
+    <task id="LOCAL-00002" summary="fixed the palcing of the files &#10;removed addFarm because file is not there &#10;please make sure to push working code">
+      <option name="closed" value="true" />
+      <created>1733920313626</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1733920313626</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -101,6 +123,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="mostly done with the calculation &#10;KC / determing which stage is the crop in to ge the lasxt result" />
-    <option name="LAST_COMMIT_MESSAGE" value="mostly done with the calculation &#10;KC / determing which stage is the crop in to ge the lasxt result" />
+    <MESSAGE value="fixed the palcing of the files &#10;removed addFarm because file is not there &#10;please make sure to push working code" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed the palcing of the files &#10;removed addFarm because file is not there &#10;please make sure to push working code" />
   </component>
 </project>

@@ -193,14 +193,14 @@ export function ApiStack({stack}: StackContext) {
         },
         authorizer: "adminAuthApi",
       },
-      "POST /adminDashboard/farms/{FarmID}/assign": {
-        function: {
-          handler: "packages/functions/src/AdminDashboard/AssignFarm.handler",
-          runtime: "nodejs18.x",
-          permissions: ["dynamodb:UpdateItem", "cognito-idp:AdminGetUser"],
-        },
-        authorizer: "adminAuthApi",
-      },
+      // "POST /adminDashboard/farms/{FarmID}/assign": {
+      //   function: {
+      //     handler: "packages/functions/src/AdminDashboard/AssignFarm.handler",
+      //     runtime: "nodejs18.x",
+      //     permissions: ["dynamodb:UpdateItem", "cognito-idp:AdminGetUser"],
+      //   },
+      //   authorizer: "adminAuthApi",
+      // },
       
     },
     });
