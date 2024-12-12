@@ -145,9 +145,10 @@ export function ApiStack({stack}: StackContext) {
         function: {
           handler: "packages/functions/src/ManagerDashboard/TriggerIrrigation.handler",
           runtime: "nodejs18.x",
+          permissions: ["iot:Publish"],
           
         },
-        authorizer: "authApi",
+        
       },
       "POST /managerDashboard/Farms/{FarmID}/Zones/{ZoneID}/UpdateStatus": {
         function: {
