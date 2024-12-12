@@ -1,0 +1,196 @@
+{
+    "prod-mun-aquacrop-Crop": [
+      {
+        "PutRequest": {
+          "Item": {
+            "CropID": { "S": "1" },
+            "nameEN": { "S": "Lettuce" },
+            "nameAR": {"S": "خس"},
+            "GrowthStage": {
+              "M": {
+                "ini": { "N": "10" },
+                "mid": { "N": "50" },
+                "end": { "N": "60" }
+              }
+            },
+            "ImageURL": { "S": "https://lui-codecatalyst-sst-app--cropsimagesbucket37842e6-xa99avf7vup7.s3.us-east-1.amazonaws.com/images/lettuce+wb.jpeg" },
+            "kc": {
+                "M": {
+                  "ini": {"N": "0.7"},
+                  "mid": {"N": "1.00"},
+                  "end": {"N": "0.95"}
+                }
+              }
+          }
+        }
+      },
+      {
+        "PutRequest": {
+          "Item": {
+            "CropID": { "S": "2" },
+            "nameEN": { "S": "Sweet corn" },
+            "nameAR": {"S": "ذرة"},
+            "GrowthStage": {
+              "M": {
+                "ini": { "N": "15" },
+                "mid": { "N": "85" },
+                "end": { "N": "100" }
+              }
+            },
+            "ImageURL": { "S": "https://lui-codecatalyst-sst-app--cropsimagesbucket37842e6-xa99avf7vup7.s3.us-east-1.amazonaws.com/images/corn+wb.jpg" },
+            "kc": {
+                "M": {
+                  "ini": {"N": "0.3"},
+                  "mid": {"N": "1.15"},
+                  "end": {"N": "1.79585632602"}
+                }
+              }
+          }
+        }
+      },
+      {
+        "PutRequest": {
+          "Item": {
+            "CropID": { "S": "3" },
+            "nameEN": { "S": "Beetroot" },
+            "nameAR": {"S": "شمندر"},
+            "GrowthStage": {
+              "M": {
+                "ini": { "N": "15" },
+                "mid": { "N": "60" },
+                "end": { "N": "70" }
+              }
+            },
+            "ImageURL": { "S": "https://lui-codecatalyst-sst-app--cropsimagesbucket37842e6-xa99avf7vup7.s3.us-east-1.amazonaws.com/images/beetroot+wb.jpg" },
+            "kc": {
+                "M": {
+                  "ini": {"N": "0.5"},
+                  "mid": {"N": "1.05"},
+                  "end": {"N": "0.95"}
+                }
+              }
+          }
+        }
+      },
+      {
+        "PutRequest": {
+          "Item": {
+            "CropID": { "S": "4" },
+            "nameEN": { "S": "Eggplants" },
+            "nameAR": {"S": "باذنجان"},
+            "GrowthStage": {
+              "M": {
+                "ini": { "N": "20" },
+                "mid": { "N": "75" },
+                "end": { "N": "90" }
+              }
+            },
+            "ImageURL": { "S": "https://lui-codecatalyst-sst-app--cropsimagesbucket37842e6-xa99avf7vup7.s3.us-east-1.amazonaws.com/images/eggplant+wb.jpg" },
+            "kc": {
+              "M": {
+                "ini": {"N": "0.6"},
+                "mid": {"N": "1.05"},
+                "end": {"N": "0.90"}
+              }
+            }
+          }
+        }
+      },
+      {
+        "PutRequest": {
+          "Item": {
+            "CropID": { "S": "5" },
+            "nameEN": { "S": "Cauliflower" },
+            "nameAR": {"S": "قرنبيط"},
+            "GrowthStage": {
+              "M": {
+                "ini": { "N": "20" },
+                "mid": { "N": "80" },
+                "end": { "N": "100" }
+              }
+            },
+            "ImageURL": { "S": "https://lui-codecatalyst-sst-app--cropsimagesbucket37842e6-xa99avf7vup7.s3.us-east-1.amazonaws.com/images/cauliflower.jpeg" },
+            "kc": {
+              "M": {
+                "ini": {"N": "0.7"},
+                "mid": {"N": "1.05"},
+                "end": {"N": "0.95"}
+              }
+            }
+          }
+        }
+      },
+      {
+        "PutRequest": {
+          "Item": {
+            "CropID": { "S": "6" },
+            "nameEN": { "S": "Cucumber" },
+            "nameAR": {"S": "خيار"},
+            "GrowthStage": {
+              "M": {
+                "ini": { "N": "10" },
+                "mid": { "N": "50" },
+                "end": { "N": "70" }
+              }
+            },
+            "ImageURL": { "S": "https://lui-codecatalyst-sst-app--cropsimagesbucket37842e6-xa99avf7vup7.s3.us-east-1.amazonaws.com/images/cucumber+wb.jpeg" },
+            "kc": {
+              "M": {
+                "ini": {"N": "0.6"},
+                "mid": {"N": "1"},
+                "end": {"N": "0.75"}
+              }
+            }
+          }
+        }
+      },
+      {
+        "PutRequest": {
+          "Item": {
+            "CropID": { "S": "7" },
+            "nameEN": { "S": "Bell pepper" },
+            "nameAR": {"S": "فلفل"},
+            "GrowthStage": {
+              "M": {
+                "ini": { "N": "20" },
+                "mid": { "N": "70" },
+                "end": { "N": "85" }
+              }
+            },
+            "ImageURL": { "S": "https://lui-codecatalyst-sst-app--cropsimagesbucket37842e6-xa99avf7vup7.s3.us-east-1.amazonaws.com/images/sweet+pepper+wb.jpg" },
+            "kc": {
+              "M": {
+                "ini": {"N": "0.6"},
+                "mid": {"N": "1.1025"},
+                "end": {"N": "0.9"}
+              }
+            }
+          }
+        }
+      },
+      {
+        "PutRequest": {
+          "Item": {
+            "CropID": { "S": "8" },
+            "nameEN": { "S": "Tomato" },
+            "nameAR": {"S": "طماطم"},
+            "GrowthStage": {
+              "M": {
+                "ini": { "N": "15" },
+                "mid": { "N": "55" },
+                "end": { "N": "80" }
+              }
+            },
+            "ImageURL": { "S": "https://lui-codecatalyst-sst-app--cropsimagesbucket37842e6-xa99avf7vup7.s3.us-east-1.amazonaws.com/images/tomato+wb.jpg" },
+            "kc": {
+                "M": {
+                  "ini": {"N": "0.6"},
+                  "mid": {"N": "1.3225"},
+                  "end": {"N": "0.8"}
+                }
+              }
+          }
+        }
+      }
+    ]
+  }
