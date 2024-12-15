@@ -1,9 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
 import { Link, useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';
+import AWS, { CognitoIdentityServiceProvider } from 'aws-sdk';
+import { storage } from '../utils/storage';
+
+// Configure AWS SDK with the region from environment variables
+AWS.config.update({
+  region: process.env.EXPO_PUBLIC_AWS_REGION || 'us-east-1', // Default to 'us-east-1' if not set
+});
 
 const HomeScreen = () => {
   return (
@@ -13,61 +17,86 @@ const HomeScreen = () => {
   );
 };
 
-const refreshToken = async () => {
+const getToken = async () => {
   try {
-    const refreshToken = await AsyncStorage.getItem('refreshToken');
-    const clientId = process.env.EXPO_PUBLIC_AWS_USERPOOL_CLIENTID; 
-    const refreshUrl = `https://cognito-idp.us-east-1.amazonaws.com/`;
-
-    if (!refreshToken) return false;
-
-    const response = await axios.post(refreshUrl, {
-      AuthParameters: {
-        REFRESH_TOKEN: refreshToken,
-      },
-      AuthFlow: 'REFRESH_TOKEN_AUTH',
-      ClientId: clientId,
-    });
-
-    const { IdToken, AccessToken } = response.data.AuthenticationResult;
-    await AsyncStorage.setItem('idToken', IdToken);
-    await AsyncStorage.setItem('accessToken', AccessToken);
-    return true;
-  } catch (e) {
-    console.error("Error refreshing token:", e);
-    return false;
+    const token = await storage.getItem('accessToken');
+    if (token) {
+      console.log('Retrieved Token:', token);
+      return token;
+    } else {
+      console.log('No token found');
+    }
+  } catch (error) {
+    console.error('Error fetching token:', error);
   }
 };
 
-const decodeJwt = (token: string) => {
+const validateToken = async (accessToken: string) => {
+  const cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider();
+  const params = {
+    AccessToken: accessToken,
+  };
+
   try {
-    return jwtDecode(token);
-  } catch (e) {
-    console.error("Error decoding JWT:", e);
+    const data = await cognitoidentityserviceprovider.getUser(params).promise();
+    console.log('Token is valid:', data);
+    return data;
+  } catch (error) {
+    console.error('Token validation failed:', error);
     return null;
+  }
+};
+
+const refreshToken = async () => {
+  try {
+    const storedRefreshToken = await storage.getItem('refreshToken');
+    if (!storedRefreshToken) return false;
+
+    const cognito = new CognitoIdentityServiceProvider();
+    const params = {
+      AuthFlow: 'REFRESH_TOKEN_AUTH',
+      ClientId: process.env.EXPO_PUBLIC_AWS_USERPOOL_CLIENTID || '',
+      AuthParameters: {
+        REFRESH_TOKEN: storedRefreshToken,
+      },
+    };
+
+    const data = await cognito.initiateAuth(params).promise();
+
+    if (data.AuthenticationResult) {
+      const { IdToken, AccessToken, RefreshToken } = data.AuthenticationResult;
+      if (IdToken) {
+        await storage.setItem('idToken', IdToken);
+      }
+      if (AccessToken) {
+        await storage.setItem('accessToken', AccessToken);
+      }
+      if (RefreshToken) {
+        await storage.setItem('refreshToken', RefreshToken);
+      }
+      return true;
+    }
+    return false;
+  } catch (e) {
+    console.error('Error refreshing token:', e);
+    return false;
   }
 };
 
 const isAuthenticated = async () => {
   try {
-    const idToken = await AsyncStorage.getItem('idToken');
+    const idToken = await getToken();
     if (!idToken) return false;
 
-    const decodedToken = decodeJwt(idToken);
-    if (!decodedToken || !decodedToken.exp) {
-      return false;
-    }
-    const currentTime = Date.now() / 1000;
-
-    // Check if the token is expired
-    if (decodedToken.exp < currentTime) {
+    const isValid = await validateToken(idToken);
+    if (!isValid) {
       const refreshed = await refreshToken();
       return refreshed;
     }
 
     return true;
   } catch (e) {
-    console.error("Error checking authentication status:", e);
+    console.error('Error checking authentication status:', e);
     return false;
   }
 };
@@ -99,7 +128,7 @@ export default function Page() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome to My App!</Text>
-      
+
       {/* Navigation Links */}
       <Link style={styles.link} href="/screens/AuthScreen">
         Signup
