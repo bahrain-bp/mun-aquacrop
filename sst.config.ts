@@ -8,6 +8,8 @@ import {ImageBuilderForCodeCatalyst} from "./stacks/devops/ImageBuilderForCodeCa
 import {OIDCForGitHubCI} from "./stacks/devops/OIDCForGitHubCI";
 import {AuthStack} from "./stacks/AuthStack";
 import {MobileStack} from "./stacks/MobileStack";
+import {IoTStack} from "./stacks/IoTStack";
+
 
 export default {
     config(_input) {
@@ -35,7 +37,9 @@ export default {
                 .stack(S3Stack)
                 .stack(ApiStack)
                 .stack(FrontendStack)
-                .stack(MobileStack);
+                .stack(MobileStack)
+                .stack(IoTStack);
+                
         }
     }
 } satisfies SSTConfig;

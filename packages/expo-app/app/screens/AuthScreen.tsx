@@ -3,9 +3,9 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
+import { storage } from '../utils/storage';
 
 const API_URL = process.env.EXPO_PUBLIC_API_ENDPOINT; // Replace with your actual API Gateway URL
-
 
 const AuthScreen = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -63,6 +63,21 @@ const AuthScreen = () => {
       );
 
       const { idToken, accessToken } = response.data;
+        
+
+      // Save the token using the unified storage utility
+      const saveToken = async (idToken: string): Promise<void> => {
+        try {
+          await storage.setItem('idToken', idToken);
+          await storage.setItem('accessToken', accessToken);
+          
+          console.log('Token saved successfully!');
+        } catch (error) {
+          console.error('Error saving token:', error);
+        }
+      };
+
+      await saveToken(idToken);
 
       if (idToken && accessToken) {
         Alert.alert('Success', 'Authentication successful!');

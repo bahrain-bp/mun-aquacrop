@@ -4,15 +4,18 @@ import { DynamoDBStack } from "./DynamoDBStack";
 import { AuthStack } from "./AuthStack"; 
 import { CacheHeaderBehavior, CachePolicy } from "aws-cdk-lib/aws-cloudfront";
 import { Duration } from "aws-cdk-lib/core";
+import {S3Stack} from "./StorageStack";
 
 export function ApiStack({stack}: StackContext) {
     const {table} = use(DBStack);
     const auth = use(AuthStack);
+    const {CSVReadings} = use(S3Stack);
+    const { userPoolId, userPoolClientId } = use(AuthStack);
     const {stationTable, cropTable, weatherReadingsTable} = use(DynamoDBStack);
 
     const authApi = {
-      userPoolId: "us-east-1_pgaytsnVv", // Replace with your Cognito User Pool ID
-      userPoolClientId: "pbia0bkmcsbjmmgmu8b72ducm", // Replace with your Cognito App Client ID
+      userPoolId,
+      userPoolClientId,
     };
 
     // Create the HTTP API
@@ -35,6 +38,21 @@ export function ApiStack({stack}: StackContext) {
               id: authApi.userPoolId,
               clientIds: [authApi.userPoolClientId],
             },
+          },
+          adminAuthApi: {
+            type: "user_pool",
+            userPool: {
+              id: authApi.userPoolId,
+              clientIds: [authApi.userPoolClientId],
+            },
+            // Add admin group authorization
+            identitySource: ["$request.header.Authorization"],
+            // Add group authorization check
+            authorizationScopes: ["aws.cognito.signin.user.admin"],
+            // Ensure admin group validation
+            properties: {
+              AllowedGroupsOverride: ["Admin"]
+            }
           },
         },
         routes: {
@@ -61,6 +79,16 @@ export function ApiStack({stack}: StackContext) {
                     handler: "packages/functions/src/getLatestWeatherReading.handler",
                     environment: {
                         weatherReadingsTable: weatherReadingsTable.tableName,
+                    },
+                    permissions: [weatherReadingsTable],
+                },
+            },
+
+            "POST /Upload/CSV": {
+                function: {
+                    handler: "packages/functions/src/GenerateUploadUrl.handler",
+                    environment: {
+                        CSVReadings: CSVReadings.bucketName,
                     },
                     permissions: [weatherReadingsTable],
                 },
@@ -100,49 +128,93 @@ export function ApiStack({stack}: StackContext) {
             },
     
 
-      // Admin Dashboard Routing //
+      // Manager Dashboard Routing //
 
 
-      "POST /adminDashboard/exportData": {
+      "POST /managerDashboard/exportData": {
         function: {
-          handler: "packages/functions/src/AdminDashboard/Auth/exportData.handler",
+          handler: "packages/functions/src/ManagerDashboard/Auth/exportData.handler",
           runtime: "nodejs18.x",
           permissions: ["cognito-idp:AdminGetUser","dynamodb:PutItem","dynamodb:GetItem","dynamodb:UpdateItem"],
         },
       },
-      "GET /adminDashboard/Farms": {
+      "GET /managerDashboard/Farms": {
         function: {
-          handler: "packages/functions/src/AdminDashboard/GetFarms.handler",
+          handler: "packages/functions/src/ManagerDashboard/GetFarms.handler",
           runtime: "nodejs18.x",
           permissions: ["dynamodb:Query","dynamodb:GetItem"],
         },
         authorizer: "authApi",
       },
-      "GET /adminDashboard/Farms/{FarmID}/Zones": {
+      "GET /managerDashboard/Farms/{FarmID}/Zones": {
         function: {
-          handler: "packages/functions/src/AdminDashboard/GetZones.handler",
+          handler: "packages/functions/src/ManagerDashboard/GetZones.handler",
           runtime: "nodejs18.x",
           permissions: ["dynamodb:Query","dynamodb:GetItem","s3:GetObject","s3:ListBucket"],
         },
         authorizer: "authApi",
       },
-      "POST /adminDashboard/Farms/{FarmID}/Zones/{ZoneID}/Irrigate": {
+      "POST /managerDashboard/Farms/{FarmID}/Zones/{ZoneID}/Irrigate": {
         function: {
-          handler: "packages/functions/src/AdminDashboard/TriggerIrrigation.handler",
+          handler: "packages/functions/src/ManagerDashboard/TriggerIrrigation.handler",
+          runtime: "nodejs18.x",
+          permissions: ["iot:Publish"],
+
+        },
+
+      },
+      "POST /managerDashboard/Farms/{FarmID}/Zones/{ZoneID}/UpdateStatus": {
+        function: {
+          handler: "packages/functions/src/ManagerDashboard/UpdateZoneStatus.handler",
           runtime: "nodejs18.x",
           
         },
         authorizer: "authApi",
       },
-      "POST /adminDashboard/Farms/{FarmID}/Zones/{ZoneID}/UpdateStatus": {
-        function: {
-          handler: "packages/functions/src/AdminDashboard/UpdateZoneStatus.handler",
-          runtime: "nodejs18.x",
-          
-        },
-        authorizer: "authApi", 
-      },
 
+
+      // Admin Dashboard Routing //
+
+      // "POST /adminDashboard/farms": {
+      //   function: {
+      //     handler: "packages/functions/src/AdminDashboard/AddFarm.handler",
+      //     runtime: "nodejs18.x",
+      //     permissions: ["dynamodb:PutItem"],
+      //   },
+      //   authorizer: "adminAuthApi",
+      // },
+      "DELETE /adminDashboard/farms/{FarmID}": {
+        function: {
+          handler: "packages/functions/src/AdminDashboard/DeleteFarm.handler",
+          runtime: "nodejs18.x",
+          permissions: ["dynamodb:DeleteItem", "dynamodb:GetItem"],
+        },
+        authorizer: "adminAuthApi",
+      },
+      // "POST /adminDashboard/farms/{FarmID}/zones": {
+      //   function: {
+      //     handler: "packages/functions/src/AdminDashboard/AddZone.handler",
+      //     runtime: "nodejs18.x",
+      //     permissions: ["dynamodb:PutItem"],
+      //   },
+      //   authorizer: "adminAuthApi",
+      // },
+      "DELETE /adminDashboard/farms/{FarmID}/zones/{ZoneID}": {
+        function: {
+          handler: "packages/functions/src/AdminDashboard/DeleteZone.handler",
+          runtime: "nodejs18.x",
+          permissions: ["dynamodb:DeleteItem", "dynamodb:GetItem"],
+        },
+        authorizer: "adminAuthApi",
+      },
+      // "POST /adminDashboard/farms/{FarmID}/assign": {
+      //   function: {
+      //     handler: "packages/functions/src/AdminDashboard/AssignFarm.handler",
+      //     runtime: "nodejs18.x",
+      //     permissions: ["dynamodb:UpdateItem", "cognito-idp:AdminGetUser"],
+      //   },
+      //   authorizer: "adminAuthApi",
+      // },
       
     },
     });

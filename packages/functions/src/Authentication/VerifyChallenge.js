@@ -17,7 +17,7 @@ export const handler = async (event) => {
   }
 
   const params = {
-    ClientId: "2elcs7olcp15b23tg498p3p62c", // Replace with your ClientId 
+    ClientId: "32hncgshhd5c88g95c5ie3gi61", // Replace with your ClientId 
     ChallengeName: "CUSTOM_CHALLENGE",
     Session: session,
     ChallengeResponses: {
