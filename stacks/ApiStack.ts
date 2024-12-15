@@ -7,12 +7,12 @@ import { Duration } from "aws-cdk-lib/core";
 
 export function ApiStack({stack}: StackContext) {
     const {table} = use(DBStack);
-    const auth = use(AuthStack);
+    const { userPoolId, userPoolClientId } = use(AuthStack);
     const {stationTable, cropTable, weatherReadingsTable} = use(DynamoDBStack);
 
     const authApi = {
-      userPoolId: "us-east-1_yn913oCJF", // Replace with your Cognito User Pool ID
-      userPoolClientId: "6330hslmlvljuj2sh78pn13to", // Replace with your Cognito App Client ID
+      userPoolId,
+      userPoolClientId,
     };
 
     // Create the HTTP API

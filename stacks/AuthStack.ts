@@ -93,9 +93,14 @@ export function AuthStack({ stack }: StackContext) {
   stack.addOutputs({
     UserPoolId: auth.userPoolId,
     UserPoolClientId: auth.userPoolClientId,
-    WebAuthUserPoolId: webAuth.cdk.userPool.userPoolId,
-    WebAuthUserPoolClientId: webAuth.cdk.userPoolClient.userPoolClientId,
+    WebUserPoolId: webAuth.userPoolId,
+    WebUserPoolClientId: webAuth.userPoolClientId,
   });
 
-  return auth;
+  return {
+    auth,
+    webAuth,
+    userPoolId: webAuth.userPoolId,
+    userPoolClientId: webAuth.userPoolClientId,
+  };
 }
