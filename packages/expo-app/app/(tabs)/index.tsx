@@ -4,7 +4,7 @@ import { Link, useRouter } from 'expo-router';
 import AWS, { CognitoIdentityServiceProvider } from 'aws-sdk';
 import { storage } from '../utils/storage';
 
-// Configure AWS SDK with the region from environment variables
+// Configure AWS SDK with the region from environment variabless
 AWS.config.update({
   region: process.env.EXPO_PUBLIC_AWS_REGION || 'us-east-1', // Default to 'us-east-1' if not set
 });
