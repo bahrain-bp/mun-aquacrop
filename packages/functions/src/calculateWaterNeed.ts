@@ -37,42 +37,9 @@ function mapToWeatherReading(item: Record<string, AttributeValue>): WeatherReadi
         maxTemp: parseFloat(item.maxTemp.N!),
         wind_speed: parseFloat(item.wind_speed.N!),
         humidity: parseFloat(item.humidity.N!),
+        ET0: parseFloat(item.ET0.N!),
     };
 }
-
-
-const penman = (Rin: number, Rout: number, Tmin: number, Tmax: number, H: number, U: number, G: number = 0): number => {
-    // Constants
-
-    const T = (Tmax + Tmin) / 2; // Average temperature
-    const Rn = Rin - Rout; // Net radiation
-    const γ = 0.665 * 0.001 * 101.3; // Psychrometric constant
-    const esmax = 0.6108 * Math.exp((17.27 * Tmax) / (Tmax + 237.3)); // Saturation vapor pressure
-    const esmin = 0.6108 * Math.exp((17.27 * Tmin) / (Tmin + 237.3)); // Saturation vapor pressure
-    const esT = 0.6108 * Math.exp((17.27 * T) / (T + 237.3)); // Saturation vapor pressure
-    const es = (esmax + esmin) / 2; // Average saturation vapor pressure
-    const ea = es * (H / 100); // Actual vapor pressure
-    const Δ = (4098 * esT) / ((T + 237.3) ** 2); // Slope of saturation vapor pressure curve
-
-    // Penman equation
-    const ET =
-        (0.408 * Δ * (Rn - G) + γ * (900 / (T + 273)) * U * (es - ea)) /
-        (Δ + γ * (1 + 0.34 * U));
-
-    return ET;
-}
-
-// ReadingID: "string",
-//     StationID: "string",
-//     date: "string",
-//     incomingRadiation: "number",
-//     outgoingRadiation: "number",
-//     meanTemp: "number",
-//     minTemp: "number",
-//     maxTemp: "number",
-//     wind_speed: "number",
-//     humidity: "number",
-
 
 interface WeatherReading {
     ReadingID: string;
@@ -85,11 +52,12 @@ interface WeatherReading {
     maxTemp: number;
     wind_speed: number;
     humidity: number;
+    ET0: number;
 }
 
 
 // Lambda function to find the nearest station
-export const handler: APIGatewayProxyHandler = async (event: any) => {
+export const handler = async (event: any) => {
     try {
         // Parse the request body
         const body = JSON.parse(event.body);
@@ -207,8 +175,6 @@ export const handler: APIGatewayProxyHandler = async (event: any) => {
             //TODO: add check
             return;
         }
-        const ET0 = penman(weatherReading.incomingRadiation, weatherReading.outgoingRadiation,
-            weatherReading.minTemp, weatherReading.maxTemp, weatherReading.humidity, weatherReading.wind_speed, 0);
 
 
         // nearestStationId,
@@ -222,7 +188,7 @@ export const handler: APIGatewayProxyHandler = async (event: any) => {
             return {
                 statusCode: 200,
                 body: JSON.stringify({
-                    ET0: ET0
+                    ET0: weatherReading.ET0
                 }),
             };
         } else {
