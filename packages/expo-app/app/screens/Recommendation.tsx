@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
+import i18n from '../i18n'; // Import the shared i18n instance
 
 const Recommendation: React.FC = () => {
     const {
@@ -64,20 +65,20 @@ const Recommendation: React.FC = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Recommendation for {title}</Text>
+            <Text style={styles.title}>{i18n.t('rec')} {title}</Text>
             {imageSource && <Image source={{ uri: imageSource }} style={styles.image} />}
 
             {isLoading ? (
                 <View style={styles.loadingContainer}>
                     <ActivityIndicator size="large" color="#00aaff" />
-                    <Text style={styles.loadingText}>Calculating water need...</Text>
+                    <Text style={styles.loadingText}>{i18n.t('calcwaterneed')}</Text>
                 </View>
             ) : (
                 <>
                     {ET0 !== null && (
                         <View style={styles.resultBox}>
                             <Text style={styles.resultText}>
-                                Total Water Needed: <Text style={styles.emphasis}>{ET0.toFixed(2)} Liters</Text>
+                            {i18n.t('totwaterneed')} <Text style={styles.emphasis}>{ET0.toFixed(2)} Liters</Text>
                             </Text>
                         </View>
                     )}

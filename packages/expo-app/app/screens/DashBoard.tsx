@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, ScrollView, Image, TouchableOpacity, useWindowDimensions } from 'react-native';
+import { Text, View, StyleSheet, ScrollView, Image, TouchableOpacity, useWindowDimensions, Button } from 'react-native';
 import { useRouter } from 'expo-router';
+import i18n from '../i18n'; // Import the shared i18n instance
 
 const API_URL = process.env.EXPO_PUBLIC_PROD_API_URL;
 
@@ -56,7 +57,7 @@ const Index: React.FC = () => {
 
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-            <Text style={styles.text}>Home screen</Text>
+            <Text style={styles.text}>{i18n.t('home')}</Text>
             <View style={styles.grid}>
                 {crops.length > 0 ? (
                     <View style={styles.row}>
@@ -65,7 +66,7 @@ const Index: React.FC = () => {
                         ))}
                     </View>
                 ) : (
-                    <Text style={styles.text}>Loading crops...</Text>
+                    <Text style={styles.text}>{i18n.t('loading')}</Text>
                 )}
             </View>
         </ScrollView>

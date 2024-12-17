@@ -1,112 +1,45 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { Link, useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
-import { jwtDecode } from 'jwt-decode';
-
-const HomeScreen = () => {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome to the Home Screen!</Text>
-    </View>
-  );
-};
-
-const refreshToken = async () => {
-  try {
-    const refreshToken = await AsyncStorage.getItem('refreshToken');
-    const clientId = process.env.EXPO_PUBLIC_AWS_USERPOOL_CLIENTID; 
-    const refreshUrl = `https://cognito-idp.us-east-1.amazonaws.com/`;
-
-    if (!refreshToken) return false;
-
-    const response = await axios.post(refreshUrl, {
-      AuthParameters: {
-        REFRESH_TOKEN: refreshToken,
-      },
-      AuthFlow: 'REFRESH_TOKEN_AUTH',
-      ClientId: clientId,
-    });
-
-    const { IdToken, AccessToken } = response.data.AuthenticationResult;
-    await AsyncStorage.setItem('idToken', IdToken);
-    await AsyncStorage.setItem('accessToken', AccessToken);
-    return true;
-  } catch (e) {
-    console.error("Error refreshing token:", e);
-    return false;
-  }
-};
-
-const decodeJwt = (token: string) => {
-  try {
-    return jwtDecode(token);
-  } catch (e) {
-    console.error("Error decoding JWT:", e);
-    return null;
-  }
-};
-
-const isAuthenticated = async () => {
-  try {
-    const idToken = await AsyncStorage.getItem('idToken');
-    if (!idToken) return false;
-
-    const decodedToken = decodeJwt(idToken);
-    if (!decodedToken || !decodedToken.exp) {
-      return false;
-    }
-    const currentTime = Date.now() / 1000;
-
-    // Check if the token is expired
-    if (decodedToken.exp < currentTime) {
-      const refreshed = await refreshToken();
-      return refreshed;
-    }
-
-    return true;
-  } catch (e) {
-    console.error("Error checking authentication status:", e);
-    return false;
-  }
-};
+import { View, Text, StyleSheet, Button } from 'react-native';
+import { useRouter } from 'expo-router';
+import i18n from '../i18n'; // Import the shared i18n instance
+//import { I18n } from 'i18n-js';
 
 export default function Page() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
+  const [language, setLanguage] = useState('en');
+  const [_, forceUpdate] = useState(0); // Used to force a re-render
 
+  // Set the locale whenever the language changes
   useEffect(() => {
-    const checkAuth = async () => {
-      const authenticated = await isAuthenticated();
-      if (authenticated) {
-        router.replace('/screens/DashBoard');
-      } else {
-        setLoading(false);
-      }
-    };
-    checkAuth();
-  }, []);
+    i18n.locale = language;
+    forceUpdate((prev) => prev + 1); // Trigger a re-render
+  }, [language]);
 
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
-  }
+  const toggleLanguage = () => {
+    const newLang = language === 'en' ? 'ar' : 'en';
+    setLanguage(newLang);
+  };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome to My App!</Text>
-      
-      {/* Navigation Links */}
-      <Link style={styles.link} href="/screens/AuthScreen">
-        Signup
-      </Link>
-      <Link style={styles.link} href="/screens/DashBoard">
-        Skip Auth
-      </Link>
+      {/* Display greeting text */}
+      <Text style={styles.title}>{i18n.t('greeting')}</Text>
+
+      {/* Navigation Buttons */}
+      <Button 
+        title={i18n.t('signup')} 
+        onPress={() => router.push('/screens/AuthScreen')} 
+      />
+      <Button 
+        title={i18n.t('skipauth')} 
+        onPress={() => router.push('/screens/DashBoard')} 
+      />
+
+      {/* Language Toggle Button */}
+      <Button 
+        title={language === 'en' ? 'عربي' : 'English'} 
+        onPress={toggleLanguage} 
+      />
     </View>
   );
 }
@@ -124,9 +57,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
   },
-  link: {
-    fontSize: 18,
-    color: 'blue',
-    marginVertical: 10,
+  button: {
+    marginTop: 10,
   },
 });

@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
+import i18n from '../i18n'; // Import the shared i18n instance
 
 const API_URL = process.env.EXPO_PUBLIC_API_ENDPOINT; // Replace with your actual API Gateway URL
 
@@ -83,7 +84,7 @@ const AuthScreen = () => {
     <View style={styles.container}>
       {!isChallengeStep ? (
         <>
-          <Text style={styles.label}>Enter Phone Number:</Text>
+          <Text style={styles.label}>{i18n.t('phone')}</Text>
           <TextInput
             style={styles.input}
             value={phoneNumber}
@@ -91,7 +92,7 @@ const AuthScreen = () => {
             placeholder="+1234567890"
             keyboardType="phone-pad"
           />
-          <Text style={styles.label}>Enter Fullname:</Text>
+          <Text style={styles.label}>{i18n.t('name')}</Text>
           <TextInput
             style={styles.input}
             value={fullname}
