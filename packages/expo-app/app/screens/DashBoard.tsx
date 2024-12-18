@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Text, View, StyleSheet, ScrollView, Image, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
+import { storage } from '../utils/storage';
+import AWS from 'aws-sdk';
 
 const API_URL = process.env.EXPO_PUBLIC_PROD_API_URL;
 
@@ -36,26 +38,49 @@ const parseCrops = (data: any): Crop[] => {
     }));
 };
 
+// Configure AWS
+AWS.config.update({
+    region: process.env.EXPO_PUBLIC_AWS_REGION || 'us-east-1',
+});
+
 const Index: React.FC = () => {
     const [crops, setCrops] = useState<Crop[]>([]);
-    const { width } = useWindowDimensions(); // Get the current window width
+    const [userName, setUserName] = useState<string>('Guest');
+    const { width } = useWindowDimensions();
 
     useEffect(() => {
-        const fetchCrops = async () => {
+        const fetchData = async () => {
             try {
                 const response = await fetch(API_URL + '/crops');
                 const data = await response.json();
                 setCrops(parseCrops(data));
+
+                const accessToken = await storage.getItem('accessToken');
+                if (accessToken) {
+                    const cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider();
+                    const userData = await cognitoidentityserviceprovider.getUser({ 
+                        AccessToken: accessToken 
+                    }).promise();
+                    const name = userData.UserAttributes.find(attr => attr.Name === 'name')?.Value;
+                    if (name) {
+                        setUserName(name);
+                    }
+                }
             } catch (error) {
-                console.error("Error fetching crops:", error);
+                console.error("Error fetching data:", error);
             }
         };
 
-        fetchCrops();
+        fetchData();
     }, []);
 
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+            <View style={styles.welcomeContainer}>
+                <Text style={styles.greetingText}>Welcome</Text>
+                <Text style={styles.welcomeText}>{userName} 👋</Text>
+                
+            </View>
             <Text style={styles.text}>Home screen</Text>
             <View style={styles.grid}>
                 {crops.length > 0 ? (
@@ -155,6 +180,30 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         color: '#333',
+    },
+    welcomeText: {
+        color: '#fff',
+        fontSize: 32,
+        fontWeight: 'bold',
+        marginBottom: 8,
+        textAlign: 'center',  // Added this line
+    },
+    welcomeContainer: {
+        marginBottom: 30,
+        alignItems: 'center',  // Changed from 'flex-start' to 'center'
+        alignSelf: 'stretch',
+        paddingHorizontal: 20,
+    },
+    greetingText: {
+        color: '#9DA3B4',
+        fontSize: 18,
+        marginBottom: 5,
+        textAlign: 'center',  // Added this line
+    },
+    subText: {
+        color: '#9DA3B4',
+        fontSize: 16,
+        textAlign: 'center',  // Added this line
     },
 });
 

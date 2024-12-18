@@ -19,13 +19,7 @@ const HomeScreen = () => {
 
 const getToken = async () => {
   try {
-    const token = await storage.getItem('accessToken');
-    if (token) {
-      console.log('Retrieved Token:', token);
-      return token;
-    } else {
-      console.log('No token found');
-    }
+    return await storage.getItem('accessToken');
   } catch (error) {
     console.error('Error fetching token:', error);
   }
@@ -39,11 +33,13 @@ const validateToken = async (accessToken: string) => {
 
   try {
     const data = await cognitoidentityserviceprovider.getUser(params).promise();
-    console.log('Token is valid:', data);
-    return data;
+    const userName = data.UserAttributes.find(attr => attr.Name === 'name')?.Value || '';
+    if (userName) {
+      await storage.setItem('userName', userName);
+    }
+    return { isValid: true, userName };
   } catch (error) {
-    console.error('Token validation failed:', error);
-    return null;
+    return { isValid: false, userName: '' };
   }
 };
 
@@ -54,50 +50,51 @@ const refreshToken = async () => {
 
     const cognito = new CognitoIdentityServiceProvider();
     const params = {
-      AuthFlow: 'REFRESH_TOKEN_AUTH',
       ClientId: process.env.EXPO_PUBLIC_AWS_USERPOOL_CLIENTID || '',
+      AuthFlow: 'REFRESH_TOKEN_AUTH',
       AuthParameters: {
-        REFRESH_TOKEN: storedRefreshToken,
+        'REFRESH_TOKEN': storedRefreshToken,
+        'CLIENT_ID': process.env.EXPO_PUBLIC_AWS_USERPOOL_CLIENTID || '',
       },
     };
 
     const data = await cognito.initiateAuth(params).promise();
-
+    
     if (data.AuthenticationResult) {
-      const { IdToken, AccessToken, RefreshToken } = data.AuthenticationResult;
-      if (IdToken) {
-        await storage.setItem('idToken', IdToken);
-      }
-      if (AccessToken) {
-        await storage.setItem('accessToken', AccessToken);
-      }
-      if (RefreshToken) {
-        await storage.setItem('refreshToken', RefreshToken);
-      }
-      return true;
+      const { AccessToken, IdToken } = data.AuthenticationResult;
+      if (AccessToken) await storage.setItem('accessToken', AccessToken);
+      if (IdToken) await storage.setItem('idToken', IdToken);
+      return { success: true, accessToken: AccessToken };
     }
-    return false;
+    return { success: false, accessToken: null };
   } catch (e) {
     console.error('Error refreshing token:', e);
-    return false;
+    return { success: false, accessToken: null };
   }
 };
 
 const isAuthenticated = async () => {
   try {
-    const idToken = await getToken();
-    if (!idToken) return false;
+    const accessToken = await getToken();
+    if (!accessToken) return { authenticated: false, userName: '' };
 
-    const isValid = await validateToken(idToken);
-    if (!isValid) {
-      const refreshed = await refreshToken();
-      return refreshed;
+    try {
+      const validation = await validateToken(accessToken);
+      return { authenticated: true, userName: validation.userName };
+    } catch (error) {
+      // Token expired, try refreshing
+      if ((error as any).code === 'NotAuthorizedException') {
+        const refreshResult = await refreshToken();
+        if (refreshResult && refreshResult.success && refreshResult.accessToken) {
+          const validation = await validateToken(refreshResult.accessToken);
+          return { authenticated: true, userName: validation.userName };
+        }
+      }
+      return { authenticated: false, userName: '' };
     }
-
-    return true;
   } catch (e) {
     console.error('Error checking authentication status:', e);
-    return false;
+    return { authenticated: false, userName: '' };
   }
 };
 
@@ -107,9 +104,12 @@ export default function Page() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      const authenticated = await isAuthenticated();
+      const { authenticated, userName } = await isAuthenticated();
       if (authenticated) {
-        router.replace('/screens/DashBoard');
+        router.replace({
+          pathname: '/screens/DashBoard',
+          params: { userName }
+        });
       } else {
         setLoading(false);
       }
