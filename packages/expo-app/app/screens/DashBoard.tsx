@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, ScrollView, Image, TouchableOpacity, useWindowDimensions } from 'react-native';
+import { Text, View, StyleSheet, ScrollView, Image, TouchableOpacity, useWindowDimensions, Button } from 'react-native';
 import { useRouter } from 'expo-router';
 import { storage } from '../utils/storage';
 import AWS from 'aws-sdk';
+import i18n from '../i18n'; // Import the shared i18n instance
 
 const API_URL = process.env.EXPO_PUBLIC_PROD_API_URL;
 
@@ -58,8 +59,8 @@ const Index: React.FC = () => {
                 const accessToken = await storage.getItem('accessToken');
                 if (accessToken) {
                     const cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider();
-                    const userData = await cognitoidentityserviceprovider.getUser({ 
-                        AccessToken: accessToken 
+                    const userData = await cognitoidentityserviceprovider.getUser({
+                        AccessToken: accessToken
                     }).promise();
                     const name = userData.UserAttributes.find(attr => attr.Name === 'name')?.Value;
                     if (name) {
@@ -79,9 +80,9 @@ const Index: React.FC = () => {
             <View style={styles.welcomeContainer}>
                 <Text style={styles.greetingText}>Welcome</Text>
                 <Text style={styles.welcomeText}>{userName} 👋</Text>
-                
+
             </View>
-            <Text style={styles.text}>Home screen</Text>
+            <Text style={styles.text}>{i18n.t('home')}</Text>
             <View style={styles.grid}>
                 {crops.length > 0 ? (
                     <View style={styles.row}>
@@ -90,7 +91,7 @@ const Index: React.FC = () => {
                         ))}
                     </View>
                 ) : (
-                    <Text style={styles.text}>Loading crops...</Text>
+                    <Text style={styles.text}>{i18n.t('loading')}</Text>
                 )}
             </View>
         </ScrollView>
@@ -186,11 +187,11 @@ const styles = StyleSheet.create({
         fontSize: 32,
         fontWeight: 'bold',
         marginBottom: 8,
-        textAlign: 'center',  
+        textAlign: 'center',
     },
     welcomeContainer: {
         marginBottom: 30,
-        alignItems: 'center',  
+        alignItems: 'center',
         alignSelf: 'stretch',
         paddingHorizontal: 20,
     },
@@ -198,12 +199,12 @@ const styles = StyleSheet.create({
         color: '#9DA3B4',
         fontSize: 18,
         marginBottom: 5,
-        textAlign: 'center', 
+        textAlign: 'center',
     },
     subText: {
         color: '#9DA3B4',
         fontSize: 16,
-        textAlign: 'center', 
+        textAlign: 'center',
     },
 });
 

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { Link, useRouter } from 'expo-router';
+import { View, Text, StyleSheet, Button ,ActivityIndicator } from 'react-native';
+import { useRouter } from 'expo-router';
 import AWS, { CognitoIdentityServiceProvider } from 'aws-sdk';
 import { storage } from '../utils/storage';
+import i18n from '../i18n';
 
 // Configure AWS SDK with the region from environment variabless
 AWS.config.update({
@@ -59,7 +60,7 @@ const refreshToken = async () => {
     };
 
     const data = await cognito.initiateAuth(params).promise();
-    
+
     if (data.AuthenticationResult) {
       const { AccessToken, IdToken } = data.AuthenticationResult;
       if (AccessToken) await storage.setItem('accessToken', AccessToken);
@@ -100,7 +101,9 @@ const isAuthenticated = async () => {
 
 export default function Page() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(true);
+    const [language, setLanguage] = useState('en');
+  const [_, forceUpdate] = useState(0); // Used to force a re-render
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -127,15 +130,24 @@ export default function Page() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome to My App!</Text>
+      {/* Display greeting text */}
+      <Text style={styles.title}>{i18n.t('greeting')}</Text>
 
-      {/* Navigation Links */}
-      <Link style={styles.link} href="/screens/AuthScreen">
-        Signup
-      </Link>
-      <Link style={styles.link} href="/screens/DashBoard">
-        Skip Auth
-      </Link>
+      {/* Navigation Buttons */}
+      <Button
+        title={i18n.t('signup')}
+        onPress={() => router.push('/screens/AuthScreen')}
+      />
+      <Button
+        title={i18n.t('skipauth')}
+        onPress={() => router.push('/screens/DashBoard')}
+      />
+
+      {/* Language Toggle Button */}
+      <Button
+        title={language === 'en' ? 'عربي' : 'English'}
+        onPress={toggleLanguage}
+      />
     </View>
   );
 }
@@ -153,9 +165,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
   },
-  link: {
-    fontSize: 18,
-    color: 'blue',
-    marginVertical: 10,
+  button: {
+    marginTop: 10,
   },
 });
