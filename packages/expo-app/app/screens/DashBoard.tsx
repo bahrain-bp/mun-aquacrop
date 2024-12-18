@@ -186,11 +186,11 @@ const styles = StyleSheet.create({
         fontSize: 32,
         fontWeight: 'bold',
         marginBottom: 8,
-        textAlign: 'center',  // Added this line
+        textAlign: 'center',  
     },
     welcomeContainer: {
         marginBottom: 30,
-        alignItems: 'center',  // Changed from 'flex-start' to 'center'
+        alignItems: 'center',  
         alignSelf: 'stretch',
         paddingHorizontal: 20,
     },
@@ -198,12 +198,12 @@ const styles = StyleSheet.create({
         color: '#9DA3B4',
         fontSize: 18,
         marginBottom: 5,
-        textAlign: 'center',  // Added this line
+        textAlign: 'center', 
     },
     subText: {
         color: '#9DA3B4',
         fontSize: 16,
-        textAlign: 'center',  // Added this line
+        textAlign: 'center', 
     },
 });
 
