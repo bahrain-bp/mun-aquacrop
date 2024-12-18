@@ -10,6 +10,13 @@ AWS.config.update({
   region: process.env.EXPO_PUBLIC_AWS_REGION || 'us-east-1', // Default to 'us-east-1' if not set
 });
 
+const toggleLanguage = () => {
+  const newLang = language === 'en' ? 'ar' : 'en';
+  setLanguage(newLang);
+};
+
+
+
 const HomeScreen = () => {
   return (
     <View style={styles.container}>
@@ -25,6 +32,7 @@ const getToken = async () => {
     console.error('Error fetching token:', error);
   }
 };
+
 
 const validateToken = async (accessToken: string) => {
   const cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider();
@@ -104,6 +112,17 @@ export default function Page() {
     const [loading, setLoading] = useState(true);
     const [language, setLanguage] = useState('en');
   const [_, forceUpdate] = useState(0); // Used to force a re-render
+
+
+  useEffect(() => {
+    i18n.locale = language;
+    forceUpdate((prev) => prev + 1); // Trigger a re-render
+  }, [language]);
+
+  const toggleLanguage = () => {
+    const newLang = language === 'en' ? 'ar' : 'en';
+    setLanguage(newLang);
+  };
 
   useEffect(() => {
     const checkAuth = async () => {
