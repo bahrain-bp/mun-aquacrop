@@ -29,7 +29,7 @@ function mapToWeatherReading(item: Record<string, AttributeValue>): WeatherReadi
     return {
         ReadingID: item.ReadingID.S!, // Use `S` for string attributes
         StationID: item.StationID.S!,
-        date: item.Date.S!,
+        date: item.date.S!,
         incomingRadiation: parseFloat(item.incomingRadiation.N!), // Use `N` for number attributes
         outgoingRadiation: parseFloat(item.outgoingRadiation.N!),
         meanTemp: parseFloat(item.meanTemp.N!),
@@ -140,7 +140,7 @@ export const handler = async (event: any) => {
             if (distance < minDistance) {
                 minDistance = distance;
                 nearestStationId = stationId;
-                lastReading = station.LastReadingID.S;
+                lastReading = station.lastReadingID.S;
             }
         }
 

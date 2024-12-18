@@ -5,7 +5,7 @@ Content-Type: application/json
   "stationId": "2"
 }
 ###
-POST https://26yve06bzk.execute-api.us-east-1.amazonaws.com/calculate/water
+POST https://vuor0sdlpf.execute-api.us-east-1.amazonaws.com
 content-type: application/json
 
 {
@@ -13,7 +13,7 @@ content-type: application/json
   "lon": -74.0060
 }
 ###
-POST https://26yve06bzk.execute-api.us-east-1.amazonaws.com/calculate/water
+POST https://vuor0sdlpf.execute-api.us-east-1.amazonaws.com/calculate/water
 content-type: application/json
 
 {

@@ -4,15 +4,12 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d941bf6-94e6-48a8-87a6-1900945c4909" name="Changes" comment="mostly done with the calculation &#10;KC / determing which stage is the crop in to ge the lasxt result">
-      <change afterPath="$PROJECT_DIR$/.expo/README.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.expo/devices.json" afterDir="false" />
+    <list default="true" id="af9a6a8a-c792-4eb4-9cce-a415c3983bc8" name="Changes" comment="fixed some bugs related to drop down &#10;added recommendation &#10;added api for the calclation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/functions/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/functions/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/expo-app/app.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/app.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/functions/src/calculateWaterNeed.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/functions/src/calculateWaterNeed.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/functions/src/csvProcessor.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/functions/src/csvProcessor.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stacks/DynamoDBStack.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stacks/DynamoDBStack.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test.http" beforeDir="false" afterPath="$PROJECT_DIR$/test.http" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,22 +24,6 @@
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory">{
-  &quot;lastFilter&quot;: {
-    &quot;state&quot;: &quot;OPEN&quot;,
-    &quot;assignee&quot;: &quot;Lui35&quot;
-  }
-}</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/bahrain-bp/mun-aquacrop.git&quot;,
-    &quot;accountId&quot;: &quot;f455a86c-8690-4709-9ed4-b215942d410e&quot;
-  }
-}</component>
-  <component name="ProjectColorInfo">{
-  &quot;associatedIndex&quot;: 7
-}</component>
-  <component name="ProjectId" id="2qIA7OIg3XkqTAHSg1Lut24Noi0" />
   <component name="ProjectLevelVcsManager">
     <OptionsSetting value="false" id="Update" />
     <ConfirmationsSetting value="2" id="Add" />
@@ -53,19 +34,12 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
+    "HTTP Request.test | #3.executor": "Run",
     "git-widget-placeholder": "Admin-DashBoard",
-    "ignore.virus.scanning.warn.message": "true",
-    "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "npm.dev.executor": "Debug",
-    "settings.editor.selected.configurable": "configurable.group.editor",
-    "ts.external.directory.path": "C:\\Users\\PC\\WebstormProjects\\mun-aquacrop\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+    "npm.dev.executor": "Run",
+    "ts.external.directory.path": "/Users/alilui/Desktop/Demo CIC/mun-aquacrop/node_modules/typescript/lib"
   }
 }]]></component>
   <component name="RunManager" selected="npm.dev">
@@ -94,11 +68,18 @@
       <item itemvalue="HTTP Request.test | #1" />
       <item itemvalue="npm.dev" />
     </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="HTTP Request.test | #3" />
+        <item itemvalue="HTTP Request.test | #4" />
+        <item itemvalue="HTTP Request.test | #1" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-e768b9ed790e-JavaScript-WS-243.21565.180" />
+        <option value="bundled-js-predefined-d6986cc7102b-deb605915726-JavaScript-WS-243.22562.112" />
       </set>
     </attachedChunks>
   </component>
@@ -138,15 +119,14 @@
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/packages/functions/src/csvProcessor.ts</url>
           <line>52</line>
-          <properties lambdaOrdinal="-1" />
           <option name="timeStamp" value="4" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
     <watches-manager>
       <configuration name="js.build_tools.npm">
-        <watch expression="records" language="TypeScript" />
-        <watch expression="records[1]" language="TypeScript" />
+        <watch expression="result" language="TypeScript" />
+        <watch expression="result.item" language="TypeScript" />
       </configuration>
     </watches-manager>
   </component>
