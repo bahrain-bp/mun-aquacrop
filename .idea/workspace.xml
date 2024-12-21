@@ -66,21 +66,11 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "HTTP Request.test | #1.executor": "Run",
-    "git-widget-placeholder": "Admin-DashBoard",
-    "node.js.selected.package.tslint": "(autodetect)",
+    "git-widget-placeholder": "Frontend",
     "ts.external.directory.path": "C:\\Users\\A.Annan\\Desktop\\Final Project IT7099\\CIC\\mun-aquacrop\\node_modules\\typescript\\lib"
   }
 }]]></component>
-  <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\A.Annan\Desktop\Final Project IT7099\CIC\mun-aquacrop\packages\frontend\src\components\FarmerDashboard" />
-      <recent name="C:\Users\A.Annan\Desktop\Final Project IT7099\CIC\mun-aquacrop\packages\frontend\src\components\common" />
-      <recent name="C:\Users\A.Annan\Desktop\Final Project IT7099\CIC\mun-aquacrop\packages\frontend\src" />
-      <recent name="$PROJECT_DIR$/packages/functions/src" />
-    </key>
-  </component>
-  <component name="RunManager" selected="HTTP Request.test | #1">
+  <component name="RunManager">
     <configuration name="test | #1" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/test.http" executionIdentifier="#1" runType="Run single request">
       <method v="2" />
     </configuration>
@@ -112,7 +102,11 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="HTTP Request.test | #4" />
+        <item itemvalue="HTTP Request.test | #3" />
+        <item itemvalue="HTTP Request.test | #2 (1)" />
         <item itemvalue="HTTP Request.test | #1" />
+        <item itemvalue="HTTP Request.test | #5" />
       </list>
     </recent_temporary>
   </component>
