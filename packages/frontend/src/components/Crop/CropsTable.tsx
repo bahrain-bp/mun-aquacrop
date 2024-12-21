@@ -33,7 +33,7 @@ const CropsTable: React.FC = () => {
             transition={{ delay: 0.2 }}
         >
             <div className='flex justify-between items-center mb-6'>
-                <h2 className='text-xl font-semibold text-gray-100'>Product List</h2>
+                <h2 className='text-xl font-semibold text-gray-100'>Crops List</h2>
                 <div className='relative'>
                     <input
                         type='text'
@@ -51,19 +51,22 @@ const CropsTable: React.FC = () => {
                     <thead>
                     <tr>
                         <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
-                            Name
+                            Crop ID
                         </th>
                         <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
-                            Category
+                            GrowthStage
                         </th>
                         <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
-                            Price
+                            Image
                         </th>
                         <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
-                            Stock
+                            kc
                         </th>
                         <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
-                            Sales
+                            nameAR
+                        </th>
+                        <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
+                            nameEN
                         </th>
                         <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
                             Actions
@@ -75,9 +78,9 @@ const CropsTable: React.FC = () => {
                     {filteredProducts.map((product) => (
                         <motion.tr
                             key={product.id}
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ duration: 0.3 }}
+                            initial={{opacity: 0}}
+                            animate={{opacity: 1}}
+                            transition={{duration: 0.3}}
                         >
                             <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-100 flex gap-2 items-center'>
                                 <img
@@ -97,12 +100,13 @@ const CropsTable: React.FC = () => {
                             </td>
                             <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>{product.stock}</td>
                             <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>{product.sales}</td>
+                            <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>{product.sales}</td>
                             <td className='px-6 py-4 whitespace-nowrap text-sm text-gray-300'>
                                 <button className='text-indigo-400 hover:text-indigo-300 mr-2'>
-                                    <Edit size={18} />
+                                    <Edit size={18}/>
                                 </button>
                                 <button className='text-red-400 hover:text-red-300'>
-                                    <Trash2 size={18} />
+                                    <Trash2 size={18}/>
                                 </button>
                             </td>
                         </motion.tr>

@@ -4,8 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6d941bf6-94e6-48a8-87a6-1900945c4909" name="Changes" comment="fixed the palcing of the files &#10;removed addFarm because file is not there &#10;please make sure to push working code">
-      <change beforePath="$PROJECT_DIR$/stacks/ApiStack.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stacks/ApiStack.ts" afterDir="false" />
+    <list default="true" id="634fb44d-225e-4696-95b9-9ea48d05bddb" name="Changes" comment="Back to last Dashboard update">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/frontend/src/components/Crop/CropsTable.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/components/Crop/CropsTable.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -13,134 +16,34 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_BRANCH_BY_REPOSITORY">
-      <map>
-        <entry key="$PROJECT_DIR$" value="Frontend" />
-      </map>
-    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-  </component>
-  <component name="ProblemsViewState">
-    <option name="selectedTabId" value="CurrentFile" />
   </component>
   <component name="ProjectLevelVcsManager">
     <OptionsSetting value="false" id="Update" />
     <ConfirmationsSetting value="2" id="Add" />
   </component>
-  <component name="ProjectViewState">
-    <option name="hideEmptyMiddlePackages" value="true" />
-    <option name="showLibraryContents" value="true" />
-  </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "git-widget-placeholder": "Frontend",
+    "git-widget-placeholder": "Admin-DashBoard",
+    "node.js.selected.package.tslint": "(autodetect)",
     "ts.external.directory.path": "C:\\Users\\A.Annan\\Desktop\\Final Project IT7099\\CIC\\mun-aquacrop\\node_modules\\typescript\\lib"
   }
-}</component>
-  <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/packages/functions/src" />
-    </key>
-  </component>
-  <component name="RunManager" selected="HTTP Request.test | #1">
-    <configuration name="test | #1" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/test.http" executionIdentifier="#1" runType="Run single request">
-      <method v="2" />
-    </configuration>
-    <configuration name="test | #3" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/test.http" executionIdentifier="#3" index="3" runType="Run single request">
-      <method v="2" />
-    </configuration>
-    <configuration name="test | #4" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/test.http" executionIdentifier="#4" index="4" runType="Run single request">
-      <method v="2" />
-    </configuration>
-    <configuration name="dev" type="js.build_tools.npm" nameIsGenerated="true">
-      <package-json value="$PROJECT_DIR$/package.json" />
-      <command value="run" />
-      <scripts>
-        <script value="dev" />
-      </scripts>
-      <node-interpreter value="project" />
-      <envs />
-      <method v="2" />
-    </configuration>
-    <list>
-      <item itemvalue="HTTP Request.test | #2 (1)" />
-      <item itemvalue="HTTP Request.test | #3" />
-      <item itemvalue="HTTP Request.test | #4" />
-      <item itemvalue="HTTP Request.test | #1" />
-      <item itemvalue="npm.dev" />
-    </list>
-    <recent_temporary>
-      <list>
-        <item itemvalue="HTTP Request.test | #4" />
-        <item itemvalue="HTTP Request.test | #3" />
-        <item itemvalue="HTTP Request.test | #2 (1)" />
-        <item itemvalue="HTTP Request.test | #1" />
-        <item itemvalue="HTTP Request.test | #5" />
-      </list>
-    </recent_temporary>
-  </component>
-  <component name="SharedIndexes">
-    <attachedChunks>
-      <set>
-        <option value="bundled-js-predefined-d6986cc7102b-deb605915726-JavaScript-WS-243.22562.112" />
-      </set>
-    </attachedChunks>
-  </component>
-  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+}]]></component>
   <component name="TaskManager">
-    <task active="true" id="Default" summary="Default task">
-      <changelist id="6d941bf6-94e6-48a8-87a6-1900945c4909" name="Changes" comment="mostly done with the calculation &#10;KC / determing which stage is the crop in to ge the lasxt result" />
-      <created>1734339554779</created>
-      <option name="number" value="Default" />
-      <option name="presentableId" value="Default" />
-      <updated>1734339554779</updated>
-      <workItem from="1734339558081" duration="2046000" />
-    </task>
-    <task id="LOCAL-00001" summary="fixed app.jsn in expo &#10; &quot;output&quot;: &quot;static&quot;/single,&#10; &#10; fixed some bugs related to the weather calculation &#10; &#10; before merging">
+    <task id="LOCAL-00001" summary="Back to last Dashboard update">
       <option name="closed" value="true" />
-      <created>1734523246049</created>
+      <created>1734792188300</created>
       <option name="number" value="00001" />
       <option name="presentableId" value="LOCAL-00001" />
       <option name="project" value="LOCAL" />
-      <updated>1734523246049</updated>
+      <updated>1734792188300</updated>
     </task>
     <option name="localTasksCounter" value="2" />
     <servers />
   </component>
-  <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="3" />
-  </component>
-  <component name="Vcs.Log.Tabs.Properties">
-    <option name="TAB_STATES">
-      <map>
-        <entry key="MAIN">
-          <value>
-            <State />
-          </value>
-        </entry>
-      </map>
-    </option>
-  </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="mostly done with the calculation &#10;KC / determing which stage is the crop in to ge the lasxt result" />
-    <MESSAGE value="fixed app.jsn in expo &#10; &quot;output&quot;: &quot;static&quot;/single,&#10; &#10; fixed some bugs related to the weather calculation &#10; &#10; before merging" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed app.jsn in expo &#10; &quot;output&quot;: &quot;static&quot;/single,&#10; &#10; fixed some bugs related to the weather calculation &#10; &#10; before merging" />
-  </component>
-  <component name="XDebuggerManager">
-    <breakpoint-manager>
-      <breakpoints>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/packages/functions/src/csvProcessor.ts</url>
-          <line>52</line>
-          <option name="timeStamp" value="4" />
-        </line-breakpoint>
-      </breakpoints>
-    </breakpoint-manager>
-    <watches-manager>
-      <configuration name="js.build_tools.npm">
-        <watch expression="result" language="TypeScript" />
-        <watch expression="result.item" language="TypeScript" />
-      </configuration>
-    </watches-manager>
+    <MESSAGE value="The Dashborad for admin is working and back to the last update" />
+    <MESSAGE value="Back to last Dashboard update" />
+    <option name="LAST_COMMIT_MESSAGE" value="Back to last Dashboard update" />
   </component>
 </project>
