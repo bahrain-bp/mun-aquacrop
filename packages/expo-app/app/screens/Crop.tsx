@@ -19,6 +19,7 @@ import DateTimePicker from '@react-native-community/datetimepicker'; // For iOS/
 import DatePicker from 'react-datepicker'; // For Web
 import 'react-datepicker/dist/react-datepicker.css'; // Required CSS for react-datepicker on Web
 import CustomRadioButton from '@/components/CustomRadioButton'; // Ensure the path is correct
+import i18n from '../i18n'; // Import the shared i18n instance
 
 // Testing
 import {SelectList} from 'react-native-dropdown-select-list'
@@ -354,13 +355,14 @@ const Crop: React.FC = () => {
             <View style={styles.locationMethodWrapper}>
 
                 <View style={styles.locationMethodWrapperText}>
-                    <Text style={styles.locationMethodTitle}>Choose Location Method</Text>
+                    <Text style={styles.locationMethodTitle}>{i18n.t('chooseloc')}</Text>
                 </View>
 
                 <View style={styles.radioButtonsRow}>
                     <View style={styles.radioButtons}>
                         <CustomRadioButton
-                            label="By Location"
+                            //label="By Location"
+                            label={i18n.t('bylocation')}
                             selected={locationMethod === 'auto'}
                             onPress={() => setLocationMethod('auto')}
                             disabled={isAutoDisabled}
@@ -368,7 +370,8 @@ const Crop: React.FC = () => {
                     </View>
                     <View style={styles.radioButtons}>
                         <CustomRadioButton
-                            label="By Dropdown"
+                            //label="By Dropdown"
+                            label={i18n.t('bydropdown')}
                             selected={locationMethod === 'manual'}
                             onPress={() => setLocationMethod('manual')}
                         />
@@ -395,7 +398,8 @@ const Crop: React.FC = () => {
                 <View style={styles.radioButtonsRow}>
                     <View style={styles.radioButtons}>
                         <CustomRadioButton
-                            label="Date Planted"
+                            //label="Date Planted"
+                            label={i18n.t('datep')}
                             selected={selectedOption === 'datePlanted'}
                             onPress={() => setSelectedOption('datePlanted')}
                         />
@@ -403,7 +407,8 @@ const Crop: React.FC = () => {
 
                     <View style={styles.radioButtons}>
                         <CustomRadioButton
-                            label="Growth Stage"
+                            //label="Growth Stage"
+                            label={i18n.t('growthstage')}
                             selected={selectedOption === 'growthStage'}
                             onPress={() => setSelectedOption('growthStage')}
                         />

@@ -59,6 +59,7 @@ export function DynamoDBStack({ stack }: StackContext) {
             maxTemp: "number",
             wind_speed: "number",
             humidity: "number",
+            ET0: "number",
         },
         primaryIndex: { partitionKey: "ReadingID" },
     });

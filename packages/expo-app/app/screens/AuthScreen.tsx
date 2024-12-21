@@ -3,9 +3,10 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
+import { storage } from '../utils/storage';
+import i18n from '../i18n'; // Import the shared i18n instance
 
 const API_URL = process.env.EXPO_PUBLIC_API_ENDPOINT; // Replace with your actual API Gateway URL
-
 
 const AuthScreen = () => {
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -64,6 +65,21 @@ const AuthScreen = () => {
 
       const { idToken, accessToken } = response.data;
 
+
+      // Save the token using the unified storage utility
+      const saveToken = async (idToken: string): Promise<void> => {
+        try {
+          await storage.setItem('idToken', idToken);
+          await storage.setItem('accessToken', accessToken);
+
+          console.log('Token saved successfully!');
+        } catch (error) {
+          console.error('Error saving token:', error);
+        }
+      };
+
+      await saveToken(idToken);
+
       if (idToken && accessToken) {
         Alert.alert('Success', 'Authentication successful!');
         // Navigate to the home screen
@@ -83,7 +99,7 @@ const AuthScreen = () => {
     <View style={styles.container}>
       {!isChallengeStep ? (
         <>
-          <Text style={styles.label}>Enter Phone Number:</Text>
+          <Text style={styles.label}>{i18n.t('phone')}</Text>
           <TextInput
             style={styles.input}
             value={phoneNumber}
@@ -91,7 +107,7 @@ const AuthScreen = () => {
             placeholder="+1234567890"
             keyboardType="phone-pad"
           />
-          <Text style={styles.label}>Enter Fullname:</Text>
+          <Text style={styles.label}>{i18n.t('name')}</Text>
           <TextInput
             style={styles.input}
             value={fullname}

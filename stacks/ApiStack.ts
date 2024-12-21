@@ -4,15 +4,18 @@ import { DynamoDBStack } from "./DynamoDBStack";
 import { AuthStack } from "./AuthStack"; 
 import { CacheHeaderBehavior, CachePolicy } from "aws-cdk-lib/aws-cloudfront";
 import { Duration } from "aws-cdk-lib/core";
+import {S3Stack} from "./StorageStack";
 
 export function ApiStack({stack}: StackContext) {
     const {table} = use(DBStack);
     const auth = use(AuthStack);
+    const {CSVReadings} = use(S3Stack);
+    const { userPoolId, userPoolClientId } = use(AuthStack);
     const {stationTable, cropTable, weatherReadingsTable} = use(DynamoDBStack);
 
     const authApi = {
-      userPoolId: "us-east-1_yn913oCJF", // Replace with your Cognito User Pool ID
-      userPoolClientId: "6330hslmlvljuj2sh78pn13to", // Replace with your Cognito App Client ID
+      userPoolId,
+      userPoolClientId,
     };
 
     // Create the HTTP API
@@ -76,6 +79,16 @@ export function ApiStack({stack}: StackContext) {
                     handler: "packages/functions/src/getLatestWeatherReading.handler",
                     environment: {
                         weatherReadingsTable: weatherReadingsTable.tableName,
+                    },
+                    permissions: [weatherReadingsTable],
+                },
+            },
+
+            "POST /Upload/CSV": {
+                function: {
+                    handler: "packages/functions/src/GenerateUploadUrl.handler",
+                    environment: {
+                        CSVReadings: CSVReadings.bucketName,
                     },
                     permissions: [weatherReadingsTable],
                 },
@@ -146,9 +159,9 @@ export function ApiStack({stack}: StackContext) {
           handler: "packages/functions/src/ManagerDashboard/TriggerIrrigation.handler",
           runtime: "nodejs18.x",
           permissions: ["iot:Publish"],
-          
+
         },
-        
+
       },
       "POST /managerDashboard/Farms/{FarmID}/Zones/{ZoneID}/UpdateStatus": {
         function: {
@@ -156,7 +169,7 @@ export function ApiStack({stack}: StackContext) {
           runtime: "nodejs18.x",
           
         },
-        authorizer: "authApi", 
+        authorizer: "authApi",
       },
 
 
