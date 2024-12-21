@@ -1,6 +1,5 @@
 // Farms.tsx
 import React, { useState, useEffect } from 'react';
-import Layout from './Layout'; // Import the Layout component
 
 import { Authenticator } from '@aws-amplify/ui-react';
 import axios from 'axios';
@@ -94,7 +93,6 @@ const Farms: React.FC = () => {
     return (
         <Authenticator>
             {({ signOut }) => (
-                <Layout isSidebarCollapsed={false} toggleSidebar={() => {}}>
                     <div style={{ padding: '20px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <h1>Farms</h1>
@@ -182,7 +180,6 @@ const Farms: React.FC = () => {
                             </div>
                         )}
                     </div>
-                </Layout>
             )}
         </Authenticator>
     );

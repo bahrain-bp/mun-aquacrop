@@ -5,7 +5,27 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6d941bf6-94e6-48a8-87a6-1900945c4909" name="Changes" comment="fixed the palcing of the files &#10;removed addFarm because file is not there &#10;please make sure to push working code">
-      <change beforePath="$PROJECT_DIR$/stacks/ApiStack.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stacks/ApiStack.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/packages/frontend/src/components/AdminDashboard/CategoryChart.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/packages/frontend/src/components/AdminDashboard/CropsChart.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/packages/frontend/src/components/AdminDashboard/RecommendationsOverviewChart.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/packages/frontend/src/components/Crop/CropsTable.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/packages/frontend/src/components/FarmerDashboard/CompareOverviewChart.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/packages/frontend/src/components/common/Header.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/packages/frontend/src/components/common/Sidebar.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/packages/frontend/src/components/common/StatCard.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/packages/frontend/src/pages/Crops.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/packages/frontend/src/pages/Reports.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/aws.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/aws.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/expo-app/.expo/types/router.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/.expo/types/router.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/frontend/.eslintrc.cjs" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/.eslintrc.cjs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/frontend/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/frontend/src/App.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/App.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/frontend/src/index.css" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/index.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/frontend/src/pages/AdminDashboard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/pages/AdminDashboard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/frontend/src/pages/Farms.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/pages/Farms.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/frontend/src/pages/Layout.tsx" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -46,13 +66,17 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
-    "git-widget-placeholder": "#93 on Admin-DashBoard",
+    "HTTP Request.test | #1.executor": "Run",
+    "git-widget-placeholder": "Admin-DashBoard",
     "node.js.selected.package.tslint": "(autodetect)",
-    "ts.external.directory.path": "/Users/alilui/Desktop/Demo CIC/mun-aquacrop/node_modules/typescript/lib"
+    "ts.external.directory.path": "C:\\Users\\A.Annan\\Desktop\\Final Project IT7099\\CIC\\mun-aquacrop\\node_modules\\typescript\\lib"
   }
 }]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\A.Annan\Desktop\Final Project IT7099\CIC\mun-aquacrop\packages\frontend\src\components\FarmerDashboard" />
+      <recent name="C:\Users\A.Annan\Desktop\Final Project IT7099\CIC\mun-aquacrop\packages\frontend\src\components\common" />
+      <recent name="C:\Users\A.Annan\Desktop\Final Project IT7099\CIC\mun-aquacrop\packages\frontend\src" />
       <recent name="$PROJECT_DIR$/packages/functions/src" />
     </key>
   </component>
@@ -79,6 +103,18 @@
       <envs />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="HTTP Request.test | #2 (1)" />
+      <item itemvalue="HTTP Request.test | #3" />
+      <item itemvalue="HTTP Request.test | #4" />
+      <item itemvalue="HTTP Request.test | #1" />
+      <item itemvalue="npm.dev" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="HTTP Request.test | #1" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
