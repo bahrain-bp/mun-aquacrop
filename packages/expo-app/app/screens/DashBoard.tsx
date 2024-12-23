@@ -84,6 +84,10 @@ const Index: React.FC = () => {
             </View>
             <Text style={styles.text}>{i18n.t('home')}</Text>
             <View style={styles.grid}>
+                {/* Fixed Upload Image Card */}
+                <View style={styles.row2}>
+                    <UploadImageCard />
+                </View>
                 {crops.length > 0 ? (
                     <View style={styles.row}>
                         {crops.map((crop, index) => (
@@ -130,6 +134,26 @@ const Card: React.FC<CardProps> = ({ CropData }) => {
     );
 };
 
+const UploadImageCard: React.FC = () => {
+    const router = useRouter();  // Initialize the router
+
+    // Handle the press action to navigate to the "Test" page
+    const handlePress = () => {
+        router.push({
+            pathname: '/screens/CropImage',
+
+        });  // Navigate to the "Test" page (adjust the path as needed)
+    };
+
+    return (
+        <TouchableOpacity style={styles.cardLink} onPress={handlePress}>  {/* Add onPress handler */}
+            <View style={styles.cardContainer}>
+                <Text style={styles.cardTitle}>Upload Image</Text>
+            </View>
+        </TouchableOpacity>
+    );
+};
+
 const styles = StyleSheet.create({
     container: {
         backgroundColor: '#25292e',
@@ -152,6 +176,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',  // Align the cards horizontally
         flexWrap: 'wrap',      // Allow cards to wrap to the next row
         justifyContent: 'space-between',  // Distribute cards evenly across rows
+        width: '100%',  // Ensure the row takes the full width of the parent container
+    },
+    row2: {
+        flexDirection: 'row',  // Align the cards horizontally
+        flexWrap: 'wrap',      // Allow cards to wrap to the next row
+        justifyContent: 'center',  // Distribute cards evenly across rows
         width: '100%',  // Ensure the row takes the full width of the parent container
     },
     cardLink: {

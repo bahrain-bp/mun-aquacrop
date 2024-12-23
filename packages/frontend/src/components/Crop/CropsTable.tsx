@@ -2,28 +2,48 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Edit, Search, Trash2, Plus} from 'lucide-react';
 
-const PRODUCT_DATA = [
-    { id: 1, name: "Wireless Earbuds", category: "Electronics", price: 59.99, stock: 143, sales: 1200 },
-    { id: 2, name: "Leather Wallet", category: "Accessories", price: 39.99, stock: 89, sales: 800 },
-    { id: 3, name: "Smart Watch", category: "Electronics", price: 199.99, stock: 56, sales: 650 },
-    { id: 4, name: "Yoga Mat", category: "Fitness", price: 29.99, stock: 210, sales: 950 },
-    { id: 5, name: "Coffee Maker", category: "Home", price: 79.99, stock: 78, sales: 720 },
-];
+// const PRODUCT_DATA = [
+//     { id: 1, name: "Wireless Earbuds", category: "Electronics", price: 59.99, stock: 143, sales: 1200 },
+//     { id: 2, name: "Leather Wallet", category: "Accessories", price: 39.99, stock: 89, sales: 800 },
+//     { id: 3, name: "Smart Watch", category: "Electronics", price: 199.99, stock: 56, sales: 650 },
+//     { id: 4, name: "Yoga Mat", category: "Fitness", price: 29.99, stock: 210, sales: 950 },
+//     { id: 5, name: "Coffee Maker", category: "Home", price: 79.99, stock: 78, sales: 720 },
+// ];
+
+const CROPS_DATA =[
+    {CropID: 1, GrowthStage: "ini : 10 , mid : 50, end : 60", ImageURL : "", kc: "ini : 0.7 , mid : 1, end : 0.95", nameAR: "خس", nameEN: "Lettuce"},
+    {CropID: 2, GrowthStage: "ini : 15 , mid : 85, end : 100", ImageURL : "", kc: "ini : 0.3 , mid : 1.15, end : 1.79585632602", nameAR: "ذرة", nameEN: "Sweet corn"},
+    {CropID: 3, GrowthStage: "ini : 15 , mid : 60, end : 70", ImageURL : "", kc: "ini : 0.5 , mid : 1.05, end : 0.95", nameAR: "شمندر", nameEN: "Beetroot"},
+    {CropID: 4, GrowthStage: "ini : 20 , mid : 75, end : 90", ImageURL : "", kc: "ini : 0.6 , mid : 1.05, end : 0.9", nameAR: "باذنجان", nameEN: "Eggplants"},
+    {CropID: 5, GrowthStage: "ini : 20 , mid : 80, end : 100", ImageURL : "https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/cauliflower.png", kc: "ini : 0.7 , mid : 1.05, end : 0.95", nameAR: "قرنبيط", nameEN: "Cauliflower"},
+]
 
 const CropsTable: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState("");
-    const [filteredProducts, setFilteredProducts] = useState(PRODUCT_DATA);
+    const [filteredCrops, setFilteredCrops] = useState(CROPS_DATA);
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         const term = e.target.value.toLowerCase();
         setSearchTerm(term);
-        const filtered = PRODUCT_DATA.filter(
-            (product) =>
-                product.name.toLowerCase().includes(term) || product.category.toLowerCase().includes(term)
-        );
 
-        setFilteredProducts(filtered);
-    };
+        const filtered = CROPS_DATA.filter(
+                (crop) =>
+                    crop.nameEN.toLowerCase().includes(term) || crop.nameAR.includes(term)
+            );
+
+        setFilteredCrops(filtered);
+    }
+
+    // const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     const term = e.target.value.toLowerCase();
+    //     setSearchTerm(term);
+    //     const filtered = crop.filter(
+    //         (crop) =>
+    //             crop.name.toLowerCase().includes(term) || crop.category.toLowerCase().includes(term)
+    //     );
+    //
+    //     setFilteredcrop(filtered);
+    // };
 
     return (
         <motion.div
@@ -37,7 +57,7 @@ const CropsTable: React.FC = () => {
                 <div className='relative'>
                     <input
                         type='text'
-                        placeholder='Search products...'
+                        placeholder='Search Crops...'
                         className='bg-gray-700 text-white placeholder-gray-400 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500'
                         onChange={handleSearch}
                         value={searchTerm}
@@ -50,23 +70,23 @@ const CropsTable: React.FC = () => {
                 <table className='min-w-full divide-y divide-gray-700'>
                     <thead>
                     <tr>
+                        {/*<th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>*/}
+                        {/*    Image*/}
+                        {/*</th>*/}
                         <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
                             Crop ID
                         </th>
                         <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
-                            GrowthStage
-                        </th>
-                        <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
-                            Image
-                        </th>
-                        <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
-                            kc
+                            nameEN
                         </th>
                         <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
                             nameAR
                         </th>
                         <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
-                            nameEN
+                            GrowthStage
+                        </th>
+                        <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
+                            kc
                         </th>
                         <th className='px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider'>
                             Actions
@@ -75,9 +95,9 @@ const CropsTable: React.FC = () => {
                     </thead>
 
                     <tbody className='divide-y divide-gray-700'>
-                    {filteredProducts.map((product) => (
+                    {filteredCrops.map((crop) => (
                         <motion.tr
-                            key={product.id}
+                            key={crop.CropID}
                             initial={{opacity: 0}}
                             animate={{opacity: 1}}
                             transition={{duration: 0.3}}
