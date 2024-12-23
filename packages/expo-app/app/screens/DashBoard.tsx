@@ -48,20 +48,34 @@ const Index: React.FC = () => {
     const [crops, setCrops] = useState<Crop[]>([]);
     const [userName, setUserName] = useState<string>('Guest');
     const { width } = useWindowDimensions();
+    const router = useRouter();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
+                // Get both tokens
+                const idToken = await storage.getItem('idToken');
+                const accessToken = await storage.getItem('accessToken');
 
-                var idToken =  await storage.getItem('idToken');
+                if (!idToken || !accessToken) {
+                    throw new Error('No tokens found');
+                }
 
                 const response = await fetch(API_URL + '/crops', {
-                    headers: { Authorization: `Bearer ${idToken}` },
+                    headers: {
+                        'Authorization': `Bearer ${idToken}`,
+                        'X-Access-Token': accessToken
+                    },
                 });
+
+                if (!response.ok) {
+                    throw new Error('API request failed');
+                }
+
                 const data = await response.json();
                 setCrops(parseCrops(data));
 
-                const accessToken = await storage.getItem('accessToken');
+                // Fetch user data with access token
                 if (accessToken) {
                     const cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider();
                     const userData = await cognitoidentityserviceprovider.getUser({
@@ -74,6 +88,8 @@ const Index: React.FC = () => {
                 }
             } catch (error) {
                 console.error("Error fetching data:", error);
+                // Redirect to login if unauthorized
+                router.replace('/');
             }
         };
 
