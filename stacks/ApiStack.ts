@@ -10,7 +10,7 @@ export function ApiStack({stack}: StackContext) {
     const {table} = use(DBStack);
     const auth = use(AuthStack);
     const {CSVReadings, indexBucket} = use(S3Stack);
-    const {userPoolId, userPoolClientId} = use(AuthStack);
+    const {userPoolId, userPoolClientId, mobileUserPoolId, mobileUserPoolClientId} = use(AuthStack);
     const {stationTable, cropTable, weatherReadingsTable} = use(DynamoDBStack);
 
     const authApi = {
@@ -30,8 +30,16 @@ export function ApiStack({stack}: StackContext) {
                     WeatherReadingsTableName: weatherReadingsTable.tableName,
                 },
             },
+        
         },
         authorizers: {
+            mobileauthApi: {
+                type: "user_pool",
+                userPool: {
+                    id: mobileUserPoolId,
+                    clientIds: [mobileUserPoolClientId],
+                },
+            },
             authApi: {
                 type: "user_pool",
                 userPool: {
@@ -69,7 +77,7 @@ export function ApiStack({stack}: StackContext) {
                     },
                     permissions: [cropTable],
                 },
-                authorizer: "authApi",
+                authorizer: "mobileauthApi",
             },
 
 
@@ -90,7 +98,7 @@ export function ApiStack({stack}: StackContext) {
                         indexBucket: indexBucket.bucketName,
                     },
                 },
-                authorizer: "authApi",
+                authorizer: "mobileauthApi",
             },
 
 
@@ -105,7 +113,7 @@ export function ApiStack({stack}: StackContext) {
                     },
                     permissions: [stationTable, cropTable, weatherReadingsTable],
                 },
-                authorizer: "authApi",
+                authorizer: "mobileauthApi",
             },
 
             // Add new routes for custom authentication
@@ -224,6 +232,11 @@ export function ApiStack({stack}: StackContext) {
             "Content-Type",
             "Referer"
         ),
+    });
+
+    // Output the API URL
+    stack.addOutputs({
+        ApiEndpoint: api.url,
     });
 
     return {api, apiCachePolicy};
