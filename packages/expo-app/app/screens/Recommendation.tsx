@@ -47,8 +47,9 @@ const Recommendation: React.FC = () => {
                 var idToken =  await storage.getItem('idToken');
 
                 const response = await axios.post(`${API_URL}/calculate/water`, {
-                    lat:latitude,
-                    lon:longitude,
+                    lat: latitude,
+                    lon: longitude,
+                }, {
                     headers: { Authorization: `Bearer ${idToken}` },
                 });
                 // Extract ET0 from the response

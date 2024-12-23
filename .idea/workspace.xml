@@ -4,18 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="af9a6a8a-c792-4eb4-9cce-a415c3983bc8" name="Changes" comment="fixed app.jsn in expo &#10; &quot;output&quot;: &quot;static&quot;/single,&#10; &#10; fixed some bugs related to the weather calculation &#10; &#10; before merging">
-      <change afterPath="$PROJECT_DIR$/packages/functions/src/imageProcessor.ts" afterDir="false" />
+    <list default="true" id="af9a6a8a-c792-4eb4-9cce-a415c3983bc8" name="Changes" comment="some api fixes&#10;added s3 bucket to for new ai imaguing &#10;&#10;need to check authorizer for crops/recemondation">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/expo-app/app/screens/DashBoard.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/app/screens/DashBoard.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/expo-app/.expo/types/router.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/.expo/types/router.d.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/packages/expo-app/app/screens/Recommendation.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/app/screens/Recommendation.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/functions/src/GenerateUploadUrl.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/functions/src/GenerateUploadUrl.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/functions/src/calculateWaterNeed.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/functions/src/calculateWaterNeed.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/functions/src/crops-handler.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/functions/src/crops-handler.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stacks/ApiStack.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stacks/ApiStack.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stacks/DynamoDBStack.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stacks/DynamoDBStack.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stacks/StorageStack.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stacks/StorageStack.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test.http" beforeDir="false" afterPath="$PROJECT_DIR$/test.http" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -59,27 +51,27 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;HTTP Request.test | #1.executor&quot;: &quot;Run&quot;,
-    &quot;HTTP Request.test | #2.executor&quot;: &quot;Run&quot;,
-    &quot;HTTP Request.test | #3.executor&quot;: &quot;Run&quot;,
-    &quot;HTTP Request.test | #4.executor&quot;: &quot;Run&quot;,
-    &quot;HTTP Request.test | #5.executor&quot;: &quot;Run&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;Admin-DashBoard&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;npm.dev.executor&quot;: &quot;Run&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\PC\\WebstormProjects\\mun-aquacrop\\node_modules\\typescript\\lib&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "HTTP Request.test | #1.executor": "Run",
+    "HTTP Request.test | #2.executor": "Run",
+    "HTTP Request.test | #3.executor": "Run",
+    "HTTP Request.test | #4.executor": "Run",
+    "HTTP Request.test | #5.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "Admin-DashBoard",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "npm.dev.executor": "Run",
+    "settings.editor.selected.configurable": "com.github.copilot.settings.ApplicationConfigurable",
+    "ts.external.directory.path": "C:\\Users\\PC\\WebstormProjects\\mun-aquacrop\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\PC\WebstormProjects\mun-aquacrop\packages\functions\src" />
@@ -146,7 +138,7 @@
       <updated>1734339554779</updated>
       <workItem from="1734339558081" duration="2046000" />
       <workItem from="1734887073362" duration="1598000" />
-      <workItem from="1734965771816" duration="1215000" />
+      <workItem from="1734965771816" duration="2775000" />
     </task>
     <task id="LOCAL-00001" summary="fixed app.jsn in expo &#10; &quot;output&quot;: &quot;static&quot;/single,&#10; &#10; fixed some bugs related to the weather calculation &#10; &#10; before merging">
       <option name="closed" value="true" />
@@ -156,7 +148,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734523246049</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="some api fixes&#10;added s3 bucket to for new ai imaguing &#10;&#10;need to check authorizer for crops/recemondation">
+      <option name="closed" value="true" />
+      <created>1734967314120</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1734967314120</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -176,7 +176,8 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="mostly done with the calculation &#10;KC / determing which stage is the crop in to ge the lasxt result" />
     <MESSAGE value="fixed app.jsn in expo &#10; &quot;output&quot;: &quot;static&quot;/single,&#10; &#10; fixed some bugs related to the weather calculation &#10; &#10; before merging" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixed app.jsn in expo &#10; &quot;output&quot;: &quot;static&quot;/single,&#10; &#10; fixed some bugs related to the weather calculation &#10; &#10; before merging" />
+    <MESSAGE value="some api fixes&#10;added s3 bucket to for new ai imaguing &#10;&#10;need to check authorizer for crops/recemondation" />
+    <option name="LAST_COMMIT_MESSAGE" value="some api fixes&#10;added s3 bucket to for new ai imaguing &#10;&#10;need to check authorizer for crops/recemondation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
