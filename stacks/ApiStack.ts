@@ -67,13 +67,10 @@ export function ApiStack({stack}: StackContext) {
             // Sample TypeScript lambda function
             "POST /": "packages/functions/src/lambda.main",
 
-            // Penman equation Lambda function
-            "POST /penman": "packages/functions/src/penman.handler",
-
 
             "GET /crops": {
                 function: {
-                    handler: "packages/functions/src/crops-handler.main",
+                    handler: "packages/functions/src/mobile-api/crops-handler.main",
                     timeout: "30 seconds",
                     environment: {
                         CropTableName: cropTable.tableName,
@@ -83,15 +80,6 @@ export function ApiStack({stack}: StackContext) {
                 authorizer: "mobileauthApi",
             },
 
-            "POST /Latest/Weather/Reading": {
-                function: {
-                    handler: "packages/functions/src/getLatestWeatherReading.handler",
-                    environment: {
-                        weatherReadingsTable: weatherReadingsTable.tableName,
-                    },
-                    permissions: [weatherReadingsTable],
-                },
-            },
 
             "POST /Upload/CSV": {
                 function: {
@@ -114,12 +102,10 @@ export function ApiStack({stack}: StackContext) {
             },
 
 
-            "POST /station": "packages/functions/src/station-handler.main",
-
             // route for calculating water
             "POST /calculate/water": {
                 function: {
-                    handler: "packages/functions/src/calculateWaterNeed.handler",
+                    handler: "packages/functions/src/mobile-api/calculateWaterNeed.handler",
                     environment: {
                         cropTable: cropTable.tableName,
                         stationTable: stationTable.tableName,
@@ -148,8 +134,6 @@ export function ApiStack({stack}: StackContext) {
 
 
             // Manager Dashboard Routing //
-
-
             "POST /managerDashboard/exportData": {
                 function: {
                     handler: "packages/functions/src/ManagerDashboard/Auth/exportData.handler",

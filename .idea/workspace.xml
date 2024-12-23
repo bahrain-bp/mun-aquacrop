@@ -4,10 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="af9a6a8a-c792-4eb4-9cce-a415c3983bc8" name="Changes" comment="some api fixes&#10;added s3 bucket to for new ai imaguing &#10;&#10;need to check authorizer for crops/recemondation">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+    <list default="true" id="af9a6a8a-c792-4eb4-9cce-a415c3983bc8" name="Changes" comment="fixed the recommendation">
       <change beforePath="$PROJECT_DIR$/packages/expo-app/.expo/types/router.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/.expo/types/router.d.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/expo-app/app/screens/Recommendation.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/app/screens/Recommendation.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/functions/src/calculateWaterNeed.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/functions/src/mobile-api/calculateWaterNeed.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/functions/src/crops-handler.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/functions/src/mobile-api/crops-handler.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/functions/src/getLatestWeatherReading.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/functions/src/penman.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/functions/src/station-handler.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stacks/ApiStack.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stacks/ApiStack.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -74,6 +78,7 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\PC\WebstormProjects\mun-aquacrop\packages\functions\src\mobile-api" />
       <recent name="C:\Users\PC\WebstormProjects\mun-aquacrop\packages\functions\src" />
     </key>
   </component>
@@ -138,7 +143,7 @@
       <updated>1734339554779</updated>
       <workItem from="1734339558081" duration="2046000" />
       <workItem from="1734887073362" duration="1598000" />
-      <workItem from="1734965771816" duration="2775000" />
+      <workItem from="1734965771816" duration="3265000" />
     </task>
     <task id="LOCAL-00001" summary="fixed app.jsn in expo &#10; &quot;output&quot;: &quot;static&quot;/single,&#10; &#10; fixed some bugs related to the weather calculation &#10; &#10; before merging">
       <option name="closed" value="true" />
@@ -156,7 +161,15 @@
       <option name="project" value="LOCAL" />
       <updated>1734967314120</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="fixed the recommendation">
+      <option name="closed" value="true" />
+      <created>1734968685761</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1734968685761</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -177,7 +190,8 @@
     <MESSAGE value="mostly done with the calculation &#10;KC / determing which stage is the crop in to ge the lasxt result" />
     <MESSAGE value="fixed app.jsn in expo &#10; &quot;output&quot;: &quot;static&quot;/single,&#10; &#10; fixed some bugs related to the weather calculation &#10; &#10; before merging" />
     <MESSAGE value="some api fixes&#10;added s3 bucket to for new ai imaguing &#10;&#10;need to check authorizer for crops/recemondation" />
-    <option name="LAST_COMMIT_MESSAGE" value="some api fixes&#10;added s3 bucket to for new ai imaguing &#10;&#10;need to check authorizer for crops/recemondation" />
+    <MESSAGE value="fixed the recommendation" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed the recommendation" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
