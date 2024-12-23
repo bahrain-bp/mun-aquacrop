@@ -71,7 +71,8 @@ export function ApiStack({stack}: StackContext) {
                         CropTableName: cropTable.tableName,
                     },
                     permissions: [cropTable],
-                }
+                },
+                authorizer: "authApi",
             },
 
             "POST /Latest/Weather/Reading": {
@@ -92,6 +93,7 @@ export function ApiStack({stack}: StackContext) {
                     },
                     permissions: [weatherReadingsTable],
                 },
+                authorizer: "authApi",
             },
 
 
@@ -109,6 +111,7 @@ export function ApiStack({stack}: StackContext) {
                     },
                     permissions: [stationTable, cropTable, weatherReadingsTable],
                 },
+                authorizer: "authApi",
             },
 
             // Add new routes for custom authentication
