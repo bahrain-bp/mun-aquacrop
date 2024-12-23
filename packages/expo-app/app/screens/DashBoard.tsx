@@ -52,7 +52,12 @@ const Index: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(API_URL + '/crops');
+
+                var idToken =  await storage.getItem('idToken');
+
+                const response = await fetch(API_URL + '/crops', {
+                    headers: { Authorization: `Bearer ${idToken}` },
+                });
                 const data = await response.json();
                 setCrops(parseCrops(data));
 

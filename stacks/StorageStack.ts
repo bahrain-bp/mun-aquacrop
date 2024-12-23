@@ -5,7 +5,43 @@ import {DynamoDBStack} from "./DynamoDBStack";
 
 
 export function S3Stack({ stack }: StackContext) {
-    const {stationTable, weatherReadingsTable} = use(DynamoDBStack);
+    const {stationTable, weatherReadingsTable, imageResult} = use(DynamoDBStack);
+
+    const indexBucket = new Bucket(stack, "indexBucket", {
+        cdk: {
+            bucket: {
+                versioned: true,
+                removalPolicy: stack.stage === "prod" ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY,
+                publicReadAccess: true,
+                cors: [
+                    {
+                        allowedHeaders: ["*"],
+                        allowedMethods: [HttpMethods.GET, HttpMethods.PUT, HttpMethods.POST],
+                        allowedOrigins: ["*"], // TODO: Replace "*" with your frontend's domain for production
+                        exposedHeaders: ["ETag"],
+                        maxAge: 3000,
+                    },
+                ],
+            },
+        },
+    });
+
+    const imageProcessor = new Function(stack, "imageProcessor", {
+        handler: "packages/functions/src/imageProcessor.handler", // Ensure this path is correct
+        environment: {
+            imageResult: imageResult.tableName,
+            stationTable:stationTable.tableName,
+            weatherReadingsTable:weatherReadingsTable.tableName
+        },
+        permissions: [imageResult,stationTable,weatherReadingsTable], // Grants necessary permissions
+    });
+
+    indexBucket.addNotifications(stack, {
+        objectCreatedInIndexBucket: {
+            function: imageProcessor,
+            events: ["object_created"], // Triggers on object creation
+        },
+    });
 
     const imageBucket = new Bucket(stack, "CropsImagesBucket", {
         cdk: {
@@ -45,6 +81,9 @@ export function S3Stack({ stack }: StackContext) {
         },
     });
 
+
+
+    // 5. Add notification to CSVReadings bucket to trigger Lambda on object creation
     const ProcessCSV = new Function(stack, "csvProcessor", {
         handler: "packages/functions/src/csvProcessor.handler", // Ensure this path is correct
         environment: {
@@ -62,11 +101,12 @@ export function S3Stack({ stack }: StackContext) {
         },
     });
 
-    // 6. Output the bucket names and table name for reference
+
     stack.addOutputs({
         ImageBucketName: imageBucket.bucketName,
         CSVReadingsBucketName: CSVReadings.bucketName,
+        indexBucketName: indexBucket.bucketName,
     });
 
-    return { imageBucket, CSVReadings };
+    return { imageBucket, CSVReadings, indexBucket };
 }

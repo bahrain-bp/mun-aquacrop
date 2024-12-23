@@ -110,7 +110,7 @@ export const handler = async (event: any) => {
 
         let nearestStationId: string | null = null;
         let minDistance = Infinity;
-        let lastReading: string | null = null;
+        let lastReading: string | undefined | null = null;
 
         // Iterate over stations and find the nearest one
         for (const station of result.Items) {

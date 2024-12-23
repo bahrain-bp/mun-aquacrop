@@ -30,7 +30,6 @@ export function DynamoDBStack({ stack }: StackContext) {
             cropDescriptionEn: "string",
             cropImageURL: "string",
             KC: "map",
-            KC: "map",
             growthStage: "map",
         },
         primaryIndex: { partitionKey: "CropID" },
@@ -116,6 +115,16 @@ export function DynamoDBStack({ stack }: StackContext) {
         primaryIndex: { partitionKey: "OwnerID", sortKey: "FarmID" },
     });
 
+const imageResult = new Table(stack, "ImageResult", {
+    fields: {
+        result: "string",
+        userId: "string",
+        imageid: "string",
+    },
+    primaryIndex: { partitionKey: "result"},
+});
+
+
     const zonesTable = new Table(stack, "Zones", {
         fields: {
             FarmID: "string",
@@ -131,6 +140,7 @@ export function DynamoDBStack({ stack }: StackContext) {
 
 
     stack.addOutputs({
+        ImageResult: imageResult.tableName,
         UserTableName: userTable.tableName,
         CropTableName: cropTable.tableName,
         // CropCoefficientTableName: cropCoefficientTable.tableName,
@@ -143,6 +153,7 @@ export function DynamoDBStack({ stack }: StackContext) {
     });
 
     return {
+        imageResult,
         userTable,
         cropTable,
         // cropCoefficientTable,
