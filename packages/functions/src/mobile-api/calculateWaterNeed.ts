@@ -58,11 +58,26 @@ interface WeatherReading {
 
 // Lambda function to find the nearest station
 export const handler = async (event: any) => {
+
+    const claims = event.requestContext?.authorizer?.jwt?.claims;
+    if (!claims || !claims.sub) {
+      return {
+        statusCode: 401,
+        body: JSON.stringify({ message: "Unauthorized: Missing claims or sub" }),
+      };
+    }
+
+    // Extract the authenticated user's ID (sub) from the claims
+    const ownerId = claims.sub;
+
+    console.log("Authenticated User ID:", ownerId);
+    
     try {
         // Parse the request body
         const body = JSON.parse(event.body);
         const userLat = parseFloat(body.lat);
         const userLon = parseFloat(body.lon);
+
 
         // Validate input coordinates
         if (isNaN(userLat) || isNaN(userLon)) {
@@ -95,7 +110,7 @@ export const handler = async (event: any) => {
 
         let nearestStationId: string | null = null;
         let minDistance = Infinity;
-        let lastReading: string | null = null;
+        let lastReading: string | undefined | null = null;
 
         // Iterate over stations and find the nearest one
         for (const station of result.Items) {

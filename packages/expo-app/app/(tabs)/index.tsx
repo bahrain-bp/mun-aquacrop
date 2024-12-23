@@ -55,15 +55,15 @@ const validateToken = async (accessToken: string) => {
 const refreshToken = async () => {
   try {
     const storedRefreshToken = await storage.getItem('refreshToken');
-    if (!storedRefreshToken) return false;
+    if (!storedRefreshToken) return { success: false, accessToken: null };
 
     const cognito = new CognitoIdentityServiceProvider();
     const params = {
       ClientId: process.env.EXPO_PUBLIC_AWS_USERPOOL_CLIENTID || '',
       AuthFlow: 'REFRESH_TOKEN_AUTH',
       AuthParameters: {
-        'REFRESH_TOKEN': storedRefreshToken,
-        'CLIENT_ID': process.env.EXPO_PUBLIC_AWS_USERPOOL_CLIENTID || '',
+        REFRESH_TOKEN: storedRefreshToken,
+        CLIENT_ID: process.env.EXPO_PUBLIC_AWS_USERPOOL_CLIENTID || '',
       },
     };
 
@@ -71,36 +71,49 @@ const refreshToken = async () => {
 
     if (data.AuthenticationResult) {
       const { AccessToken, IdToken } = data.AuthenticationResult;
+      
+      // Store both tokens
       if (AccessToken) await storage.setItem('accessToken', AccessToken);
       if (IdToken) await storage.setItem('idToken', IdToken);
-      return { success: true, accessToken: AccessToken };
+      
+      return { success: true, accessToken: AccessToken, idToken: IdToken };
     }
-    return { success: false, accessToken: null };
+    return { success: false, accessToken: null, idToken: null };
   } catch (e) {
     console.error('Error refreshing token:', e);
-    return { success: false, accessToken: null };
+    // Clear all tokens on refresh failure
+    await storage.removeItem('accessToken');
+    await storage.removeItem('idToken');
+    await storage.removeItem('refreshToken');
+    return { success: false, accessToken: null, idToken: null };
   }
 };
 
 const isAuthenticated = async () => {
   try {
     const accessToken = await getToken();
-    if (!accessToken) return { authenticated: false, userName: '' };
-
-    try {
-      const validation = await validateToken(accessToken);
-      return { authenticated: true, userName: validation.userName };
-    } catch (error) {
-      // Token expired, try refreshing
-      if ((error as any).code === 'NotAuthorizedException') {
-        const refreshResult = await refreshToken();
-        if (refreshResult && refreshResult.success && refreshResult.accessToken) {
-          const validation = await validateToken(refreshResult.accessToken);
-          return { authenticated: true, userName: validation.userName };
-        }
+    const idToken = await storage.getItem('idToken');
+    
+    if (!accessToken || !idToken) {
+      const refreshResult = await refreshToken();
+      if (!refreshResult.success) {
+        return { authenticated: false, userName: '' };
       }
-      return { authenticated: false, userName: '' };
     }
+
+    if (!accessToken) {
+      throw new Error('Access token is missing');
+    }
+    const validation = await validateToken(accessToken);
+    if (!validation.isValid) {
+      const refreshResult = await refreshToken();
+      if (!refreshResult.success) {
+        return { authenticated: false, userName: '' };
+      }
+      return { authenticated: true, userName: validation.userName };
+    }
+
+    return { authenticated: true, userName: validation.userName };
   } catch (e) {
     console.error('Error checking authentication status:', e);
     return { authenticated: false, userName: '' };

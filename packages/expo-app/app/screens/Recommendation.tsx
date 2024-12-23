@@ -4,7 +4,8 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
-import i18n from '../i18n'; // Import the shared i18n instance
+import i18n from '../i18n';
+import {storage} from "@/app/utils/storage"; // Import the shared i18n instance
 
 const Recommendation: React.FC = () => {
     const {
@@ -43,9 +44,13 @@ const Recommendation: React.FC = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
+                var idToken =  await storage.getItem('idToken');
+
                 const response = await axios.post(`${API_URL}/calculate/water`, {
-                    lat:latitude,
-                    lon:longitude,
+                    lat: latitude,
+                    lon: longitude,
+                }, {
+                    headers: { Authorization: `Bearer ${idToken}` },
                 });
                 // Extract ET0 from the response
                 var { ET0 } = response.data;

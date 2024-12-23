@@ -4,46 +4,210 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="634fb44d-225e-4696-95b9-9ea48d05bddb" name="Changes" comment="Back to last Dashboard update">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/frontend/src/components/Crop/CropsTable.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/packages/frontend/src/components/Crop/CropsTable.tsx" afterDir="false" />
+    <list default="true" id="af9a6a8a-c792-4eb4-9cce-a415c3983bc8" name="Changes" comment="fixed the recommendation">
+      <change beforePath="$PROJECT_DIR$/packages/expo-app/.expo/types/router.d.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/expo-app/.expo/types/router.d.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/functions/src/calculateWaterNeed.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/functions/src/mobile-api/calculateWaterNeed.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/functions/src/crops-handler.ts" beforeDir="false" afterPath="$PROJECT_DIR$/packages/functions/src/mobile-api/crops-handler.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/functions/src/getLatestWeatherReading.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/functions/src/penman.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/functions/src/station-handler.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/stacks/ApiStack.ts" beforeDir="false" afterPath="$PROJECT_DIR$/stacks/ApiStack.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="TypeScript File" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;Lui35&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/bahrain-bp/mun-aquacrop.git&quot;,
+    &quot;accountId&quot;: &quot;f455a86c-8690-4709-9ed4-b215942d410e&quot;
+  }
+}</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 8
+}</component>
+  <component name="ProjectId" id="2qa3sk49cyqd2DgRnW0XzOsmpyG" />
   <component name="ProjectLevelVcsManager">
     <OptionsSetting value="false" id="Update" />
     <ConfirmationsSetting value="2" id="Add" />
   </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "HTTP Request.test | #1.executor": "Run",
+    "HTTP Request.test | #2.executor": "Run",
+    "HTTP Request.test | #3.executor": "Run",
+    "HTTP Request.test | #4.executor": "Run",
+    "HTTP Request.test | #5.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "Admin-DashBoard",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
-    "ts.external.directory.path": "C:\\Users\\A.Annan\\Desktop\\Final Project IT7099\\CIC\\mun-aquacrop\\node_modules\\typescript\\lib"
+    "nodejs_package_manager_path": "npm",
+    "npm.dev.executor": "Run",
+    "settings.editor.selected.configurable": "com.github.copilot.settings.ApplicationConfigurable",
+    "ts.external.directory.path": "C:\\Users\\PC\\WebstormProjects\\mun-aquacrop\\node_modules\\typescript\\lib",
+    "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\PC\WebstormProjects\mun-aquacrop\packages\functions\src\mobile-api" />
+      <recent name="C:\Users\PC\WebstormProjects\mun-aquacrop\packages\functions\src" />
+    </key>
+  </component>
+  <component name="RunManager" selected="npm.dev">
+    <configuration name="test | #1" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/test.http" executionIdentifier="#1" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="test | #2" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/test.http" executionIdentifier="#2" index="2" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="test | #3" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/test.http" executionIdentifier="#3" index="3" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="test | #4" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/test.http" executionIdentifier="#4" index="4" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="test | #5" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/test.http" executionIdentifier="#5" index="5" runType="Run single request">
+      <method v="2" />
+    </configuration>
+    <configuration name="dev" type="js.build_tools.npm" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="dev" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="HTTP Request.test | #2" />
+      <item itemvalue="HTTP Request.test | #5" />
+      <item itemvalue="HTTP Request.test | #3" />
+      <item itemvalue="HTTP Request.test | #4" />
+      <item itemvalue="HTTP Request.test | #1" />
+      <item itemvalue="npm.dev" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="HTTP Request.test | #5" />
+        <item itemvalue="HTTP Request.test | #3" />
+        <item itemvalue="HTTP Request.test | #4" />
+        <item itemvalue="HTTP Request.test | #2" />
+        <item itemvalue="HTTP Request.test | #1" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-e768b9ed790e-JavaScript-WS-243.21565.180" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
-    <task id="LOCAL-00001" summary="Back to last Dashboard update">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="af9a6a8a-c792-4eb4-9cce-a415c3983bc8" name="Changes" comment="fixed app.jsn in expo &#10; &quot;output&quot;: &quot;static&quot;/single,&#10; &#10; fixed some bugs related to the weather calculation &#10; &#10; before merging" />
+      <created>1734339554779</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1734339554779</updated>
+      <workItem from="1734339558081" duration="2046000" />
+      <workItem from="1734887073362" duration="1598000" />
+      <workItem from="1734965771816" duration="3265000" />
+    </task>
+    <task id="LOCAL-00001" summary="fixed app.jsn in expo &#10; &quot;output&quot;: &quot;static&quot;/single,&#10; &#10; fixed some bugs related to the weather calculation &#10; &#10; before merging">
       <option name="closed" value="true" />
-      <created>1734792188300</created>
+      <created>1734523246049</created>
       <option name="number" value="00001" />
       <option name="presentableId" value="LOCAL-00001" />
       <option name="project" value="LOCAL" />
-      <updated>1734792188300</updated>
+      <updated>1734523246049</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="some api fixes&#10;added s3 bucket to for new ai imaguing &#10;&#10;need to check authorizer for crops/recemondation">
+      <option name="closed" value="true" />
+      <created>1734967314120</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1734967314120</updated>
+    </task>
+    <task id="LOCAL-00003" summary="fixed the recommendation">
+      <option name="closed" value="true" />
+      <created>1734968685761</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1734968685761</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="The Dashborad for admin is working and back to the last update" />
-    <MESSAGE value="Back to last Dashboard update" />
-    <option name="LAST_COMMIT_MESSAGE" value="Back to last Dashboard update" />
+    <MESSAGE value="mostly done with the calculation &#10;KC / determing which stage is the crop in to ge the lasxt result" />
+    <MESSAGE value="fixed app.jsn in expo &#10; &quot;output&quot;: &quot;static&quot;/single,&#10; &#10; fixed some bugs related to the weather calculation &#10; &#10; before merging" />
+    <MESSAGE value="some api fixes&#10;added s3 bucket to for new ai imaguing &#10;&#10;need to check authorizer for crops/recemondation" />
+    <MESSAGE value="fixed the recommendation" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed the recommendation" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/packages/functions/src/csvProcessor.ts</url>
+          <line>52</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+    <watches-manager>
+      <configuration name="js.build_tools.npm">
+        <watch expression="result" language="TypeScript" />
+        <watch expression="result.item" language="TypeScript" />
+      </configuration>
+    </watches-manager>
   </component>
 </project>
