@@ -102,5 +102,7 @@ export function AuthStack({ stack }: StackContext) {
     webAuth,
     userPoolId: webAuth.userPoolId,
     userPoolClientId: webAuth.userPoolClientId,
+    mobileUserPoolId: auth.userPoolId,
+    mobileUserPoolClientId: auth.userPoolClientId,
   };
 }
