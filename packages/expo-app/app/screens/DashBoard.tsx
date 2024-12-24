@@ -32,13 +32,14 @@ const parseCrops = (data: any): Crop[] => {
         GrowthStage: item.GrowthStage,
         kc: item.kc,
         CropID: item.CropID,
-        ImageURL: item.ImageURL
+        ImageURL: item.ImageURL,
     }));
 };
 
 const Index: React.FC = () => {
     const [crops, setCrops] = useState<Crop[]>([]);
     const { width } = useWindowDimensions(); // Get the current window width
+    const router = useRouter(); // Router for navigation
 
     useEffect(() => {
         const fetchCrops = async () => {
@@ -47,17 +48,34 @@ const Index: React.FC = () => {
                 const data = await response.json();
                 setCrops(parseCrops(data));
             } catch (error) {
-                console.error("Error fetching crops:", error);
+                console.error('Error fetching crops:', error);
             }
         };
 
         fetchCrops();
     }, []);
 
+    // Fixed "Upload Image" Card handler
+    const handleUploadImagePress = () => {
+        router.push({
+            pathname: '/screens/UploadCrop',
+        }); // Navigates to UploadCrop screen
+    };
+
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
             <Text style={styles.text}>Home screen</Text>
             <View style={styles.grid}>
+                {/* Fixed Upload Image Card */}
+                <View style={styles.row}>
+                    <Card
+                        title="Upload Image"
+                        onPress={handleUploadImagePress} // Navigate to UploadCrop on press
+                        isUploadCard={true} // Flag to indicate this is an upload card
+                    />
+                </View>
+
+                {/* Dynamically generated crop cards */}
                 {crops.length > 0 ? (
                     <View style={styles.row}>
                         {crops.map((crop, index) => (
@@ -73,32 +91,45 @@ const Index: React.FC = () => {
 };
 
 interface CardProps {
-    CropData: Crop;
+    CropData?: Crop;
+    title?: string;
+    onPress?: () => void;
+    isUploadCard?: boolean; // Flag to identify the Upload Image card
 }
 
-const Card: React.FC<CardProps> = ({ CropData }) => {
-    const { nameEN, nameAR, GrowthStage, kc, CropID, ImageURL } = CropData;
+const Card: React.FC<CardProps> = ({ CropData, title, onPress, isUploadCard }) => {
+    const { nameEN, nameAR, GrowthStage, kc, CropID, ImageURL } = CropData || {};
     const router = useRouter();
 
     const handlePress = () => {
-        router.push({
-            pathname: '/screens/Crop',
-            params: {
-                nameEN: nameEN.S,
-                nameAR: nameAR.S,
-                GrowthStage: JSON.stringify(GrowthStage),
-                kc: JSON.stringify(kc),
-                CropID: CropID.S,
-                ImageURL: ImageURL.S,
-            },
-        });
+        if (onPress) {
+            onPress(); // If onPress exists, execute the passed handler
+        } else {
+            router.push({
+                pathname: '/screens/Crop',
+                params: {
+                    nameEN: nameEN?.S,
+                    nameAR: nameAR?.S,
+                    GrowthStage: JSON.stringify(GrowthStage),
+                    kc: JSON.stringify(kc),
+                    CropID: CropID?.S,
+                    ImageURL: ImageURL?.S,
+                },
+            });
+        }
     };
 
     return (
         <TouchableOpacity onPress={handlePress} style={styles.cardLink}>
-            <View style={styles.cardContainer}>
-                <Image source={{ uri: ImageURL.S }} style={styles.image} />
-                <Text style={styles.cardTitle}>{nameEN.S}</Text>
+            <View style={[styles.cardContainer, isUploadCard ? styles.uploadCardContainer : null]}>
+                {isUploadCard ? (
+                    <Text style={styles.uploadCardText}>{title}</Text> // Show text for upload card
+                ) : (
+                    <>
+                        <Image source={{ uri: ImageURL?.S }} style={styles.image} />
+                        <Text style={styles.cardTitle}>{nameEN?.S}</Text>
+                    </>
+                )}
             </View>
         </TouchableOpacity>
     );
@@ -123,13 +154,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     row: {
-        flexDirection: 'row',  // Align the cards horizontally
-        flexWrap: 'wrap',      // Allow cards to wrap to the next row
-        justifyContent: 'space-between',  // Distribute cards evenly across rows
-        width: '100%',  // Ensure the row takes the full width of the parent container
+        flexDirection: 'row', // Align the cards horizontally
+        flexWrap: 'wrap', // Allow cards to wrap to the next row
+        justifyContent: 'space-between', // Distribute cards evenly across rows
+        width: '100%', // Ensure the row takes the full width of the parent container
     },
     cardLink: {
-        width: '48%',  // 2 cards per row with 2% margin for spacing
+        width: '48%', // 2 cards per row with 2% margin for spacing
         marginBottom: 20,
     },
     cardContainer: {
@@ -143,7 +174,10 @@ const styles = StyleSheet.create({
         padding: 10,
         alignItems: 'center',
         justifyContent: 'center',
-        width: '100%',  // Ensure the card takes the full width of the parent container
+        width: '100%', // Ensure the card takes the full width of the parent container
+    },
+    uploadCardContainer: {
+        backgroundColor: '#4CAF50', // Different background color for Upload Image card
     },
     image: {
         width: 100,
@@ -155,6 +189,11 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         color: '#333',
+    },
+    uploadCardText: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: 'bold',
     },
 });
 
