@@ -7,6 +7,7 @@ import Farms from "./pages/Farms.tsx";
 import Crop from "./pages/Crops.tsx";
 import Reports from "./pages/Reports.tsx";
 import Sidebar from './components/common/Sidebar.tsx';
+import CropForm from "./pages/CropForm.tsx";
 
 const App: React.FC = () => {
     return (
@@ -28,6 +29,7 @@ const App: React.FC = () => {
                     <Route path="/Farms" element={<Farms />} />
                     <Route path="/Crops" element={<Crop />} />
                     <Route path="/Reports" element={<Reports />} />
+                    <Route path="/CropForm" element={<CropForm />} />
                 </Routes>
             </div>
         </Router>

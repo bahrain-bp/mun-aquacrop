@@ -20,8 +20,8 @@ const Crops: React.FC = () => {
                 >
                     <StatCard name='Total Crops' icon={Package} value={1234} color='#6366F1' />
                     <StatCard name='Top Crops' icon={TrendingUp} value={89} color='#10B981' />
-                    <StatCard name='Low Crops' icon={AlertTriangle} value={23} color='#F59E0B' />
-                    <StatCard name='Total Revenue' icon={DollarSign} value={"$543,210"} color='#EF4444' />
+                    <StatCard name='less Crops' icon={AlertTriangle} value={23} color='#F59E0B' />
+                    <StatCard name='Test' icon={DollarSign} value={"99999999999"} color='#EF4444' />
                 </motion.div>
 
                 <CropsTable />
