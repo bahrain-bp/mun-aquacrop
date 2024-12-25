@@ -1,5 +1,6 @@
 import React from 'react';
 import { Authenticator } from '@aws-amplify/ui-react';
+import SignOutButton from './SignOutButton';
 
 interface HeaderProps {
     title: string;
@@ -15,20 +16,7 @@ const Header: React.FC<HeaderProps> = ({ title }) => {
                         <div className="flex justify-between items-center">
                             <h1 className="text-2xl font-semibold text-gray-100">{title}</h1>
                             {/* Sign Out button positioned to the right */}
-                            <button
-                                onClick={signOut}
-                                style={{
-                                    padding: '10px 20px',
-                                    fontSize: '16px',
-                                    borderRadius: '5px',
-                                    border: 'none',
-                                    backgroundColor: '#FF0000',
-                                    color: 'white',
-                                    cursor: 'pointer',
-                                }}
-                            >
-                                Sign Out
-                            </button>
+                            <SignOutButton onSignOut={signOut} />
                         </div>
                     </div>
                 </header>

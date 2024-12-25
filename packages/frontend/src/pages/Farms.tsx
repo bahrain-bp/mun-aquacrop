@@ -2,10 +2,12 @@ import React, { useState, useEffect } from 'react';
 
 import { Authenticator } from '@aws-amplify/ui-react';
 import axios from 'axios';
-import { fetchAuthSession } from 'aws-amplify/auth';
+import { fetchAuthSession, signOut as amplifySignOut } from 'aws-amplify/auth';
 import { ConfirmationDialog } from '../components/Farms/ConfirmationDialog';
 import { IrrigationPopup } from '../components/Farms/IrrigationPopup';
 import { ZoneCard } from '../components/Farms/ZoneCard';
+import { useNavigate } from 'react-router-dom';
+import SignOutButton from '../components/common/SignOutButton';
 
 /**
  * Farm interface representing a farm entity with its zones
@@ -32,6 +34,7 @@ interface Zone {
  * Farms component handles the display and management of farms and their irrigation zones
  */
 const Farms: React.FC = () => {
+    const navigate = useNavigate();
     const [farms, setFarms] = useState<Farm[]>([]);
     const [zones, setZones] = useState<Zone[]>([]);
     const [selectedFarm, setSelectedFarm] = useState<Farm | null>(null);
@@ -216,20 +219,7 @@ const Farms: React.FC = () => {
                     <div style={{ padding: '20px' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <h1>Farms</h1>
-                            <button
-                                onClick={signOut}
-                                style={{
-                                    padding: '10px 20px',
-                                    fontSize: '16px',
-                                    borderRadius: '5px',
-                                    border: 'none',
-                                    backgroundColor: '#FF0000',
-                                    color: 'white',
-                                    cursor: 'pointer',
-                                }}
-                            >
-                                Sign Out
-                            </button>
+                            <SignOutButton onSignOut={signOut} />
                         </div>
 
                         <h2>Farms</h2>

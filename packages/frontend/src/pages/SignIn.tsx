@@ -47,26 +47,35 @@ const Login: React.FC = () => {
 };
 
 const AuthenticatorContent: React.FC = () => {
-  const { route, user } = useAuthenticator((context) => [context.route, context.user]);
+  const { route, user, authStatus } = useAuthenticator((context) => [
+    context.route,
+    context.user,
+    context.authStatus
+  ]);
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Cleanup function to remove the signout flag
+    return () => {
+      localStorage.removeItem('isSigningOut');
+    };
+  }, []);
+
+  useEffect(() => {
     const handlePostSignIn = async () => {
-      if (route === 'authenticated' && user) {
+      // Only proceed if properly authenticated and not in initial loading state
+      if (route === 'authenticated' && authStatus === 'authenticated' && user) {
         try {
-          // Fetch the authentication session using fetchAuthSession
           const session = await fetchAuthSession();
           const groups = session?.tokens?.accessToken?.payload["cognito:groups"];
 
-          // Check if the user is an admin
+          // Navigate based on user group
           if (Array.isArray(groups) && groups.includes("Admin")) {
-            console.log("Redirecting to AdminDashboard");
             await sendUserIdToApi(user.username);
-            navigate('/AdminDashboard');
+            navigate('/AdminDashboard', { replace: true });
           } else {
-            console.log("Redirecting to Dashboard");
-            await sendUserIdToApi(user.username); // Send user data to the backend
-            navigate('/dashboard');
+            await sendUserIdToApi(user.username);
+            navigate('/dashboard', { replace: true });
           }
         } catch (error) {
           console.error("Error during post-sign-in processing:", error);
@@ -75,7 +84,7 @@ const AuthenticatorContent: React.FC = () => {
     };
 
     handlePostSignIn();
-  }, [route, user, navigate]);
+  }, [route, user, authStatus, navigate]);
 
   const sendUserIdToApi = async (userId: string) => {
     try {
@@ -94,16 +103,8 @@ const AuthenticatorContent: React.FC = () => {
     }
   };
 
-  if (route !== 'authenticated') {
-    return null; // Show nothing while waiting for the user to authenticate
-  }
-
-  return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h1>Welcome Back, {user?.username}!</h1>
-      <p>You are now signed in.</p>
-    </div>
-  );
+  // Remove the welcome message render
+  return null;
 };
 
 export default Login;
