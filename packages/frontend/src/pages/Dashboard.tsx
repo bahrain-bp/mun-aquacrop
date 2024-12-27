@@ -11,7 +11,7 @@ import {ZoneCard} from "../components/Farms/ZoneCard.tsx";
 
 import {ConfirmationDialog} from "../components/Farms/ConfirmationDialog.tsx";
 import {useNavigate} from "react-router-dom";
-import IrrigationPopup from "../components/Farms/IrrigationPopup.tsx";
+import { IrrigationPopup } from '../components/Farms/IrrigationPopup';
 
 interface Farm {
     id: string;

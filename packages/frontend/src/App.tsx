@@ -10,6 +10,7 @@ import Sidebar from './components/common/Sidebar.tsx';
 import CropForm from "./pages/CropForm.tsx";
 import FarmForm from "./pages/FarmsForm.tsx";
 import ReportPDF from "./pages/ReportPDF.tsx";
+import ProtectedRoute from './components/common/ProtectedRoute';
 
 const App: React.FC = () => {
     return (
@@ -29,8 +30,16 @@ const App: React.FC = () => {
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/AdminDashboard" element={<AdminDashboard />} />
                     <Route path="/Farms" element={<Farms />} />
-                    <Route path="/Crops" element={<Crop />} />
-                    <Route path="/Reports" element={<Reports />} />
+                    <Route path="/Crops" element={
+                        <ProtectedRoute>
+                            <Crop />
+                        </ProtectedRoute>
+                    } />
+                    <Route path="/Reports" element={
+                        <ProtectedRoute>
+                            <Reports />
+                        </ProtectedRoute>
+                    } />
                     <Route path="/CropForm" element={<CropForm />} />
                     <Route path="/FarmForm" element={<FarmForm />} />
                     <Route path="/ReportPDF" element={<ReportPDF />} />
