@@ -3,14 +3,15 @@ import { motion } from 'framer-motion';
 import Header from '../components/common/Header';
 import {Authenticator} from "@aws-amplify/ui-react";
 import StatCard from "../components/common/StatCard.tsx";
-import {Cloud, Droplet, TreePine, Users} from "lucide-react";
+import {Cloud, Droplet, TreePine, House } from "lucide-react";
 import {fetchAuthSession} from "aws-amplify/auth";
 import axios from "axios";
 // import SignOutButton from "../components/common/SignOutButton.tsx";
 import {ZoneCard} from "../components/Farms/ZoneCard.tsx";
-import {IrrigationPopup} from "../components/Farms/IrrigationPopup.tsx";
+
 import {ConfirmationDialog} from "../components/Farms/ConfirmationDialog.tsx";
 import {useNavigate} from "react-router-dom";
+import IrrigationPopup from "../components/Farms/IrrigationPopup.tsx";
 
 interface Farm {
     id: string;
@@ -217,9 +218,9 @@ const Dashboard: React.FC = () => {
                             transition={{duration: 1}}
                         >
                             <StatCard name='Total Recommendations' icon={Droplet} value='12345' color='#6366F1'/>
-                            <StatCard name='Total Users' icon={Users} value='1234' color='#8B5CF6'/>
+                            <StatCard name='Total Farms' icon={House} value='1234' color='#8B5CF6'/>
                             <StatCard name='Total Crops' icon={TreePine} value='11' color='#EC4899'/>
-                            <StatCard name='Weather' icon={Cloud} value='12.5' color='#10B981'/>
+                            <StatCard name='Weather' icon={Cloud} value='12.5°C' color='#10B981'/>
                         </motion.div>
 
                         {/*    Test*/}

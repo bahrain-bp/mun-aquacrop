@@ -1,5 +1,7 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf'; // Make sure jsPDF is imported
 import Header from "../components/common/Header.tsx";
 import RecommendationsOverviewChart from "../components/AdminDashboard/RecommendationsOverviewChart.tsx";
 
@@ -18,9 +20,38 @@ const ReportPDF: React.FC = () => {
         }
     };
 
+    const pdfRef = useRef<HTMLDivElement>(null); // Type the ref to be a div
+
+    // Function to capture the content and generate PDF
+    const generatePDF = () => {
+        const input = pdfRef.current;
+        if (!input) return;
+
+        html2canvas(input, {
+            useCORS: true,  // This helps with external images
+            logging: true,  // Enable logging to check if any errors occur
+        }).then((canvas) => {
+            const imgData = canvas.toDataURL('image/png');
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            const pdfWidth = pdf.internal.pageSize.getWidth();
+            const pdfHeight = pdf.internal.pageSize.getHeight();
+            const imgWidth = canvas.width;
+            const imgHeight = canvas.height;
+            const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+            const imgX = (pdfWidth - imgWidth * ratio) / 2;
+            const imgY = 30;
+
+            // Add image to PDF
+            pdf.addImage(imgData, 'PNG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+
+            // Save the PDF
+            pdf.save('report.pdf');
+        });
+    };
+
     return (
         <div className="flex-1 overflow-auto relative z-10">
-            <Header title='Report Generation' />
+            <Header title="Report Generation" />
             <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
                 <motion.div
                     className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8 m-auto"
@@ -29,10 +60,10 @@ const ReportPDF: React.FC = () => {
                     transition={{ delay: 0.2 }}
                 >
                     {/* A4-like page structure */}
-                    <div
-                        className="flex items-center justify-center min-h-screen bg-gray-800"> {/* Center content horizontally & vertically */}
-                        <div className="bg-white p-8 rounded-lg shadow-lg"
-                             style={{maxWidth: '21cm', minHeight: '29.7cm'}}>
+                    <div className="flex items-center justify-center min-h-screen bg-white" ref={pdfRef}>
+                        <div
+                            className="bg-white p-8 rounded-lg shadow-lg w-full"
+                        >
                             {/* Header Section */}
                             <div className="flex items-center justify-between mb-8">
                                 <img
@@ -79,10 +110,19 @@ const ReportPDF: React.FC = () => {
 
                             {/* Footer Section */}
                             <div className="mt-12 text-center text-gray-600">
-                                <p>For more information, contact us at: <a href="mailto:support@saqi.com"
-                                                                           className="text-blue-600">support@saqi.com</a></p>
+                                <p>For more information, contact us at: <a href="mailto:support@saqi.com" className="text-blue-600">support@saqi.com</a></p>
                             </div>
                         </div>
+                    </div>
+
+                    {/* Download PDF Button */}
+                    <div className="mt-8 flex justify-center">
+                        <button
+                            onClick={generatePDF}
+                            className="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700"
+                        >
+                            Download PDF
+                        </button>
                     </div>
                 </motion.div>
             </main>

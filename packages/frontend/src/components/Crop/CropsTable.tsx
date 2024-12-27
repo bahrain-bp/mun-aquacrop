@@ -112,7 +112,9 @@ const CropsTable: React.FC = () => {
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{crop.GrowthStage}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">{crop.kc}</td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
-                                <button className="text-indigo-400 hover:text-indigo-300 mr-2">
+                                <button className="text-indigo-400 hover:text-indigo-300 mr-2"
+                                        onClick={navigateToCropEdit} // Trigger navigation on button click
+                                >
                                     <Edit size={18}/>
                                 </button>
                                 {/*<button className="text-red-400 hover:text-red-300">*/}
@@ -120,7 +122,6 @@ const CropsTable: React.FC = () => {
                                 {/*</button>*/}
                                 <button
                                     className="text-red-400 hover:text-red-300"
-                                    onClick={navigateToCropEdit} // Trigger navigation on button click
                                 >
                                     <Trash2 size={18}/>
                                 </button>
