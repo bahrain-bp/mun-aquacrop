@@ -7,18 +7,18 @@ const client = new DynamoDBClient({});
 export const main = async (event: any) => {
 
 
-    const claims = event.requestContext?.authorizer?.jwt?.claims;
-    if (!claims || !claims.sub) {
-        return {
-            statusCode: 401,
-            body: JSON.stringify({ message: "Unauthorized: Missing claims or sub" }),
-        };
-    }
-
-    // Extract the authenticated user's ID (sub) from the claims
-    const ownerId = claims.sub;
-
-    console.log("Authenticated User ID:", ownerId);
+    // const claims = event.requestContext?.authorizer?.jwt?.claims;
+    // if (!claims || !claims.sub) {
+    //     return {
+    //         statusCode: 401,
+    //         body: JSON.stringify({ message: "Unauthorized: Missing claims or sub" }),
+    //     };
+    // }
+    //
+    // // Extract the authenticated user's ID (sub) from the claims
+    // const ownerId = claims.sub;
+    //
+    // console.log("Authenticated User ID:", ownerId);
 
     try {
         // Define the scan parameters

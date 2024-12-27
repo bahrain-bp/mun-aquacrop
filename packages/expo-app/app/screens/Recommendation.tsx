@@ -55,6 +55,7 @@ const Recommendation: React.FC = () => {
                 // Extract ET0 from the response
                 var { ET0 } = response.data;
                  ET0 = ET0 * kcForCrop;
+                 ET0 =1.05 * 0.25 * ET0;
                 setET0(ET0);
             } catch (error) {
                 console.error('Error fetching ET0:', error);

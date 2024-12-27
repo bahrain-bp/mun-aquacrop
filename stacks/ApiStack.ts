@@ -9,7 +9,7 @@ import {S3Stack} from "./StorageStack";
 export function ApiStack({stack}: StackContext) {
     const {table} = use(DBStack);
     const auth = use(AuthStack);
-    const {CSVReadings, indexBucket} = use(S3Stack);
+    const {CSVReadings, indexBucket,imageBucket} = use(S3Stack);
     const {userPoolId, userPoolClientId, mobileUserPoolId, mobileUserPoolClientId} = use(AuthStack);
     const {stationTable, cropTable, weatherReadingsTable} = use(DynamoDBStack);
 
@@ -68,6 +68,19 @@ export function ApiStack({stack}: StackContext) {
             "POST /": "packages/functions/src/lambda.main",
 
 
+            "GET /admin/crops": {
+                function: {
+                    handler: "packages/functions/src/mobile-api/crops-handler.main",
+                    timeout: "30 seconds",
+                    environment: {
+                        CropTableName: cropTable.tableName,
+                    },
+                    permissions: [cropTable],
+                },
+                // authorizer: "authApi",
+            },
+
+
             "GET /crops": {
                 function: {
                     handler: "packages/functions/src/mobile-api/crops-handler.main",
@@ -98,7 +111,45 @@ export function ApiStack({stack}: StackContext) {
                         indexBucket: indexBucket.bucketName,
                     },
                 },
-                authorizer: "mobileauthApi",
+                // authorizer: "mobileauthApi",
+            },
+
+
+            "POST /Upload/crop/image": {
+                function: {
+                    handler: "packages/functions/src/GenerateUploadUrl.uploadImageForCrop",
+                    environment: {
+                        imageBucket: imageBucket.bucketName,
+                    },
+                },
+            },
+
+            "PUT /update/crop": {
+                function: {
+                    handler: "packages/functions/src/AdminDashboard/CropsManager.update",
+                    environment: {
+                        cropTable: cropTable.tableName,
+                    },
+                },
+            },
+
+            "DELETE /delete/crop/{CropID}": {
+                function: {
+                    handler: "packages/functions/src/AdminDashboard/CropsManager.deleteCrop",
+                    environment: {
+                        cropTable: cropTable.tableName,
+                    },
+                },
+            },
+
+
+            "POST /add/crop": {
+                function: {
+                    handler: "packages/functions/src/AdminDashboard/CropsManager.add",
+                    environment: {
+                        cropTable: cropTable.tableName,
+                    },
+                },
             },
 
 

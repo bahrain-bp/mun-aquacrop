@@ -56,7 +56,7 @@ Content-Type: text/csv
 
 
 ###
-GET  https://26yve06bzk.execute-api.us-east-1.amazonaws.com/crops
+POST  https://vuor0sdlpf.execute-api.us-east-1.amazonaws.com/Upload/crop/image
 
 <> 2024-12-03T202405.200.txt
 <> 2024-12-03T202142.200.txt
