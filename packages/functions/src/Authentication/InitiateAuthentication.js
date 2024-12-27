@@ -8,12 +8,12 @@ import {
 const cognitoClient = new CognitoIdentityProviderClient({ region: "us-east-1" });
 
 export const handler = async (event) => {
-  const { phoneNumber, fullname } = JSON.parse(event.body); // Include `fullname` from the request body
+  const { phoneNumber, fullname, isLogin } = JSON.parse(event.body); // Add isLogin parameter
 
-  if (!phoneNumber || !fullname) {
+  if (!phoneNumber || (!isLogin && !fullname)) {
     return {
       statusCode: 400,
-      body: JSON.stringify({ error: "Missing phone number or fullname in request body." }),
+      body: JSON.stringify({ error: "Missing required information in request body." }),
     };
   }
 
@@ -48,6 +48,13 @@ export const handler = async (event) => {
       console.log(`User ${phoneNumber} exists with sub: ${sub}`);
     } catch (error) {
       if (error.name === "UserNotFoundException") {
+        if (isLogin) {
+          return {
+            statusCode: 404,
+            body: JSON.stringify({ error: "User not found. Please register first." }),
+          };
+        }
+        
         console.log(`User ${phoneNumber} does not exist. Creating user...`);
 
         // Step 2: Create the user if they do not exist

@@ -9,7 +9,7 @@ const ddbDocClient = DynamoDBDocumentClient.from(dynamoDBClient);
 export const handler = async (event) => {
   const { session, challengeAnswer, sub, phoneNumber, fullname } = JSON.parse(event.body); // Extract necessary details
 
-  if (!sub || !phoneNumber || !fullname) {
+  if (!sub || !phoneNumber) {
     return {
       statusCode: 400,
       body: JSON.stringify({ error: "Missing required information in request body." }),
@@ -33,22 +33,42 @@ export const handler = async (event) => {
     if (response.AuthenticationResult) {
       console.log(`User with sub: ${sub} authenticated successfully.`);
 
-      // Step 1: Insert or Update User Data in DynamoDB
-      const putParams = {
-        TableName: "SaqiDev-mun-aquacrop-User", // Replace with your DynamoDB table name
-        Item: {
-          UID: sub,
-          Name: fullname,
-          Mobile: phoneNumber,
-          regDate: new Date().toISOString(),  // Registration date
-          LastLogged: new Date().toISOString(), // Last logged time
-          CollectData: 0, // Default value, update if needed
-          Location: "", // Update if applicable
-          Language: "", // Update if applicable
+      // Update LastLogged time for existing users
+      const updateParams = {
+        TableName: "SaqiDev-mun-aquacrop-User",
+        Key: {
+          UID: sub
         },
+        UpdateExpression: "SET LastLogged = :lastLogged",
+        ExpressionAttributeValues: {
+          ":lastLogged": new Date().toISOString()
+        }
       };
-      await ddbDocClient.send(new PutCommand(putParams));
-      console.log(`Successfully inserted user ${sub} into DynamoDB`);
+
+      try {
+        await ddbDocClient.send(new UpdateCommand(updateParams));
+      } catch (dbError) {
+        // If user doesn't exist and fullname is provided (registration case), create new user
+        if (dbError.name === 'ResourceNotFoundException' && fullname) {
+          const putParams = {
+            TableName: "SaqiDev-mun-aquacrop-User",
+            Item: {
+              UID: sub,
+              Name: fullname,
+              Mobile: phoneNumber,
+              regDate: new Date().toISOString(),
+              LastLogged: new Date().toISOString(),
+              CollectData: 0,
+              Location: "",
+              Language: "",
+            },
+          };
+          await ddbDocClient.send(new PutCommand(putParams));
+          console.log(`Successfully created new user ${sub} in DynamoDB`);
+        } else {
+          console.error("Error updating DynamoDB:", dbError);
+        }
+      }
 
       return {
         statusCode: 200,
