@@ -96,28 +96,55 @@ const Index: React.FC = () => {
         fetchData();
     }, []);
 
-    return (
-        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-            <View style={styles.welcomeContainer}>
-                <Text style={styles.greetingText}>Welcome</Text>
-                <Text style={styles.welcomeText}>{userName} 👋</Text>
+    const handleSignOut = async () => {
+        try {
+            // Clear tokens from storage
+            await storage.removeItem('idToken');
+            await storage.removeItem('accessToken');
+            // Navigate back to auth screen
+            router.replace('/');
+        } catch (error) {
+            console.error('Error signing out:', error);
+        }
+    };
 
-            </View>
-            <Text style={styles.text}>{i18n.t('home')}</Text>
-            <View style={styles.grid}>
-                {/* Fixed Upload Image Card */}
-                <View style={styles.row2}>
-                    <UploadImageCard />
+    return (
+        <ScrollView 
+            style={styles.container} 
+            contentContainerStyle={styles.contentContainer}
+            showsVerticalScrollIndicator={false}
+        >
+            <View style={styles.header}>
+                <View style={styles.welcomeContainer}>
+                    <Text style={styles.greetingText}>Welcome</Text>
+                    <Text style={styles.welcomeText}>{userName} 👋</Text>
                 </View>
-                {crops.length > 0 ? (
-                    <View style={styles.row}>
-                        {crops.map((crop, index) => (
-                            <Card key={index} CropData={crop} />
-                        ))}
-                    </View>
-                ) : (
-                    <Text style={styles.text}>{i18n.t('loading')}</Text>
-                )}
+            </View>
+
+            <View style={styles.mainContent}>
+                <Text style={styles.sectionTitle}>{i18n.t('home')}</Text>
+                
+                <View style={styles.cropSection}>
+                    <UploadImageCard />
+                    {crops.length > 0 ? (
+                        <View style={styles.cropGrid}>
+                            {crops.map((crop, index) => (
+                                <Card key={index} CropData={crop} />
+                            ))}
+                        </View>
+                    ) : (
+                        <Text style={styles.loadingText}>{i18n.t('loading')}</Text>
+                    )}
+                </View>
+
+                <View style={styles.signOutContainer}>
+                    <TouchableOpacity 
+                        style={styles.signOutButton}
+                        onPress={handleSignOut}
+                    >
+                        <Text style={styles.signOutButtonText}>Sign Out</Text>
+                    </TouchableOpacity>
+                </View>
             </View>
         </ScrollView>
     );
@@ -146,9 +173,13 @@ const Card: React.FC<CardProps> = ({ CropData }) => {
     };
 
     return (
-        <TouchableOpacity onPress={handlePress} style={styles.cardLink}>
+        <TouchableOpacity onPress={handlePress} style={styles.cardWrapper}>
             <View style={styles.cardContainer}>
-                <Image source={{ uri: ImageURL.S }} style={styles.image} />
+                <Image 
+                    source={{ uri: ImageURL.S }} 
+                    style={styles.image}
+                    resizeMode="cover"
+                />
                 <Text style={styles.cardTitle}>{nameEN.S}</Text>
             </View>
         </TouchableOpacity>
@@ -156,20 +187,21 @@ const Card: React.FC<CardProps> = ({ CropData }) => {
 };
 
 const UploadImageCard: React.FC = () => {
-    const router = useRouter();  // Initialize the router
-
-    // Handle the press action to navigate to the "Test" page
-    const handlePress = () => {
-        router.push({
-            pathname: '/screens/CropImage',
-
-        });  // Navigate to the "Test" page (adjust the path as needed)
-    };
+    const router = useRouter();
 
     return (
-        <TouchableOpacity style={styles.cardLink} onPress={handlePress}>  {/* Add onPress handler */}
-            <View style={styles.cardContainer}>
-                <Text style={styles.cardTitle}>Upload Image</Text>
+        <TouchableOpacity 
+            style={styles.uploadCard} 
+            onPress={() => router.push({ pathname: '/screens/CropImage' })}
+        >
+            <View style={styles.uploadContent}>
+                <View>
+                    <Text style={styles.uploadTitle}>Upload Image</Text>
+                    <Text style={styles.uploadSubtitle}>Analyze your crop images</Text>
+                </View>
+                <View style={styles.uploadIconContainer}>
+                    <Text style={styles.uploadIcon}>📸</Text>
+                </View>
             </View>
         </TouchableOpacity>
     );
@@ -177,85 +209,138 @@ const UploadImageCard: React.FC = () => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#25292e',
-        padding: 20,
+        backgroundColor: '#202124', // Slightly lighter dark background
+        flex: 1,
     },
     contentContainer: {
-        alignItems: 'center',
-        paddingBottom: 20,
+        flexGrow: 1,
     },
-    text: {
-        color: '#fff',
-        fontSize: 24,
-        marginBottom: 20,
+    header: {
+        paddingHorizontal: 16,
+        paddingTop: 20,
+        paddingBottom: 10,
     },
-    grid: {
-        alignItems: 'center',
-        justifyContent: 'center',
+    mainContent: {
+        padding: 16,
     },
-    row: {
-        flexDirection: 'row',  // Align the cards horizontally
-        flexWrap: 'wrap',      // Allow cards to wrap to the next row
-        justifyContent: 'space-between',  // Distribute cards evenly across rows
-        width: '100%',  // Ensure the row takes the full width of the parent container
+    section: {
+        marginBottom: 24,
     },
-    row2: {
-        flexDirection: 'row',  // Align the cards horizontally
-        flexWrap: 'wrap',      // Allow cards to wrap to the next row
-        justifyContent: 'center',  // Distribute cards evenly across rows
-        width: '100%',  // Ensure the row takes the full width of the parent container
-    },
-    cardLink: {
-        width: '48%',  // 2 cards per row with 2% margin for spacing
-        marginBottom: 20,
-    },
-    cardContainer: {
-        backgroundColor: '#D3D3D3',
-        borderRadius: 10,
-        elevation: 5,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 2,
-        padding: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%',  // Ensure the card takes the full width of the parent container
-    },
-    image: {
-        width: 100,
-        height: 100,
-        borderRadius: 10,
-    },
-    cardTitle: {
-        marginVertical: 10,
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#333',
-    },
-    welcomeText: {
-        color: '#fff',
-        fontSize: 32,
-        fontWeight: 'bold',
-        marginBottom: 8,
+    sectionTitle: {
+        color: '#FFFFFF',
+        fontSize: 20,
+        fontWeight: '600',
+        marginBottom: 24,
         textAlign: 'center',
     },
     welcomeContainer: {
-        marginBottom: 30,
-        alignItems: 'center',
-        alignSelf: 'stretch',
-        paddingHorizontal: 20,
+        padding: 20,
+        backgroundColor: '#2D2F31', // Lighter card background
+        borderRadius: 15,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
     },
     greetingText: {
-        color: '#9DA3B4',
-        fontSize: 18,
-        marginBottom: 5,
-        textAlign: 'center',
+        color: '#B4B8C0', // Brighter secondary text
+        fontSize: 16,
+        marginBottom: 8,
     },
-    subText: {
+    welcomeText: {
+        color: '#FFFFFF',
+        fontSize: 28,
+        fontWeight: 'bold',
+    },
+    loadingText: {
         color: '#9DA3B4',
         fontSize: 16,
         textAlign: 'center',
+    },
+    cropGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        gap: 12,
+    },
+    cardWrapper: {
+        width: '48%',
+        marginBottom: 12,
+    },
+    cardContainer: {
+        backgroundColor: '#2D2F31', // Lighter card background
+        borderRadius: 12,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: '#404144', // Lighter border
+        height: 180, // Increased height for better proportion
+    },
+    image: {
+        width: '100%',
+        height: 140, // Increased height for better image display
+        backgroundColor: '#353839',
+    },
+    cardTitle: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: '#FFFFFF',
+        textAlign: 'center',
+        padding: 10,
+    },
+    uploadCard: {
+        backgroundColor: '#2D2F31', // Lighter card background
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: '#404144', // Lighter border
+        padding: 16,
+        marginBottom: 16,
+    },
+    uploadContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    uploadTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#FFFFFF',
+        marginBottom: 4,
+    },
+    uploadSubtitle: {
+        color: '#B4B8C0', // Brighter secondary text
+        fontSize: 14,
+    },
+    uploadIconContainer: {
+        backgroundColor: '#404144', // Lighter icon background
+        padding: 12,
+        borderRadius: 12,
+    },
+    uploadIcon: {
+        fontSize: 24,
+    },
+    signOutContainer: {
+        alignItems: 'center',
+        marginTop: 16,
+        marginBottom: 24,
+    },
+    signOutButton: {
+        backgroundColor: '#2D2F31', // Lighter button background
+        paddingVertical: 12,
+        paddingHorizontal: 32,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#FF4B4B',
+        minWidth: 140,
+    },
+    signOutButtonText: {
+        color: '#FF4B4B',
+        fontSize: 16,
+        fontWeight: '600',
+        textAlign: 'center',
+    },
+    cropSection: {
+        gap: 16,
     },
 });
 

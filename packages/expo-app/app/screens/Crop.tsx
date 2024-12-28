@@ -61,6 +61,7 @@ const Crop: React.FC = () => {
     const [locationMethod, setLocationMethod] = useState<'auto' | 'manual'>('auto'); // Toggle location method
     const [selectedLocationValue, setSelectedLocationValue] = useState<string>(""); // Initialize to empty string
     const [isAutoDisabled, setIsAutoDisabled] = useState<boolean>(false); // To disable 'auto' if location fetching fails
+    const [showDatePicker, setShowDatePicker] = useState(false);
 
     const bahrainLocations: LocationOption[] = [
         {label: "Manama", value: "manama", latitude: 26.2041, longitude: 50.5860},
@@ -315,7 +316,12 @@ const Crop: React.FC = () => {
         });
     };
 
+    const handleOpenDatePicker = () => {
+        setShowDatePicker(true);
+    };
+
     const onDateChange = (event: any, chosenDate: Date | undefined) => {
+        setShowDatePicker(false); // Hide picker after selection
         const currentDate = chosenDate || selectedDate;
         setSelectedDate(currentDate);
         console.log('Selected Date:', currentDate);
@@ -341,294 +347,304 @@ const Crop: React.FC = () => {
     // testing end
 
     return (
-        <ScrollView contentContainerStyle={styles.container}>
-            <Text style={styles.title}>{nameEN}</Text>
-            {ImageURL ? (
-                <Image source={{uri: ImageURL}} style={styles.image}/>
-            ) : (
-                <View style={styles.placeholderImage}>
-                    <Text>No Image Available</Text>
-                </View>
-            )}
+        <ScrollView 
+            style={styles.container} 
+            contentContainerStyle={styles.contentContainer}
+            showsVerticalScrollIndicator={false}
+        >
+            <View style={styles.header}>
+                <Text style={styles.title}>{nameEN}</Text>
+                {ImageURL ? (
+                    <Image source={{uri: ImageURL}} style={styles.image}/>
+                ) : (
+                    <View style={styles.placeholderImage}>
+                        <Text style={styles.placeholderText}>No Image Available</Text>
+                    </View>
+                )}
+            </View>
 
-            {/* Radio buttons to choose location method */}
-            <View style={styles.locationMethodWrapper}>
-
-                <View style={styles.locationMethodWrapperText}>
-                    <Text style={styles.locationMethodTitle}>{i18n.t('chooseloc')}</Text>
-                </View>
-
-                <View style={styles.radioButtonsRow}>
-                    <View style={styles.radioButtons}>
+            <View style={styles.mainContent}>
+                {/* Location Selection Section */}
+                <View style={styles.section}>
+                    <Text style={styles.sectionTitle}>{i18n.t('chooseloc')}</Text>
+                    <View style={styles.radioButtonsRow}>
                         <CustomRadioButton
-                            //label="By Location"
                             label={i18n.t('bylocation')}
                             selected={locationMethod === 'auto'}
                             onPress={() => setLocationMethod('auto')}
                             disabled={isAutoDisabled}
                         />
-                    </View>
-                    <View style={styles.radioButtons}>
                         <CustomRadioButton
-                            //label="By Dropdown"
                             label={i18n.t('bydropdown')}
                             selected={locationMethod === 'manual'}
                             onPress={() => setLocationMethod('manual')}
                         />
                     </View>
-                </View>
-            </View>
 
-            {/* Dropdown for manual location selection */}
-            {locationMethod === 'manual' && (
-                <View style={styles.pickerContainer}>
-                    <SelectList
-                        data={locationDataForSelect}
-                        setSelected={(val) => {
-                            setSelected(val);
-                            handleLocationSelect(val);
-                        }}
-                        placeholder="Select your location in Bahrain"
-                    />
+                    {locationMethod === 'manual' && (
+                        <View style={styles.pickerContainer}>
+                            <SelectList
+                                setSelected={(val) => {
+                                    setSelected(val);
+                                    handleLocationSelect(val);
+                                }}
+                                data={locationDataForSelect}
+                                placeholder="Select your location in Bahrain"
+                                boxStyles={styles.selectBox}
+                                dropdownStyles={styles.dropdown}
+                                inputStyles={styles.selectInput}
+                                dropdownTextStyles={styles.dropdownText}
+                            />
+                        </View>
+                    )}
                 </View>
-            )}
 
-            {/* Radio buttons for Date Planted and Growth Stage */}
-            <View style={styles.radioButtonWrapperDateGrowth}>
-                <View style={styles.radioButtonsRow}>
-                    <View style={styles.radioButtons}>
+                {/* Growth Stage Selection Section */}
+                <View style={styles.section}>
+                    <View style={styles.radioButtonsRow}>
                         <CustomRadioButton
-                            //label="Date Planted"
                             label={i18n.t('datep')}
                             selected={selectedOption === 'datePlanted'}
                             onPress={() => setSelectedOption('datePlanted')}
                         />
-                    </View>
-
-                    <View style={styles.radioButtons}>
                         <CustomRadioButton
-                            //label="Growth Stage"
                             label={i18n.t('growthstage')}
                             selected={selectedOption === 'growthStage'}
                             onPress={() => setSelectedOption('growthStage')}
                         />
                     </View>
-                </View>
-            </View>
 
-            {/* Date Picker */}
-            {selectedOption === 'datePlanted' && (
-                <View style={styles.datePlantedContainer}>
-                    {Platform.OS === 'web' ? (
-                        <DatePicker
-                            selected={selectedDate}
-                            onChange={(date: Date) => setSelectedDate(date)}
-                            dateFormat="yyyy-MM-dd"
-                            className="date-picker"
-                            placeholderText="Select a date"
-                        />
-                    ) : (
-                        <DateTimePicker
-                            value={selectedDate || new Date()}
-                            mode="date"
-                            display="default"
-                            onChange={onDateChange}
-                        />
+                    {/* Date Selection */}
+                    {selectedOption === 'datePlanted' && (
+                        <View style={styles.datePickerContainer}>
+                            <TouchableOpacity 
+                                style={styles.dateButton}
+                                onPress={handleOpenDatePicker}
+                            >
+                                <Text style={styles.dateButtonText}>
+                                    {selectedDate ? selectedDate.toLocaleDateString() : 'Select Date'}
+                                </Text>
+                            </TouchableOpacity>
+
+                            {Platform.OS === 'web' ? (
+                                showDatePicker && (
+                                    <DatePicker
+                                        selected={selectedDate}
+                                        onChange={(date: Date) => {
+                                            setSelectedDate(date);
+                                            setShowDatePicker(false);
+                                        }}
+                                        dateFormat="yyyy-MM-dd"
+                                        className="dark-theme-datepicker"
+                                        placeholderText="Select a date"
+                                    />
+                                )
+                            ) : (
+                                showDatePicker && (
+                                    <DateTimePicker
+                                        value={selectedDate || new Date()}
+                                        mode="date"
+                                        display="default"
+                                        onChange={onDateChange}
+                                    />
+                                )
+                            )}
+                        </View>
+                    )}
+
+                    {/* Growth Stage Selection */}
+                    {selectedOption === 'growthStage' && (
+                        <ScrollView
+                            horizontal={true}
+                            showsHorizontalScrollIndicator={false}
+                            style={styles.growthStagesScroll}
+                        >
+                            {growthStages.map((stage) => (
+                                <TouchableOpacity
+                                    key={stage.value}
+                                    style={[
+                                        styles.stageBox,
+                                        growthStage === stage.value && styles.selectedStageBox
+                                    ]}
+                                    onPress={() => handleStageSelection(stage.value)}
+                                >
+                                    <Text style={styles.stageLabel}>{stage.label}</Text>
+                                    <Image source={{uri: stage.imageSource}} style={styles.stageImage}/>
+                                    <CustomRadioButton
+                                        label=""
+                                        selected={growthStage === stage.value}
+                                        onPress={() => handleStageSelection(stage.value)}
+                                    />
+                                </TouchableOpacity>
+                            ))}
+                        </ScrollView>
                     )}
                 </View>
-            )}
 
-            {/* Growth Stage Selection */}
-            {selectedOption === 'growthStage' && (
-                <View style={styles.growthStageContainer}>
-                    <Text style={styles.sectionTitle}>Select Growth Stage:</Text>
-                    <ScrollView
-                        horizontal={true}
-                        contentContainerStyle={styles.growthStagesScroll}
-                        showsHorizontalScrollIndicator={false}
-                    >
-                        {growthStages.map((stage) => (
-                            <View
-                                key={stage.value}
-                                style={[
-                                    styles.stageBox,
-                                    growthStage === stage.value && styles.selectedStageBox
-                                ]}
-                            >
-                                <Text style={styles.stageLabel}>{stage.label}</Text>
-                                {stage.imageSource ? (
-                                    <Image source={{uri: stage.imageSource}} style={styles.stageImage}/>
-                                ) : (
-                                    <View style={styles.placeholderStageImage}>
-                                        <Text>No Image</Text>
-                                    </View>
-                                )}
-                                <CustomRadioButton
-                                    label=""
-                                    selected={growthStage === stage.value}
-                                    onPress={() => handleStageSelection(stage.value)}
-                                />
-                            </View>
-                        ))}
-                    </ScrollView>
-                </View>
-            )}
-
-            {/* Calculate Water Need Button */}
-            <TouchableOpacity
-                style={[
-                    styles.calculateButton,
-                    (!isButtonEnabled || !isLocationAvailable) ? styles.disabledButton : {}
-                ]}
-                onPress={navigateToRecommendation}
-                disabled={!isButtonEnabled || !isLocationAvailable}
-            >
-                <Text style={styles.calculateButtonText}>Calculate Water Need</Text>
-            </TouchableOpacity>
+                {/* Calculate Button */}
+                <TouchableOpacity
+                    style={[
+                        styles.calculateButton,
+                        (!isButtonEnabled || !isLocationAvailable) && styles.disabledButton
+                    ]}
+                    onPress={navigateToRecommendation}
+                    disabled={!isButtonEnabled || !isLocationAvailable}
+                >
+                    <Text style={styles.calculateButtonText}>Calculate Water Need</Text>
+                </TouchableOpacity>
+            </View>
         </ScrollView>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
+        backgroundColor: '#202124',
+        flex: 1,
+    },
+    contentContainer: {
+        flexGrow: 1,
+    },
+    header: {
         alignItems: 'center',
         padding: 20,
-        backgroundColor: '#f0f4f7',
+        backgroundColor: '#2D2F31',
+        borderRadius: 15,
+        margin: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    mainContent: {
+        padding: 16,
+    },
+    section: {
+        backgroundColor: '#2D2F31',
+        borderRadius: 12,
+        padding: 16,
+        marginBottom: 16,
+        borderWidth: 1,
+        borderColor: '#404144',
     },
     title: {
-        fontSize: 26,
+        fontSize: 28,
         fontWeight: 'bold',
-        marginTop: 20,
-        marginBottom: 10,
-        color: '#333',
+        color: '#FFFFFF',
+        marginBottom: 16,
     },
     image: {
-        width: 220,
-        height: 220,
-        borderRadius: 15,
-        marginTop: 20,
-        marginBottom: 20,
+        width: 200,
+        height: 200,
+        borderRadius: 12,
     },
     placeholderImage: {
-        width: 220,
-        height: 220,
-        borderRadius: 15,
-        marginTop: 20,
-        marginBottom: 20,
-        backgroundColor: '#ccc',
+        width: 200,
+        height: 200,
+        borderRadius: 12,
+        backgroundColor: '#404144',
         justifyContent: 'center',
         alignItems: 'center',
     },
-    locationMethodWrapper: {},
-    locationMethodWrapperText: {
-        alignItems: 'center',
-    },
-    locationMethodTitle: {
-        fontSize: 18,
-        fontWeight: '600',
-        marginBottom: 10,
-        color: '#555',
-    },
-    radioButtonsRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    radioButtons: {
-        padding: 20,
-        paddingBottom: 0,
-        paddingTop: 0,
-        margin: 10,
-    },
-    pickerContainer: {
-        width: '35%',
-        marginTop: 20,
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 8,
-    },
-    picker: {
-        height: 50,
-        width: '100%',
-    },
-    radioButtonWrapperDateGrowth: {
-        justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    datePlantedContainer: {
-        width: '80%',
-        marginTop: 20,
-        alignItems: 'center',
-    },
-    growthStageContainer: {
-        width: '100%',
-        marginTop: 20,
-        alignItems: 'center',
+    placeholderText: {
+        color: '#B4B8C0',
     },
     sectionTitle: {
         fontSize: 18,
-        fontWeight: '500',
-        color: '#555',
-        marginBottom: 10,
+        fontWeight: '600',
+        color: '#FFFFFF',
+        marginBottom: 16,
+        textAlign: 'center',
+    },
+    radioButtonsRow: {
+        flexDirection: 'row',
+        justifyContent: 'center',
+        gap: 20,
+        marginBottom: 16,
+    },
+    pickerContainer: {
+        marginTop: 16,
+    },
+    selectBox: {
+        backgroundColor: '#404144',
+        borderColor: '#505259',
+    },
+    selectInput: {
+        color: '#FFFFFF',
+    },
+    dropdown: {
+        backgroundColor: '#404144',
+        borderColor: '#505259',
+    },
+    dropdownText: {
+        color: '#FFFFFF',
+    },
+    datePickerContainer: {
+        alignItems: 'center',
+        marginTop: 16,
+    },
+    dateButton: {
+        backgroundColor: '#404144',
+        paddingVertical: 12,
+        paddingHorizontal: 24,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#505259',
+        marginTop: 8,
+        minWidth: 200,
+        alignItems: 'center',
+    },
+    dateButtonText: {
+        color: '#FFFFFF',
+        fontSize: 16,
     },
     growthStagesScroll: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+        marginTop: 16,
     },
     stageBox: {
-        width: 120,
+        backgroundColor: '#404144',
+        borderRadius: 12,
+        padding: 16,
+        marginRight: 12,
+        width: 160,
         alignItems: 'center',
-        marginRight: 15,
-        padding: 10,
-        backgroundColor: '#fff',
-        borderRadius: 10,
-        elevation: 2, // For Android shadow
-        shadowColor: '#000', // For iOS shadow
-        shadowOffset: {width: 0, height: 2}, // For iOS shadow
-        shadowOpacity: 0.2, // For iOS shadow
-        shadowRadius: 2, // For iOS shadow
+        borderWidth: 1,
+        borderColor: '#505259',
     },
     selectedStageBox: {
-        borderWidth: 2,
         borderColor: '#4CAF50',
+        borderWidth: 2,
     },
     stageLabel: {
+        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '600',
-        marginBottom: 5,
-        color: '#333',
+        marginBottom: 8,
     },
     stageImage: {
-        width: 80,
-        height: 80,
-        borderRadius: 5,
-        marginBottom: 10,
-    },
-    placeholderStageImage: {
-        width: 80,
-        height: 80,
-        borderRadius: 5,
-        marginBottom: 10,
-        backgroundColor: '#ccc',
-        justifyContent: 'center',
-        alignItems: 'center',
+        width: 100,
+        height: 100,
+        borderRadius: 8,
+        marginBottom: 8,
     },
     calculateButton: {
         backgroundColor: '#4CAF50',
-        paddingVertical: 15,
-        paddingHorizontal: 50,
-        borderRadius: 5,
-        marginTop: 40,
+        paddingVertical: 16,
+        paddingHorizontal: 32,
+        borderRadius: 12,
         alignItems: 'center',
+        marginTop: 24,
+        marginBottom: 32,
     },
     disabledButton: {
-        backgroundColor: '#ccc',
+        backgroundColor: '#404144',
+        opacity: 0.7,
     },
     calculateButtonText: {
-        color: '#fff',
+        color: '#FFFFFF',
         fontSize: 16,
-        fontWeight: 'bold',
-
+        fontWeight: '600',
     },
 });
 
