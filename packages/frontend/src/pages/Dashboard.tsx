@@ -177,12 +177,28 @@ const Dashboard: React.FC = () => {
             if (!idToken || !selectedFarm || !selectedZone) return;
 
             await axios.post(
-                `https://vuor0sdlpf.execute-api.us-east-1.amazonaws.com/managerDashboard/Farms/${selectedFarm.id}/Zones/${selectedZone.id}/irrigation`,
+                `https://vuor0sdlpf.execute-api.us-east-1.amazonaws.com/managerDashboard/Farms/${selectedFarm.id}/Zones/${selectedZone.id}/Irrigate`,
                 { action: confirmationDialog.action },
                 { headers: { Authorization: `Bearer ${idToken}` } }
             );
 
-            alert(`Irrigation ${confirmationDialog.action}ed for ${selectedZone.name}`);
+            // Update zones state with new irrigation status
+            setZones(currentZones => 
+                currentZones.map(zone => 
+                    zone.id === selectedZone.id 
+                        ? { ...zone, irrigationStatus: confirmationDialog.action === 'start' ? 'active' : 'inactive' }
+                        : zone
+                )
+            );
+
+            // Update selected zone state
+            setSelectedZone(currentZone => 
+                currentZone 
+                    ? { ...currentZone, irrigationStatus: confirmationDialog.action === 'start' ? 'active' : 'inactive' }
+                    : null
+            );
+
+           
         } catch (error) {
             console.error('Error controlling irrigation:', error);
             alert('Failed to control irrigation');
