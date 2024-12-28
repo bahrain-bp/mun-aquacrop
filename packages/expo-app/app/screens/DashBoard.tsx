@@ -78,7 +78,7 @@ const Index: React.FC = () => {
     return (
         <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
             <View style={styles.welcomeContainer}>
-                <Text style={styles.greetingText}>Welcome</Text>
+                <Text style={styles.greetingText}>{i18n.t('welcome')}</Text>
                 <Text style={styles.welcomeText}>{userName} 👋</Text>
 
             </View>

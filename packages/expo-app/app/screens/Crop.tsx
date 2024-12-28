@@ -1,16 +1,6 @@
 // app/screens/Crop.tsx
-
 import React, {useState, useEffect} from 'react';
-import {
-    Text,
-    View,
-    Image,
-    TouchableOpacity,
-    StyleSheet,
-    ScrollView,
-    Platform,
-    Alert,
-} from 'react-native';
+import { Text, View, Image, TouchableOpacity, StyleSheet, ScrollView, Platform, Alert, } from 'react-native';
 import {useRouter} from "expo-router";
 import {useLocalSearchParams} from 'expo-router';
 import * as Location from 'expo-location';
@@ -20,6 +10,7 @@ import DatePicker from 'react-datepicker'; // For Web
 import 'react-datepicker/dist/react-datepicker.css'; // Required CSS for react-datepicker on Web
 import CustomRadioButton from '@/components/CustomRadioButton'; // Ensure the path is correct
 import i18n from '../i18n'; // Import the shared i18n instance
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Testing
 import {SelectList} from 'react-native-dropdown-select-list'
@@ -41,15 +32,16 @@ interface GrowthStageOption {
 
 const Crop: React.FC = () => {
     const router = useRouter();
-    const {nameEN, GrowthStage, kc, CropID, ImageURL} = useLocalSearchParams<{
+    const {nameEN, nameAR, GrowthStage, kc, CropID, ImageURL} = useLocalSearchParams<{
         nameEN: string;
+        nameAR: string;
         GrowthStage: string;
         kc: string;
         CropID: string;
         ImageURL: string;
     }>();
 
-    console.log('Received Params:', {nameEN, GrowthStage, kc, CropID, ImageURL});
+    console.log('Received Params:', {nameEN, nameAR, GrowthStage, kc, CropID, ImageURL});
 
     // State Variables
     const [selectedOption, setSelectedOption] = useState<"datePlanted" | "growthStage">("datePlanted");
@@ -61,6 +53,7 @@ const Crop: React.FC = () => {
     const [locationMethod, setLocationMethod] = useState<'auto' | 'manual'>('auto'); // Toggle location method
     const [selectedLocationValue, setSelectedLocationValue] = useState<string>(""); // Initialize to empty string
     const [isAutoDisabled, setIsAutoDisabled] = useState<boolean>(false); // To disable 'auto' if location fetching fails
+    const [language, setLanguage] = useState<string | null>(null); // to keep track of the language preference
 
     const bahrainLocations: LocationOption[] = [
         {label: "Manama", value: "manama", latitude: 26.2041, longitude: 50.5860},
@@ -73,17 +66,17 @@ const Crop: React.FC = () => {
 
     const growthStages: GrowthStageOption[] = [
         {
-            label: "Stage 1",
+            label: i18n.t('s1'),
             value: "stage1",
             imageSource: "https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/Plant+Intial+Stage.png"
         },
         {
-            label: "Stage 2",
+            label: i18n.t('s2'),
             value: "stage2",
             imageSource: "https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/Plant+Middle+Stage.png"
         },
         {
-            label: "Stage 3",
+            label: i18n.t('s3'),
             value: "stage3",
             imageSource: "https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/Plant+End+Stage.png"
         },
@@ -173,6 +166,7 @@ const Crop: React.FC = () => {
     };
 
     // Handle stage selection
+    
     const handleStageSelection = (stage: string) => {
         console.log('Selected Growth Stage:', stage);
         setGrowthStage(stage);
@@ -333,16 +327,31 @@ const Crop: React.FC = () => {
 
     const isButtonEnabled = (selectedOption === 'datePlanted' && isDateSelected) ||
         (selectedOption === 'growthStage' && isGrowthStageSelected);
-
+        
     // testing
-    const [selected, setSelected] = React.useState("");
 
-
+    //retrieve language selected
+    useEffect(() => {
+        const loadLanguage = async () => {
+          try {
+            const savedLanguage = await AsyncStorage.getItem('language');
+            const activeLanguage = savedLanguage || 'en'; // Default to English if no preference exists
+            setLanguage(activeLanguage);
+            i18n.locale = activeLanguage;
+          } catch (error) {
+            console.error("Error loading language:", error);
+            setLanguage('en'); // Fallback to English on error
+            i18n.locale = 'en';
+          }
+        };
+      
+        loadLanguage();
+      }, []);
     // testing end
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
-            <Text style={styles.title}>{nameEN}</Text>
+            <Text style={styles.title}>{language === 'ar' ? nameAR : nameEN}</Text>
             {ImageURL ? (
                 <Image source={{uri: ImageURL}} style={styles.image}/>
             ) : (
@@ -483,7 +492,7 @@ const Crop: React.FC = () => {
                 onPress={navigateToRecommendation}
                 disabled={!isButtonEnabled || !isLocationAvailable}
             >
-                <Text style={styles.calculateButtonText}>Calculate Water Need</Text>
+                <Text style={styles.calculateButtonText}>{i18n.t('calcbtn')}</Text>
             </TouchableOpacity>
         </ScrollView>
     );

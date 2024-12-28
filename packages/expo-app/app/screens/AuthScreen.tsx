@@ -122,7 +122,7 @@ const AuthScreen = () => {
         </>
       ) : (
         <>
-          <Text style={styles.label}>Enter Verification Code:</Text>
+          <Text style={styles.label}>{i18n.t('code')}</Text>
           <TextInput
             style={styles.input}
             value={challengeResponse}

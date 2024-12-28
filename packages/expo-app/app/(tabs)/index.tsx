@@ -1,29 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Button ,ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Button , ActivityIndicator, TouchableOpacity, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import AWS, { CognitoIdentityServiceProvider } from 'aws-sdk';
 import { storage } from '../utils/storage';
 import i18n from '../i18n';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// Configure AWS SDK with the region from environment variabless
+// Configure AWS SDK with the region from environment variables
 AWS.config.update({
   region: process.env.EXPO_PUBLIC_AWS_REGION || 'us-east-1', // Default to 'us-east-1' if not set
 });
-
-const toggleLanguage = () => {
-  const newLang = language === 'en' ? 'ar' : 'en';
-  setLanguage(newLang);
-};
-
-
-
-const HomeScreen = () => {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome to the Home Screen!</Text>
-    </View>
-  );
-};
 
 const getToken = async () => {
   try {
@@ -32,7 +18,6 @@ const getToken = async () => {
     console.error('Error fetching token:', error);
   }
 };
-
 
 const validateToken = async (accessToken: string) => {
   const cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider();
@@ -109,19 +94,40 @@ const isAuthenticated = async () => {
 
 export default function Page() {
   const router = useRouter();
-    const [loading, setLoading] = useState(true);
-    const [language, setLanguage] = useState('en');
-  const [_, forceUpdate] = useState(0); // Used to force a re-render
+  const [language, setLanguage] = useState(null);
+  const [loading, setLoading] = useState(true);
 
+  // Load the saved language preference
 
   useEffect(() => {
-    i18n.locale = language;
-    forceUpdate((prev) => prev + 1); // Trigger a re-render
-  }, [language]);
+    const loadLanguage = async () => {
+      try {
+        const savedLanguage = await AsyncStorage.getItem('language');
+        const activeLanguage = savedLanguage || 'en'; // Default to English if no preference exists
+        setLanguage(activeLanguage);
+        i18n.locale = activeLanguage;
+      } catch (error) {
+        console.error("Error loading language:", error);
+        setLanguage('en'); // Fallback to English on error
+        i18n.locale = 'en';
+      } finally {
+        setLoading(false); // Mark loading as complete
+      }
+    };
 
-  const toggleLanguage = () => {
+    loadLanguage();
+  }, []);
+
+  // Toggle the language and save the preference
+  const toggleLanguage = async () => {
     const newLang = language === 'en' ? 'ar' : 'en';
     setLanguage(newLang);
+    i18n.locale = newLang;
+    try {
+      await AsyncStorage.setItem('language', newLang);
+    } catch (error) {
+      console.error("Error saving language:", error);
+    }
   };
 
   useEffect(() => {
@@ -140,6 +146,7 @@ export default function Page() {
   }, []);
 
   if (loading) {
+      // Display a loading indicator while the language is being loaded
     return (
       <View style={styles.container}>
         <ActivityIndicator size="large" color="#0000ff" />
@@ -149,24 +156,48 @@ export default function Page() {
 
   return (
     <View style={styles.container}>
+      {/* Language Toggle Flags */}
+      <View style={styles.flagsContainer}>
+      <TouchableOpacity onPress={toggleLanguage}>
+        <View style={styles.flagWrapper}>
+          <Image
+            source={{
+              uri: language === 'en'
+                ? 'https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/bahrain-flag.png'
+                : 'https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/english-flag.png',
+            }}
+            style={[styles.flagImage, language === 'en' && styles.selectedFlag]}
+          />
+          <Text style={styles.flagText}>
+            {language === 'en' ? 'العربية' : 'English'}
+          </Text>
+        </View>
+      </TouchableOpacity>
+      </View>
+
+      <Image
+      source={{ uri: 'https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/saqi-logo-2' }}
+      style={styles.logo}
+      />
+
       {/* Display greeting text */}
       <Text style={styles.title}>{i18n.t('greeting')}</Text>
-
+  
       {/* Navigation Buttons */}
-      <Button
-        title={i18n.t('signup')}
-        onPress={() => router.push('/screens/AuthScreen')}
-      />
-      <Button
-        title={i18n.t('skipauth')}
-        onPress={() => router.push('/screens/DashBoard')}
-      />
-
-      {/* Language Toggle Button */}
-      <Button
-        title={language === 'en' ? 'عربي' : 'English'}
-        onPress={toggleLanguage}
-      />
+      <View style={styles.buttonsContainer}>
+        <TouchableOpacity
+          style={[styles.button, styles.signupButton]}
+          onPress={() => router.push('/screens/AuthScreen')}
+        >
+          <Text style={styles.buttonText}>{i18n.t('signup')}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.button, styles.skipButton]}
+          onPress={() => router.push('/screens/DashBoard')}
+        >
+          <Text style={styles.buttonText}>{i18n.t('skipauth')}</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -179,12 +210,59 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 16,
   },
+  logo: {
+    width: 100,
+    height: 100,
+    marginBottom: 16,
+  },
   title: {
+    color: '#032239',
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
   },
+  buttonsContainer: {
+    width: '100%',
+    alignItems: 'center',
+    marginVertical: 20,
+  },
   button: {
-    marginTop: 10,
+    width: '15%',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 8,
+    marginVertical: 8,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  signupButton: {
+    backgroundColor: '#032239',
+  },
+  skipButton: {
+    backgroundColor: '#032239',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  flagsContainer: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+  },
+  flagWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  flagImage: {
+    width: 40,
+    height: 30,
+  },
+  flagText: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginLeft: 4,
   },
 });
