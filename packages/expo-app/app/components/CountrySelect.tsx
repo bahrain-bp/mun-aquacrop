@@ -1,3 +1,4 @@
+// Country code prefix component in the login page (phone number input)
 import React from 'react';
 import { View, Text, Modal, FlatList, TouchableOpacity, StyleSheet, TextInput } from 'react-native';
 
