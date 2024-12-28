@@ -79,25 +79,56 @@ export async function uploadImageForResult(event: any) {
 }
 
 export async function uploadImageForCrop(event: any) {
-
     const {fileName, fileType} = JSON.parse(event.body);
-    console.log("Bucket Name:", process.env.imageBucket); // Debugging log
+
+    console.log("Received request to generate signed URL for:", {fileName, fileType});
+
+    // Validate fileType
+    const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+    if (!allowedTypes.includes(fileType)) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({error: "Invalid file type"}),
+        };
+    }
+
+    // Sanitize fileName
+    const sanitizedFileName = fileName.replace(/[^a-zA-Z0-9._-]/g, "");
+    if (!sanitizedFileName) {
+        return {
+            statusCode: 400,
+            body: JSON.stringify({error: "Invalid file name"}),
+        };
+    }
+
     const bucketName = process.env.imageBucket as string;
     if (!bucketName) {
+        console.error("Bucket name is not defined in environment variables");
         return {
             statusCode: 500,
             body: JSON.stringify({error: "Bucket name is not defined in environment variables"}),
         };
     }
+
     const params = {
         Bucket: bucketName,
-        Key: fileName,
-        Expires: 300, // URL expiration in seconds
+        Key: sanitizedFileName,
+        Expires: 300,
         ContentType: fileType,
     };
-    const uploadURL = await s3.getSignedUrlPromise("putObject", params);
-    return {
-        statusCode: 200,
-        body: JSON.stringify({uploadURL}),
-    };
+
+    try {
+        const uploadURL = await s3.getSignedUrlPromise("putObject", params);
+        console.log("Generated signed URL:", uploadURL);
+        return {
+            statusCode: 200,
+            body: JSON.stringify({uploadURL, imageURL: `https://${bucketName}.s3.amazonaws.com/${sanitizedFileName}`}),
+        };
+    } catch (error) {
+        console.error("Error generating signed URL:", error);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({error: "Could not generate signed URL"}),
+        };
+    }
 }

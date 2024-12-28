@@ -1,10 +1,10 @@
 import {StackContext, Bucket, Function, use} from "sst/constructs";
-import { HttpMethods, BlockPublicAccess } from "aws-cdk-lib/aws-s3";
-import { RemovalPolicy } from "aws-cdk-lib";
+import {HttpMethods, BlockPublicAccess} from "aws-cdk-lib/aws-s3";
+import {RemovalPolicy} from "aws-cdk-lib";
 import {DynamoDBStack} from "./DynamoDBStack";
 
 
-export function S3Stack({ stack }: StackContext) {
+export function S3Stack({stack}: StackContext) {
     const {stationTable, weatherReadingsTable, imageResult} = use(DynamoDBStack);
 
     const indexBucket = new Bucket(stack, "indexBucket", {
@@ -30,10 +30,10 @@ export function S3Stack({ stack }: StackContext) {
         handler: "packages/functions/src/imageProcessor.handler", // Ensure this path is correct
         environment: {
             imageResult: imageResult.tableName,
-            stationTable:stationTable.tableName,
-            weatherReadingsTable:weatherReadingsTable.tableName
+            stationTable: stationTable.tableName,
+            weatherReadingsTable: weatherReadingsTable.tableName
         },
-        permissions: [imageResult,stationTable,weatherReadingsTable], // Grants necessary permissions
+        permissions: [imageResult, stationTable, weatherReadingsTable], // Grants necessary permissions
     });
 
     indexBucket.addNotifications(stack, {
@@ -43,24 +43,45 @@ export function S3Stack({ stack }: StackContext) {
         },
     });
 
+
+    // Create an SST Bucket with versioning and CORS
     const imageBucket = new Bucket(stack, "CropsImagesBucket", {
         cdk: {
             bucket: {
                 versioned: true,
                 removalPolicy: stack.stage === "prod" ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY,
                 publicReadAccess: true,
-                cors: [
-                    {
-                        allowedHeaders: ["*"],
-                        allowedMethods: [HttpMethods.GET, HttpMethods.PUT, HttpMethods.POST],
-                        allowedOrigins: ["*"], // TODO: Replace "*" with your frontend's domain for production
-                        exposedHeaders: ["ETag"],
-                        maxAge: 3000,
-                    },
-                ],
             },
         },
+        cors: [
+            {
+                allowedHeaders: ["*"],
+                allowedMethods: ["GET", "PUT", "POST"],
+                allowedOrigins: ["*"],
+                exposedHeaders: ["ETag"],
+                maxAge: "3000 seconds",
+            },
+        ],
     });
+
+    // const imageBucket = new Bucket(stack, "CropsImagesBucket", {
+    //     cdk: {
+    //         bucket: {
+    //             versioned: true,
+    //             removalPolicy: stack.stage === "prod" ? RemovalPolicy.RETAIN : RemovalPolicy.DESTROY,
+    //             publicReadAccess: true,
+    //             cors: [
+    //                 {
+    //                     allowedHeaders: ["*"],
+    //                     allowedMethods: [HttpMethods.GET, HttpMethods.PUT, HttpMethods.POST],
+    //                     allowedOrigins: ["*"], // TODO: Replace "*" with your frontend's domain for production
+    //                     exposedHeaders: ["ETag"],
+    //                     maxAge: 3000,
+    //                 },
+    //             ],
+    //         },
+    //     },
+    // });
 
     const CSVReadings = new Bucket(stack, "CSVReadings", {
         cdk: {
@@ -82,15 +103,14 @@ export function S3Stack({ stack }: StackContext) {
     });
 
 
-
     // 5. Add notification to CSVReadings bucket to trigger Lambda on object creation
     const ProcessCSV = new Function(stack, "csvProcessor", {
         handler: "packages/functions/src/csvProcessor.handler", // Ensure this path is correct
         environment: {
-            stationTable:stationTable.tableName,
-            weatherReadingsTable:weatherReadingsTable.tableName
+            stationTable: stationTable.tableName,
+            weatherReadingsTable: weatherReadingsTable.tableName
         },
-        permissions: [CSVReadings,stationTable,weatherReadingsTable], // Grants necessary permissions
+        permissions: [CSVReadings, stationTable, weatherReadingsTable], // Grants necessary permissions
     });
 
     // 5. Add notification to CSVReadings bucket to trigger Lambda on object creation
@@ -108,5 +128,5 @@ export function S3Stack({ stack }: StackContext) {
         indexBucketName: indexBucket.bucketName,
     });
 
-    return { imageBucket, CSVReadings, indexBucket };
+    return {imageBucket, CSVReadings, indexBucket};
 }

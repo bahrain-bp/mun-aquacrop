@@ -166,6 +166,26 @@ export const update = async (event: APIGatewayProxyEvent): Promise<APIGatewayPro
             ImageURL: ImageURL || existingCrop.Item.ImageURL,
         };
 
+        if(ImageURL != existingCrop.Item.ImageURL){
+            try {
+                const url = new URL(existingCrop.Item.ImageURL);
+                const objectKey = decodeURIComponent(url.pathname.substring(1)); // Removes the leading '/'
+
+                const deleteS3Params = {
+                    Bucket: process.env.imageBucket!,
+                    Key: objectKey,
+                };
+
+                await new AWS.S3().deleteObject(deleteS3Params).promise();
+            } catch (s3Error) {
+                console.error('Error deleting image from S3:', s3Error);
+                // Optionally, you can decide how to handle partial failures
+                // For example, you might want to return a 200 response but log the S3 failure
+            }
+
+        }
+
+
         // Prepare DynamoDB put parameters
         const params = {
             TableName: TABLE_NAME!,
@@ -230,11 +250,11 @@ export const deleteCrop = async (event: APIGatewayProxyEvent): Promise<APIGatewa
                 const objectKey = decodeURIComponent(url.pathname.substring(1)); // Removes the leading '/'
 
                 const deleteS3Params = {
-                    Bucket: S3_BUCKET_NAME,
+                    Bucket: process.env.imageBucket!,
                     Key: objectKey,
                 };
 
-                await s3.deleteObject(deleteS3Params).promise();
+                await new AWS.S3().deleteObject(deleteS3Params).promise();
             } catch (s3Error) {
                 console.error('Error deleting image from S3:', s3Error);
                 // Optionally, you can decide how to handle partial failures

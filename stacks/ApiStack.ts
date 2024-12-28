@@ -110,6 +110,7 @@ export function ApiStack({stack}: StackContext) {
                     environment: {
                         indexBucket: indexBucket.bucketName,
                     },
+                    permissions: [indexBucket],
                 },
                 // authorizer: "mobileauthApi",
             },
@@ -121,6 +122,7 @@ export function ApiStack({stack}: StackContext) {
                     environment: {
                         imageBucket: imageBucket.bucketName,
                     },
+                    permissions: [imageBucket],
                 },
             },
 
@@ -129,7 +131,9 @@ export function ApiStack({stack}: StackContext) {
                     handler: "packages/functions/src/AdminDashboard/CropsManager.update",
                     environment: {
                         cropTable: cropTable.tableName,
+                        imageBucket: imageBucket.bucketName,
                     },
+                    permissions: [cropTable, imageBucket],
                 },
             },
 
@@ -138,7 +142,9 @@ export function ApiStack({stack}: StackContext) {
                     handler: "packages/functions/src/AdminDashboard/CropsManager.deleteCrop",
                     environment: {
                         cropTable: cropTable.tableName,
+                        imageBucket: imageBucket.bucketName,
                     },
+                    permissions: [cropTable, imageBucket],
                 },
             },
 

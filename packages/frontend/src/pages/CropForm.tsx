@@ -1,12 +1,12 @@
 // CropForm.tsx
 
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { useForm, SubmitHandler } from "react-hook-form";
+import React, {useState, useEffect} from 'react';
+import {motion} from 'framer-motion';
+import {useForm, SubmitHandler} from "react-hook-form";
 import Header from "../components/common/Header";
-import { useLocation, useNavigate } from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import axios from 'axios';
-import { ToastContainer, toast } from 'react-toastify';
+import {ToastContainer, toast} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 interface Crop {
@@ -47,7 +47,7 @@ const CropForm: React.FC = () => {
     const {
         register,
         handleSubmit,
-        formState: { errors },
+        formState: {errors},
         setValue,
         watch
     } = useForm<CropFormInputs>({
@@ -55,8 +55,8 @@ const CropForm: React.FC = () => {
             cropID: 0,
             nameEN: '',
             nameAR: '',
-            growthStage: { ini: 0, mid: 0, final: 0 },
-            kc: { ini: 0, mid: 0, final: 0 },
+            growthStage: {ini: 0, mid: 0, final: 0},
+            kc: {ini: 0, mid: 0, final: 0},
             imageURL: undefined as unknown as FileList
         }
     });
@@ -114,20 +114,22 @@ const CropForm: React.FC = () => {
             // If a new image is selected, upload it to S3
             if (data.imageURL && data.imageURL.length > 0) {
                 const file = data.imageURL[0];
-                const fileName = encodeURIComponent(file.name);
-                const fileType = encodeURIComponent(file.type);
+                // const fileName = encodeURIComponent(file.name);
+                // const fileType = encodeURIComponent(file.type);
 
                 // Step 1: Get the signed URL from the backend
                 const uploadUrlResponse = await axios.post(`${import.meta.env.VITE_API_URL}/Upload/crop/image`, {
-                    fileName,
-                    fileType
+                    fileName: file.name,
+                    fileType: file.type,
                 }, {
                     headers: {
                         'Content-Type': 'application/json'
                     }
                 });
 
-                const { uploadURL } = uploadUrlResponse.data;
+                const {uploadURL} = uploadUrlResponse.data;
+                imageURL_S3 = uploadUrlResponse.data.imageURL;
+
                 await fetch(uploadURL, {
                     method: "PUT",
                     headers: {
@@ -137,7 +139,7 @@ const CropForm: React.FC = () => {
                 });
 
                 // Replace with the actual S3 URL
-                imageURL_S3 = "test"; // TODO: Replace with actual S3 URL
+                // imageURL_S3 = "https://saqidev-mun-aquacrop-s3st-cropsimagesbucket00e4cf9-9ycdsxzj8x6d.s3.us-east-1.amazonaws.com/"+file.name; // TODO: Replace with actual S3 URL
             }
 
             // Prepare the data to send to the backend
@@ -176,29 +178,32 @@ const CropForm: React.FC = () => {
                     }
                 });
                 setSubmitSuccess("Crop added successfully!");
+
             }
 
             setIsSubmitting(false);
             toast.success(submitSuccess || "Operation successful!");
-            navigate('/Crops'); // Redirect to the crops list or another appropriate page
         } catch (error: any) {
             console.error("Error submitting form:", error);
             const errorMessage = error.response?.data?.message || "Failed to submit form.";
             setSubmitError(errorMessage);
             toast.error(errorMessage);
             setIsSubmitting(false);
+
         }
+        navigate('/Crops'); // Redirect to the crops list or another appropriate page
+
     };
 
     return (
         <div className="flex-1 overflow-auto relative z-10">
-            <Header title={crop ? 'Edit Crop' : 'Add Crop'} />
+            <Header title={crop ? 'Edit Crop' : 'Add Crop'}/>
             <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
                 <motion.div
                     className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8 m-auto"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2 }}
+                    initial={{opacity: 0, y: 20}}
+                    animate={{opacity: 1, y: 0}}
+                    transition={{delay: 0.2}}
                 >
                     <form
                         onSubmit={handleSubmit(onSubmit)}
@@ -211,7 +216,8 @@ const CropForm: React.FC = () => {
                         {/* Crop ID (Visible only in Edit Mode) */}
                         {crop && (
                             <div className="mb-4">
-                                <label htmlFor="cropID" className="block text-sm font-medium text-gray-200">Crop ID</label>
+                                <label htmlFor="cropID" className="block text-sm font-medium text-gray-200">Crop
+                                    ID</label>
                                 <input
                                     id="cropID"
                                     {...register("cropID")}
@@ -223,10 +229,11 @@ const CropForm: React.FC = () => {
 
                         {/* Name in English */}
                         <div className="mb-4">
-                            <label htmlFor="nameEN" className="block text-sm font-medium text-gray-200">Name (EN)</label>
+                            <label htmlFor="nameEN" className="block text-sm font-medium text-gray-200">Name
+                                (EN)</label>
                             <input
                                 id="nameEN"
-                                {...register("nameEN", { required: "English name is required" })}
+                                {...register("nameEN", {required: "English name is required"})}
                                 className="w-full p-3 mt-1 text-gray-800 rounded-md border border-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                             />
                             {errors.nameEN && <p className="text-red-400">{errors.nameEN.message}</p>}
@@ -234,10 +241,11 @@ const CropForm: React.FC = () => {
 
                         {/* Name in Arabic */}
                         <div className="mb-4">
-                            <label htmlFor="nameAR" className="block text-sm font-medium text-gray-200">Name (AR)</label>
+                            <label htmlFor="nameAR" className="block text-sm font-medium text-gray-200">Name
+                                (AR)</label>
                             <input
                                 id="nameAR"
-                                {...register("nameAR", { required: "Arabic name is required" })}
+                                {...register("nameAR", {required: "Arabic name is required"})}
                                 className="w-full p-3 mt-1 text-gray-800 rounded-md border border-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                             />
                             {errors.nameAR && <p className="text-red-400">{errors.nameAR.message}</p>}
@@ -303,7 +311,7 @@ const CropForm: React.FC = () => {
                                         step="0.01"
                                         {...register("kc.ini", {
                                             required: "Initial Kc is required",
-                                            min: { value: 0, message: "Must be a positive number" },
+                                            min: {value: 0, message: "Must be a positive number"},
                                             valueAsNumber: true
                                         })}
                                         className="w-full p-3 mt-1 text-gray-800 rounded-md border border-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -317,7 +325,7 @@ const CropForm: React.FC = () => {
                                         step="0.01"
                                         {...register("kc.mid", {
                                             required: "Mid Kc is required",
-                                            min: { value: 0, message: "Must be a positive number" },
+                                            min: {value: 0, message: "Must be a positive number"},
                                             valueAsNumber: true
                                         })}
                                         className="w-full p-3 mt-1 text-gray-800 rounded-md border border-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -331,7 +339,7 @@ const CropForm: React.FC = () => {
                                         step="0.01"
                                         {...register("kc.final", {
                                             required: "Final Kc is required",
-                                            min: { value: 0, message: "Must be a positive number" },
+                                            min: {value: 0, message: "Must be a positive number"},
                                             valueAsNumber: true
                                         })}
                                         className="w-full p-3 mt-1 text-gray-800 rounded-md border border-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -343,7 +351,8 @@ const CropForm: React.FC = () => {
 
                         {/* Image Upload */}
                         <div className="mb-4">
-                            <label htmlFor="imageURL" className="block text-sm font-medium text-gray-200">Image Upload</label>
+                            <label htmlFor="imageURL" className="block text-sm font-medium text-gray-200">Image
+                                Upload</label>
                             <input
                                 id="imageURL"
                                 type="file"
@@ -407,7 +416,7 @@ const CropForm: React.FC = () => {
                     </form>
                 </motion.div>
             </main>
-            <ToastContainer />
+            <ToastContainer/>
         </div>
     );
 };
