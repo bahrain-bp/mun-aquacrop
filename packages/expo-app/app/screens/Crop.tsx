@@ -434,7 +434,7 @@ const Crop: React.FC = () => {
                             onChange={(date: Date) => setSelectedDate(date)}
                             dateFormat="yyyy-MM-dd"
                             className="date-picker"
-                            placeholderText="Select a date"
+                            placeholderText={i18n.t('date')}
                         />
                     ) : (
                         <DateTimePicker
@@ -450,7 +450,7 @@ const Crop: React.FC = () => {
             {/* Growth Stage Selection */}
             {selectedOption === 'growthStage' && (
                 <View style={styles.growthStageContainer}>
-                    <Text style={styles.sectionTitle}>Select Growth Stage:</Text>
+                    <Text style={styles.sectionTitle}>{i18n.t('selectgrowthst')}</Text>
                     <ScrollView
                         horizontal={true}
                         contentContainerStyle={styles.growthStagesScroll}

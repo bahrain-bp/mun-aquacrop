@@ -4,6 +4,8 @@ import { useRouter } from 'expo-router';
 import { storage } from '../utils/storage';
 import AWS from 'aws-sdk';
 import i18n from '../i18n'; // Import the shared i18n instance
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const API_URL = process.env.EXPO_PUBLIC_PROD_API_URL;
 
@@ -48,15 +50,34 @@ const Index: React.FC = () => {
     const [crops, setCrops] = useState<Crop[]>([]);
     const [userName, setUserName] = useState<string>('Guest');
     const { width } = useWindowDimensions();
+    const router = useRouter();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(API_URL + '/crops');
+                // Get both tokens
+                const idToken = await storage.getItem('idToken');
+                const accessToken = await storage.getItem('accessToken');
+
+                if (!idToken || !accessToken) {
+                    throw new Error('No tokens found');
+                }
+
+                const response = await fetch(API_URL + '/crops', {
+                    headers: {
+                        'Authorization': `Bearer ${idToken}`,
+                        'X-Access-Token': accessToken
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error('API request failed');
+                }
+
                 const data = await response.json();
                 setCrops(parseCrops(data));
 
-                const accessToken = await storage.getItem('accessToken');
+                // Fetch user data with access token
                 if (accessToken) {
                     const cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider();
                     const userData = await cognitoidentityserviceprovider.getUser({
@@ -69,6 +90,8 @@ const Index: React.FC = () => {
                 }
             } catch (error) {
                 console.error("Error fetching data:", error);
+                // Redirect to login if unauthorized
+                router.replace('/');
             }
         };
 
@@ -84,6 +107,10 @@ const Index: React.FC = () => {
             </View>
             <Text style={styles.text}>{i18n.t('home')}</Text>
             <View style={styles.grid}>
+                {/* Fixed Upload Image Card */}
+                <View style={styles.row2}>
+                    <UploadImageCard />
+                </View>
                 {crops.length > 0 ? (
                     <View style={styles.row}>
                         {crops.map((crop, index) => (
@@ -105,6 +132,25 @@ interface CardProps {
 const Card: React.FC<CardProps> = ({ CropData }) => {
     const { nameEN, nameAR, GrowthStage, kc, CropID, ImageURL } = CropData;
     const router = useRouter();
+    const [language, setLanguage] = useState<string | null>(null);
+
+    //retrieve language selected
+    useEffect(() => {
+        const loadLanguage = async () => {
+          try {
+            const savedLanguage = await AsyncStorage.getItem('language');
+            const activeLanguage = savedLanguage || 'en'; // Default to English if no preference exists
+            setLanguage(activeLanguage);
+            i18n.locale = activeLanguage;
+          } catch (error) {
+            console.error("Error loading language:", error);
+            setLanguage('en'); // Fallback to English on error
+            i18n.locale = 'en';
+          }
+        };
+      
+        loadLanguage();
+      }, []);
 
     const handlePress = () => {
         router.push({
@@ -124,7 +170,27 @@ const Card: React.FC<CardProps> = ({ CropData }) => {
         <TouchableOpacity onPress={handlePress} style={styles.cardLink}>
             <View style={styles.cardContainer}>
                 <Image source={{ uri: ImageURL.S }} style={styles.image} />
-                <Text style={styles.cardTitle}>{nameEN.S}</Text>
+                <Text style={styles.cardTitle}>{language === 'ar' ? nameAR.S : nameEN.S}</Text>
+            </View>
+        </TouchableOpacity>
+    );
+};
+
+const UploadImageCard: React.FC = () => {
+    const router = useRouter();  // Initialize the router
+
+    // Handle the press action to navigate to the "Test" page
+    const handlePress = () => {
+        router.push({
+            pathname: '/screens/CropImage',
+
+        });  // Navigate to the "Test" page (adjust the path as needed)
+    };
+
+    return (
+        <TouchableOpacity style={styles.cardLink} onPress={handlePress}>  {/* Add onPress handler */}
+            <View style={styles.cardContainer}>
+                <Text style={styles.cardTitle}>{i18n.t('upload')}</Text>
             </View>
         </TouchableOpacity>
     );
@@ -152,6 +218,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',  // Align the cards horizontally
         flexWrap: 'wrap',      // Allow cards to wrap to the next row
         justifyContent: 'space-between',  // Distribute cards evenly across rows
+        width: '100%',  // Ensure the row takes the full width of the parent container
+    },
+    row2: {
+        flexDirection: 'row',  // Align the cards horizontally
+        flexWrap: 'wrap',      // Allow cards to wrap to the next row
+        justifyContent: 'center',  // Distribute cards evenly across rows
         width: '100%',  // Ensure the row takes the full width of the parent container
     },
     cardLink: {

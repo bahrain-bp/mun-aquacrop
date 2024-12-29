@@ -4,11 +4,16 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
 import axios from 'axios';
-import i18n from '../i18n'; // Import the shared i18n instance
+import i18n from '../i18n';
+import {storage} from "@/app/utils/storage"; // Import the shared i18n instance
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const Recommendation: React.FC = () => {
     const {
         title,
+        nameEN,
+        nameAR,
         imageSource,
         latitude,
         longitude,
@@ -23,6 +28,8 @@ const Recommendation: React.FC = () => {
         // @ts-ignore
     } = useLocalSearchParams<{
         title: string;
+        nameEN: string;
+        nameAR: string;
         imageSource: string;
         latitude: number;
         longitude: number;
@@ -39,17 +46,41 @@ const Recommendation: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [ET0, setET0] = useState<number | null>(null);
     const API_URL = process.env.EXPO_PUBLIC_PROD_API_URL;
+    const [language, setLanguage] = useState<string | null>(null); // to keep track of the language preference
+
+    //retrieve language selected
+    useEffect(() => {
+        const loadLanguage = async () => {
+          try {
+            const savedLanguage = await AsyncStorage.getItem('language');
+            const activeLanguage = savedLanguage || 'en'; // Default to English if no preference exists
+            setLanguage(activeLanguage);
+            i18n.locale = activeLanguage;
+          } catch (error) {
+            console.error("Error loading language:", error);
+            setLanguage('en'); // Fallback to English on error
+            i18n.locale = 'en';
+          }
+        };
+      
+        loadLanguage();
+      }, []);
 
     useEffect(() => {
         const fetchData = async () => {
             try {
+                var idToken =  await storage.getItem('idToken');
+
                 const response = await axios.post(`${API_URL}/calculate/water`, {
-                    lat:latitude,
-                    lon:longitude,
+                    lat: latitude,
+                    lon: longitude,
+                }, {
+                    headers: { Authorization: `Bearer ${idToken}` },
                 });
                 // Extract ET0 from the response
                 var { ET0 } = response.data;
                  ET0 = ET0 * kcForCrop;
+                 ET0 =1.05 * 0.25 * ET0;
                 setET0(ET0);
             } catch (error) {
                 console.error('Error fetching ET0:', error);
@@ -65,7 +96,7 @@ const Recommendation: React.FC = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>{i18n.t('rec')} {title}</Text>
+            <Text style={styles.title}>{i18n.t('rec')} {language === 'ar' ? nameAR : nameEN}</Text>
             {imageSource && <Image source={{ uri: imageSource }} style={styles.image} />}
 
             {isLoading ? (
@@ -78,7 +109,7 @@ const Recommendation: React.FC = () => {
                     {ET0 !== null && (
                         <View style={styles.resultBox}>
                             <Text style={styles.resultText}>
-                            {i18n.t('totwaterneed')} <Text style={styles.emphasis}>{ET0.toFixed(2)} Liters</Text>
+                            {i18n.t('totwaterneed')} <Text style={styles.emphasis}>{ET0.toFixed(2)} {i18n.t('litres')}</Text>
                             </Text>
                         </View>
                     )}

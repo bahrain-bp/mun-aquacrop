@@ -1,312 +1,373 @@
-import React, { useState, useEffect } from 'react';
-import { Authenticator } from '@aws-amplify/ui-react';
-import axios from 'axios';
-import { fetchAuthSession } from 'aws-amplify/auth';
-import { Link } from 'react-router-dom';
+import React, { useState ,useEffect} from 'react';
+import { motion } from 'framer-motion';
+import Header from '../components/common/Header';
+import {Authenticator} from "@aws-amplify/ui-react";
+import StatCard from "../components/common/StatCard.tsx";
+import {Cloud, Droplet, TreePine, House } from "lucide-react";
+import {fetchAuthSession} from "aws-amplify/auth";
+import axios from "axios";
+// import SignOutButton from "../components/common/SignOutButton.tsx";
+import {ZoneCard} from "../components/Farms/ZoneCard.tsx";
+
+import {ConfirmationDialog} from "../components/Farms/ConfirmationDialog.tsx";
+import {useNavigate} from "react-router-dom";
+import { IrrigationPopup } from '../components/Farms/IrrigationPopup';
 
 interface Farm {
-  id: string;
-  name: string;
-  zones?: Zone[]; // Prefetched zones
+    id: string;
+    name: string;
+    zones?: Zone[]; // Prefetched zones
 }
-
 interface Zone {
-  id: string;
-  name: string;
-  irrigationStatus: string;
-  CropImageURL: string;
+    id: string;
+    name: string;
+    irrigationStatus: string;
+    CropImageURL: string;
 }
-
-const Sidebar: React.FC<{ isCollapsed: boolean; toggleSidebar: () => void }> = ({
-                                                                                    isCollapsed,
-                                                                                    toggleSidebar,
-                                                                                }) => {
-    return (
-        <div
-            style={{
-                width: isCollapsed ? '80px' : '250px',
-                height: '100vh',
-                backgroundColor: '#2C3E50',
-                color: 'white',
-                padding: '20px',
-                position: 'fixed',
-                left: '0',
-                top: '0',
-                display: 'flex',
-                flexDirection: 'column',
-                transition: 'width 0.3s ease',
-            }}
-        >
-            <h2 style={{ color: '#fff', display: isCollapsed ? 'none' : 'block' }}>Farm Manager</h2>
-            <nav>
-                <ul style={{listStyleType: 'none', padding: 0}}>
-                    <li>
-                        <Link
-                            to="/" // Link to the Farms page
-                            style={{
-                                textDecoration: 'none',
-                                display: 'block',
-                                padding: '10px',
-                                backgroundColor: '#34495E',
-                                color: 'white',
-                                borderRadius: '5px',
-                                margin: '10px 0',
-                                textAlign: 'center',
-                            }}
-                        >
-                            Dashboard
-                        </Link>
-                        {/*<button style={sidebarButtonStyle}>Dashboard</button>*/}
-                    </li>
-                    {/* Add Farms Link */}
-                    <li>
-                        <Link
-                            to="/Farms" // Link to the Farms page
-                            style={{
-                                textDecoration: 'none',
-                                display: 'block',
-                                padding: '10px',
-                                backgroundColor: '#34495E',
-                                color: 'white',
-                                borderRadius: '5px',
-                                margin: '10px 0',
-                                textAlign: 'center',
-                            }}
-                        >
-                            Farms
-                        </Link>
-                    </li>
-                </ul>
-            </nav>
-            <button
-                onClick={toggleSidebar}
-                style={{
-                    marginTop: 'auto',
-                    backgroundColor: '#34495E',
-                    border: 'none',
-                    padding: '10px',
-                    color: 'white',
-                    fontSize: '16px',
-                    borderRadius: '5px',
-                    cursor: 'pointer',
-                    textAlign: 'center',
-                    width: '100%',
-                }}
-            >
-                {isCollapsed ? '>' : '<'}
-            </button>
-        </div>
-    );
-};
-
-// const sidebarButtonStyle = {
-//   backgroundColor: '#34495E',
-//   border: 'none',
-//   padding: '10px',
-//   margin: '10px 0',
-//   color: 'white',
-//   fontSize: '16px',
-//   borderRadius: '5px',
-//   cursor: 'pointer',
-//   textAlign: 'left' as 'left',
-//   width: '100%',
-// };
 
 const Dashboard: React.FC = () => {
-  const [farms, setFarms] = useState<Farm[]>([]);
-  const [zones, setZones] = useState<Zone[]>([]);
-  const [selectedFarm, setSelectedFarm] = useState<Farm | null>(null);
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false); // Track sidebar state
+    const navigate = useNavigate();
+    const [farms, setFarms] = useState<Farm[]>([]);
+    const [zones, setZones] = useState<Zone[]>([]);
+    const [selectedFarm, setSelectedFarm] = useState<Farm | null>(null);
+    const [selectedZone, setSelectedZone] = useState<Zone | null>(null);
+    const [isPopupVisible, setIsPopupVisible] = useState(false);
+    const [activeTab, setActiveTab] = useState('manual');
+    const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingZones, setIsLoadingZones] = useState(false);
+    const [confirmationDialog, setConfirmationDialog] = useState<{
+        isOpen: boolean;
+        action: 'start' | 'stop' | null;
+    }>({ isOpen: false, action: null });
 
-  // Fetch token for API requests
-  const fetchToken = async (): Promise<string | null> => {
-    try {
-      const session = await fetchAuthSession();
-      return session?.tokens?.idToken?.toString() ?? null;
-    } catch (error) {
-      console.error('Error fetching session:', error);
-      return null;
-    }
-  };
-
-  // Fetch farms and prefetch zones
-  useEffect(() => {
-    const fetchFarmsAndZones = async () => {
-      try {
-        const idToken = await fetchToken();
-        if (!idToken) {
-          console.error('No ID token found');
-          return;
+    /**
+     * Fetches authentication token for API requests
+     * @returns Promise containing the ID token or null if not authenticated
+     */
+    const fetchToken = async (): Promise<string | null> => {
+        try {
+            const session = await fetchAuthSession();
+            return session?.tokens?.idToken?.toString() ?? null;
+        } catch (error) {
+            console.error('Error fetching session:', error);
+            return null;
         }
-
-        // Fetch farms
-        const farmsResponse = await axios.get('https://vuor0sdlpf.execute-api.us-east-1.amazonaws.com/managerDashboard/Farms', {
-          headers: { Authorization: `Bearer ${idToken}` },
-        });
-
-        const fetchedFarms: Farm[] = farmsResponse.data.farms.map((farm: any) => ({
-          id: farm.FarmID,
-          name: farm.FarmName,
-        }));
-
-        // Prefetch zones for all farms concurrently
-        const prefetchZonesPromises = fetchedFarms.map(async (farm) => {
-          try {
-            const zonesResponse = await axios.get(
-                `https://vuor0sdlpf.execute-api.us-east-1.amazonaws.com/managerDashboard/Farms/${farm.id}/Zones`,
-                {
-                  headers: { Authorization: `Bearer ${idToken}` },
-                }
-            );
-            farm.zones = zonesResponse.data.zones.map((zone: any) => ({
-              id: zone.ZoneID,
-              name: zone.ZoneName,
-              irrigationStatus: zone.IrrigationStatus,
-              CropImageURL: zone.CropImageURL,
-            }));
-          } catch (error) {
-            console.error(`Error prefetching zones for farm ${farm.id}:`, error);
-            farm.zones = []; // Fallback to an empty zones array if prefetch fails
-          }
-        });
-
-        await Promise.all(prefetchZonesPromises); // Wait for all prefetches to complete
-        setFarms(fetchedFarms); // Update farms with prefetched zones
-      } catch (error) {
-        console.error('Error fetching farms and zones:', error);
-      }
     };
 
-    fetchFarmsAndZones();
-  }, []);
+    /**
+     * Initial data fetch - Gets farms and their zones on component mount
+     */
+    useEffect(() => {
+        const fetchFarmsAndZones = async () => {
+            try {
+                const idToken = await fetchToken();
+                if (!idToken) {
+                    console.error('No ID token found');
+                    return;
+                }
 
-  const handleFarmSelect = (farm: Farm) => {
-    setSelectedFarm(farm);
-    setZones(farm.zones || []); // Use prefetched zones or fallback to empty array
-  };
+                // Fetch farms
+                const farmsResponse = await axios.get('https://vuor0sdlpf.execute-api.us-east-1.amazonaws.com/managerDashboard/Farms', {
+                    headers: { Authorization: `Bearer ${idToken}` },
+                });
 
-  const handleZoneAction = (zone: Zone) => {
-    alert(`Triggering irrigation for ${zone.name}`);
-    // AWS IoT Core integration
-  };
+                const fetchedFarms: Farm[] = farmsResponse.data.farms.map((farm: any) => ({
+                    id: farm.FarmID,
+                    name: farm.FarmName,
+                }));
 
-  const toggleSidebar = () => {
-    setIsSidebarCollapsed((prevState) => !prevState); // Toggle sidebar state
-  };
+                // Prefetch zones for all farms concurrently
+                const prefetchZonesPromises = fetchedFarms.map(async (farm) => {
+                    try {
+                        const zonesResponse = await axios.get(
+                            `https://vuor0sdlpf.execute-api.us-east-1.amazonaws.com/managerDashboard/Farms/${farm.id}/Zones`,
+                            {
+                                headers: { Authorization: `Bearer ${idToken}` },
+                            }
+                        );
+                        farm.zones = zonesResponse.data.zones.map((zone: any) => ({
+                            id: zone.ZoneID,
+                            name: zone.ZoneName,
+                            irrigationStatus: zone.IrrigationStatus,
+                            CropImageURL: zone.CropImageURL,
+                        }));
+                    } catch (error) {
+                        console.error(`Error prefetching zones for farm ${farm.id}:`, error);
+                        farm.zones = []; // Fallback to an empty zones array if prefetch fails
+                    }
+                });
 
-  return (
-      <Authenticator>
-        {({ signOut }) => (
-            <div style={{ display: 'flex', minHeight: '100vh' }}>
-              {/* Sidebar */}
-              <Sidebar isCollapsed={isSidebarCollapsed} toggleSidebar={toggleSidebar} />
+                await Promise.all(prefetchZonesPromises); // Wait for all prefetches to complete
+                setFarms(fetchedFarms); // Update farms with prefetched zones
+            } catch (error) {
+                console.error('Error fetching farms and zones:', error);
+            }
+        };
 
-              {/* Main content area */}
-              <div
-                  style={{
-                    marginLeft: isSidebarCollapsed ? '80px' : '250px', // Adjust content based on sidebar state
-                    padding: '20px',
-                    width: `calc(100% - ${isSidebarCollapsed ? '80px' : '250px'})`, // Dynamically adjust width
-                    transition: 'width 0.3s ease',
-                  }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <h1>Dashboard</h1>
-                  <button
-                      onClick={signOut}
-                      style={{
-                        padding: '10px 20px',
-                        fontSize: '16px',
-                        borderRadius: '5px',
-                        border: 'none',
-                        backgroundColor: '#FF0000',
-                        color: 'white',
-                        cursor: 'pointer',
-                      }}
-                  >
-                    Sign Out
-                  </button>
-                </div>
-                <h2>Farms</h2>
-                <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-                  {farms.map((farm) => (
-                      <button
-                          key={farm.id}
-                          onClick={() => handleFarmSelect(farm)}
-                          style={{
-                              padding: '20px',
-                              width: '150px', // Set a fixed width and height for a larger round button
-                              height: '150px',
-                              border: 'none', // Remove border to make it cleaner
-                              backgroundColor: selectedFarm?.id === farm.id ? '#007BFF' : 'transparent', // Set background color when selected
-                              backgroundImage: `url('https://media.istockphoto.com/id/965148388/photo/green-ripening-soybean-field-agricultural-landscape.jpg?s=612x612&w=0&k=20&c=cEVP3uj34-5obt-Jf_WI3O9qfP6tVrFaQIv1rBvvpzc=')`, // Background image
-                              backgroundSize: 'cover', // Ensure the background image covers the entire button
-                              backgroundPosition: 'center', // Center the image
-                              color: selectedFarm?.id === farm.id ? '#fff' : '#fff', // Make text white
-                              cursor: 'pointer',
-                              display: 'flex', // Use flexbox to center the text
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              fontSize: '16px', // Adjust font size
-                              textAlign: 'center',
-                              transition: 'background-color 0.3s ease', // Smooth transition for background color change
-                          }}
-                      >
-                          {farm.name}
-                      </button>
-                  ))}
-                </div>
-                  {selectedFarm && (
-                      <div style={{display: 'flex', gap: '20px', justifyContent: 'center'}}>
-                          {zones.map((zone) => (
-                              <div
-                                  key={zone.id}
-                                  style={{
-                                      textAlign: 'center',
-                                      display: 'flex',
-                                      flexDirection: 'column',
-                                      alignItems: 'center',
-                                      width: '150px',
-                                  }}
-                              >
-                                  {zone.CropImageURL ? (
-                                      <img
-                                          src={zone.CropImageURL}
-                                          alt={zone.name}
-                                          style={{
-                                              width: '100px',
-                                              height: '100px',
-                                              objectFit: 'cover',
-                                              borderRadius: '8px',
-                                              border: '1px solid #ccc',
-                                      marginBottom: '10px',
+        fetchFarmsAndZones();
+    }, []);
+
+    /**
+     * Preloads an image to prevent flickering when displaying
+     * @param url - The URL of the image to preload
+     */
+    const preloadImage = (url: string): Promise<void> => {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.src = url;
+            img.onload = () => resolve();
+            img.onerror = () => reject();
+        });
+    };
+
+    /**
+     * Handles farm selection and loads associated zones with images
+     * @param farm - The selected farm object
+     */
+    const handleFarmSelect = async (farm: Farm) => {
+        setIsLoadingZones(true);
+        setZones([]); // Clear current zones immediately
+        setSelectedFarm(farm);
+
+        try {
+            const farmZones = farm.zones || [];
+            setZones(farmZones.map(zone => ({ ...zone, imageLoaded: false })));
+
+            // Preload all images concurrently
+            await Promise.all(
+                farmZones
+                    .filter(zone => zone.CropImageURL)
+                    .map(async (zone) => {
+                        try {
+                            await preloadImage(zone.CropImageURL);
+                            setZones(current =>
+                                current.map(z =>
+                                    z.id === zone.id ? { ...z, imageLoaded: true } : z
+                                )
+                            );
+                        } catch (error) {
+                            console.error(`Failed to load image for zone ${zone.id}:`, error);
+                        }
+                    })
+            );
+        } catch (error) {
+            console.error('Error switching farms:', error);
+        } finally {
+            setIsLoadingZones(false);
+        }
+    };
+
+    /**
+     * Initiates the irrigation control confirmation dialog
+     * @param action - The irrigation action ('start' or 'stop')
+     */
+    const handleIrrigationControl = async (action: 'start' | 'stop') => {
+        setConfirmationDialog({ isOpen: true, action });
+    };
+
+    /**
+     * Executes the confirmed irrigation action
+     */
+    const executeIrrigation = async () => {
+        if (!confirmationDialog.action) return;
+
+        setIsLoading(true);
+        try {
+            const idToken = await fetchToken();
+            if (!idToken || !selectedFarm || !selectedZone) return;
+
+            await axios.post(
+                `https://vuor0sdlpf.execute-api.us-east-1.amazonaws.com/managerDashboard/Farms/${selectedFarm.id}/Zones/${selectedZone.id}/irrigation`,
+                { action: confirmationDialog.action },
+                { headers: { Authorization: `Bearer ${idToken}` } }
+            );
+
+            alert(`Irrigation ${confirmationDialog.action}ed for ${selectedZone.name}`);
+        } catch (error) {
+            console.error('Error controlling irrigation:', error);
+            alert('Failed to control irrigation');
+        } finally {
+            setIsLoading(false);
+            setConfirmationDialog({ isOpen: false, action: null });
+        }
+    };
+
+    const handleImageLoad = (zoneId: string) => {
+        setZones(current =>
+            current.map(z =>
+                z.id === zoneId ? { ...z, imageLoaded: true } : z
+            )
+        );
+    };
+
+    const handleZoneSelect = (zone: Zone) => {
+        setSelectedZone(zone);
+        setIsPopupVisible(true);
+    };
+    return (
+        <Authenticator>
+            {({ signOut }) => (
+                <div className='flex-1 overflow-auto relative z-10'>
+                    <Header title='Dashboard'/>
+                    <main className='max-w-7xl mx-auto py-6 px-4 lg:px-8'>
+                        {/* STATS */}
+                        <motion.div
+                            className='grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mb-8'
+                            initial={{opacity: 0, y: 20}}
+                            animate={{opacity: 1, y: 0}}
+                            transition={{duration: 1}}
+                        >
+                            <StatCard name='Total Recommendations' icon={Droplet} value='12345' color='#6366F1'/>
+                            <StatCard name='Total Farms' icon={House} value='1234' color='#8B5CF6'/>
+                            <StatCard name='Total Crops' icon={TreePine} value='11' color='#EC4899'/>
+                            <StatCard name='Weather' icon={Cloud} value='12.5°C' color='#10B981'/>
+                        </motion.div>
+
+                        {/*    Test*/}
+
+                        <motion.div
+                            className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8 m-auto"
+                            initial={{opacity: 0, y: 20}}
+                            animate={{opacity: 1, y: 0}}
+                            transition={{delay: 0.2}}
+                        >
+                            <div>
+                                Registered Farms
+                            </div>
+                            <div style={{padding: '20px'}}>
+                                <div
+                                    style={{
+                                        display: 'grid',
+                                        gridTemplateColumns: 'repeat(3, 1fr)',
+                                        gap: '10px',
+                                        marginBottom: '20px',
                                     }}
-                                />
-                            ) : (
-                                <p>No Image</p>
-                            )}
-                            <button
-                                onClick={() => handleZoneAction(zone)}
-                                style={{
-                                  padding: '10px',
-                                  borderRadius: '5px',
-                                  border: '1px solid #ccc',
-                                  backgroundColor: '#00BFA6',
-                                  color: '#fff',
-                                  cursor: 'pointer',
-                                }}
-                            >
-                              {zone.name}
-                            </button>
-                          </div>
-                      ))}
-                    </div>
+                                >
+                                    {farms.map((farm) => (
+                                        <button
+                                            key={farm.id}
+                                            onClick={() => handleFarmSelect(farm)}
+                                            className={`bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 ${selectedFarm?.id === farm.id ? 'bg-blue-500 text-white' : ''}`}
+                                            style={{
+                                                backgroundImage: `url('https://albilad.s3.me-south-1.amazonaws.com/images/news/2022/07/11/thumbnails/600x314/f11231809.jpg')`,
+                                                backgroundSize: 'cover',
+                                                backgroundPosition: 'center',
+                                                cursor: 'pointer',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'center',
+                                                fontSize: '16px',
+                                                textAlign: 'center',
+                                                transition: 'background-color 0.3s ease',
+                                                height: '200px', // Fixed height
+                                                minHeight: '200px', // Minimum height for smaller screens
+                                                maxHeight: '250px', // Max height to prevent it from growing too large
+                                            }}
+                                        >
+                                            {farm.name}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {selectedFarm && (
+                                    <div style={{display: 'flex', gap: '20px', justifyContent: 'center'}}>
+                                        {isLoadingZones ? (
+                                            <div style={{
+                                                padding: '20px',
+                                                color: '#666',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                gap: '10px'
+                                            }}>
+                                                <div style={{
+                                                    width: '20px',
+                                                    height: '20px',
+                                                    border: '2px solid #00BFA6',
+                                                    borderTopColor: 'transparent',
+                                                    borderRadius: '50%',
+                                                    animation: 'spin 1s linear infinite'
+                                                }}/>
+                                                Loading zones...
+                                            </div>
+                                        ) : (
+                                            zones.map(zone => (
+                                                <ZoneCard
+                                                    key={zone.id}
+                                                    zone={zone}
+                                                    onZoneSelect={handleZoneSelect}
+                                                    onImageLoad={handleImageLoad}
+                                                />
+                                            ))
+                                        )}
+                                    </div>
+                                )}
+
+                                {isPopupVisible && selectedZone && (
+                                    <>
+                                        <div style={{
+                                            position: 'fixed',
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            bottom: 0,
+                                            backgroundColor: 'rgba(0,0,0,0.5)',
+                                            zIndex: 999
+                                        }} onClick={() => setIsPopupVisible(false)}/>
+                                        <IrrigationPopup
+                                            zone={selectedZone}
+                                            isLoading={isLoading}
+                                            activeTab={activeTab}
+                                            onClose={() => setIsPopupVisible(false)}
+                                            onTabChange={setActiveTab}
+                                            onIrrigationControl={handleIrrigationControl}
+                                        />
+                                    </>
+                                )}
+
+                                {confirmationDialog.isOpen && (
+                                    <>
+                                        <div style={{
+                                            position: 'fixed',
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            bottom: 0,
+                                            backgroundColor: 'rgba(0,0,0,0.5)',
+                                            zIndex: 1000
+                                        }} onClick={() => setConfirmationDialog({isOpen: false, action: null})}/>
+                                        <ConfirmationDialog
+                                            isLoading={isLoading}
+                                            action={confirmationDialog.action}
+                                            zoneName={selectedZone?.name}
+                                            onConfirm={executeIrrigation}
+                                            onCancel={() => setConfirmationDialog({isOpen: false, action: null})}
+                                        />
+                                    </>
+                                )}
+                            </div>
+                        </motion.div>
+
+                    </main>
+                </div>
+
                 )}
-              </div>
-            </div>
-        )}
-      </Authenticator>
-  );
+        </Authenticator>
+    )
+        ;
 };
+
+const styleSheet = document.createElement('style');
+styleSheet.textContent = `
+@keyframes spin {
+    to
+    {
+        transform: rotate(360
+        deg
+    )
+        ;
+    }
+}
+`;
+document.head.appendChild(styleSheet);
 
 export default Dashboard;
