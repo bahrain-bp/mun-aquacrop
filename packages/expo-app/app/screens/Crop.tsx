@@ -64,6 +64,24 @@ const Crop: React.FC = () => {
         // Add more locations as needed...
     ];
 
+    //retrieve language selected
+    useEffect(() => {
+        const loadLanguage = async () => {
+          try {
+            const savedLanguage = await AsyncStorage.getItem('language');
+            const activeLanguage = savedLanguage || 'en'; // Default to English if no preference exists
+            setLanguage(activeLanguage);
+            i18n.locale = activeLanguage;
+          } catch (error) {
+            console.error("Error loading language:", error);
+            setLanguage('en'); // Fallback to English on error
+            i18n.locale = 'en';
+          }
+        };
+      
+        loadLanguage();
+      }, []);
+
     const growthStages: GrowthStageOption[] = [
         {
             label: i18n.t('s1'),
@@ -332,23 +350,7 @@ const Crop: React.FC = () => {
         
     // testing
 
-    //retrieve language selected
-    useEffect(() => {
-        const loadLanguage = async () => {
-          try {
-            const savedLanguage = await AsyncStorage.getItem('language');
-            const activeLanguage = savedLanguage || 'en'; // Default to English if no preference exists
-            setLanguage(activeLanguage);
-            i18n.locale = activeLanguage;
-          } catch (error) {
-            console.error("Error loading language:", error);
-            setLanguage('en'); // Fallback to English on error
-            i18n.locale = 'en';
-          }
-        };
-      
-        loadLanguage();
-      }, []);
+    
     // testing end
 
     return (
