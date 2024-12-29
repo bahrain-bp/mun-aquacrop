@@ -286,6 +286,8 @@ const Crop: React.FC = () => {
         let recommendationParams: any = {
             // Data from the previous page
             title: nameEN,
+            nameEN: nameEN,
+            nameAR:nameAR,
             imageSource: ImageURL,
             kcForCrop: cropKC,
             // New data from this page

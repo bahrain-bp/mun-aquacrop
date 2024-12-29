@@ -2,8 +2,11 @@
 import React from 'react';
 import { Stack } from 'expo-router';
 import i18n from './i18n'; // Import the shared i18n instance
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Layout() {
+
+  
   return (
     <Stack>
       {/* Define the main tab navigator */}

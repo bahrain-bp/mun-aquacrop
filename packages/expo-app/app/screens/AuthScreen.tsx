@@ -1,10 +1,11 @@
 // app/screens/AuthScreen.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
 import { storage } from '../utils/storage';
 import i18n from '../i18n'; // Import the shared i18n instance
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 import CountrySelect from '../components/CountrySelect';
@@ -25,7 +26,26 @@ const AuthScreen = () => {
   const [countryFlag, setCountryFlag] = useState('🇧🇭');
   const [countryPickerVisible, setCountryPickerVisible] = useState(false);
   const router = useRouter();
+  const [language, setLanguage] = useState(null);
 
+  // Load the language preference
+  useEffect(() => {
+    const loadLanguage = async () => {
+      try {
+        const savedLanguage = await AsyncStorage.getItem('language');
+        const activeLanguage = savedLanguage || 'en'; // Default to English if no preference exists
+        setLanguage(activeLanguage);
+        i18n.locale = activeLanguage;
+      } catch (error) {
+        console.error("Error loading language:", error);
+        setLanguage('en'); // Fallback to English on error
+        i18n.locale = 'en';
+      }
+    };
+
+    loadLanguage();
+  }, []);
+  
   const onSelectCountry = (country: { code: string; dial_code: string; flag: string }) => {
     setCountryCode(country.code);
     setCallingCode(country.dial_code);

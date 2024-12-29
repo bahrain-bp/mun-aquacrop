@@ -51,20 +51,20 @@ const Recommendation: React.FC = () => {
     //retrieve language selected
     useEffect(() => {
         const loadLanguage = async () => {
-          try {
-            const savedLanguage = await AsyncStorage.getItem('language');
-            const activeLanguage = savedLanguage || 'en'; // Default to English if no preference exists
-            setLanguage(activeLanguage);
-            i18n.locale = activeLanguage;
-          } catch (error) {
-            console.error("Error loading language:", error);
-            setLanguage('en'); // Fallback to English on error
-            i18n.locale = 'en';
-          }
+            try {
+                const savedLanguage = await AsyncStorage.getItem('language');
+                const activeLanguage = savedLanguage || 'en'; // Default to English if no preference exists
+                setLanguage(activeLanguage);
+                i18n.locale = activeLanguage;
+            } catch (error) {
+                console.error("Error loading language:", error);
+                setLanguage('en'); // Fallback to English on error
+                i18n.locale = 'en';
+            }
         };
-      
+    
         loadLanguage();
-      }, []);
+    }, []);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -96,7 +96,7 @@ const Recommendation: React.FC = () => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>{i18n.t('rec')} {language === 'ar' ? nameAR : nameEN}</Text>
+            <Text style={styles.title}>{i18n.t('rec')}{language === 'ar' ? nameAR : nameEN}</Text>
             {imageSource && <Image source={{ uri: imageSource }} style={styles.image} />}
 
             {isLoading ? (
