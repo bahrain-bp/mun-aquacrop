@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, ScrollView, Image, TouchableOpacity, useWindowDimensions, Button } from 'react-native';
+import { Text, View, StyleSheet, ScrollView, Image, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { storage } from '../utils/storage';
 import AWS from 'aws-sdk';
 import i18n from '../i18n'; // Import the shared i18n instance
+import { MaterialIcons } from '@expo/vector-icons';
+import SettingsPopup from '../components/SettingsPopup';
+import { useTheme, themes } from '../components/ThemeContext';
 
 const API_URL = process.env.EXPO_PUBLIC_PROD_API_URL;
 
@@ -49,6 +52,9 @@ const Index: React.FC = () => {
     const [userName, setUserName] = useState<string>('Guest');
     const { width } = useWindowDimensions();
     const router = useRouter();
+    const [isSettingsVisible, setIsSettingsVisible] = useState(false);
+    const { isDarkMode } = useTheme();
+    const theme = isDarkMode ? themes.dark : themes.light;
 
     useEffect(() => {
         const fetchData = async () => {
@@ -96,57 +102,59 @@ const Index: React.FC = () => {
         fetchData();
     }, []);
 
-    const handleSignOut = async () => {
-        try {
-            // Clear tokens from storage
-            await storage.removeItem('idToken');
-            await storage.removeItem('accessToken');
-            // Navigate back to auth screen
-            router.replace('/');
-        } catch (error) {
-            console.error('Error signing out:', error);
-        }
+    const handleSettings = () => {
+        setIsSettingsVisible(true);
     };
 
     return (
-        <ScrollView 
-            style={styles.container} 
-            contentContainerStyle={styles.contentContainer}
-            showsVerticalScrollIndicator={false}
-        >
-            <View style={styles.header}>
-                <View style={styles.welcomeContainer}>
-                    <Text style={styles.greetingText}>Welcome</Text>
-                    <Text style={styles.welcomeText}>{userName} 👋</Text>
-                </View>
-            </View>
-
-            <View style={styles.mainContent}>
-                <Text style={styles.sectionTitle}>{i18n.t('home')}</Text>
-                
-                <View style={styles.cropSection}>
-                    <UploadImageCard />
-                    {crops.length > 0 ? (
-                        <View style={styles.cropGrid}>
-                            {crops.map((crop, index) => (
-                                <Card key={index} CropData={crop} />
-                            ))}
+        <>
+            <ScrollView 
+                style={[styles.container, { backgroundColor: theme.background }]} 
+                contentContainerStyle={styles.contentContainer}
+                showsVerticalScrollIndicator={false}
+            >
+                <View style={styles.header}>
+                    <View style={[styles.welcomeContainer, { 
+                        backgroundColor: theme.card,
+                        shadowColor: isDarkMode ? '#000' : '#666'
+                    }]}>
+                        <View style={styles.headerRow}>
+                            <View>
+                                <Text style={[styles.greetingText, { color: theme.subText }]}>Welcome</Text>
+                                <Text style={[styles.welcomeText, { color: theme.text }]}>{userName} 👋</Text>
+                            </View>
+                            <TouchableOpacity 
+                                onPress={handleSettings} 
+                                style={[styles.settingsButton, { backgroundColor: theme.border }]}
+                            >
+                                <MaterialIcons name="settings" size={24} color={theme.text} />
+                            </TouchableOpacity>
                         </View>
-                    ) : (
-                        <Text style={styles.loadingText}>{i18n.t('loading')}</Text>
-                    )}
+                    </View>
                 </View>
 
-                <View style={styles.signOutContainer}>
-                    <TouchableOpacity 
-                        style={styles.signOutButton}
-                        onPress={handleSignOut}
-                    >
-                        <Text style={styles.signOutButtonText}>Sign Out</Text>
-                    </TouchableOpacity>
+                <View style={styles.mainContent}>
+                    <Text style={[styles.sectionTitle, { color: theme.text }]}>{i18n.t('home')}</Text>
+                    
+                    <View style={styles.cropSection}>
+                        <UploadImageCard />
+                        {crops.length > 0 ? (
+                            <View style={styles.cropGrid}>
+                                {crops.map((crop, index) => (
+                                    <Card key={index} CropData={crop} />
+                                ))}
+                            </View>
+                        ) : (
+                            <Text style={[styles.loadingText, { color: theme.subText }]}>{i18n.t('loading')}</Text>
+                        )}
+                    </View>
                 </View>
-            </View>
-        </ScrollView>
+            </ScrollView>
+            <SettingsPopup 
+                visible={isSettingsVisible} 
+                onClose={() => setIsSettingsVisible(false)} 
+            />
+        </>
     );
 };
 
@@ -157,6 +165,8 @@ interface CardProps {
 const Card: React.FC<CardProps> = ({ CropData }) => {
     const { nameEN, nameAR, GrowthStage, kc, CropID, ImageURL } = CropData;
     const router = useRouter();
+    const { isDarkMode } = useTheme();
+    const theme = isDarkMode ? themes.dark : themes.light;
 
     const handlePress = () => {
         router.push({
@@ -174,13 +184,17 @@ const Card: React.FC<CardProps> = ({ CropData }) => {
 
     return (
         <TouchableOpacity onPress={handlePress} style={styles.cardWrapper}>
-            <View style={styles.cardContainer}>
+            <View style={[styles.cardContainer, { 
+                backgroundColor: theme.card, 
+                borderColor: theme.border,
+                shadowColor: theme.shadow
+            }]}>
                 <Image 
                     source={{ uri: ImageURL.S }} 
-                    style={styles.image}
+                    style={[styles.image, { backgroundColor: theme.border }]}
                     resizeMode="cover"
                 />
-                <Text style={styles.cardTitle}>{nameEN.S}</Text>
+                <Text style={[styles.cardTitle, { color: theme.text }]}>{nameEN.S}</Text>
             </View>
         </TouchableOpacity>
     );
@@ -188,18 +202,26 @@ const Card: React.FC<CardProps> = ({ CropData }) => {
 
 const UploadImageCard: React.FC = () => {
     const router = useRouter();
+    const { isDarkMode } = useTheme();
+    const theme = isDarkMode ? themes.dark : themes.light;
 
     return (
         <TouchableOpacity 
-            style={styles.uploadCard} 
+            style={[styles.uploadCard, { 
+                backgroundColor: theme.card, 
+                borderColor: theme.border,
+                shadowColor: theme.shadow
+            }]}
             onPress={() => router.push({ pathname: '/screens/CropImage' })}
         >
             <View style={styles.uploadContent}>
                 <View>
-                    <Text style={styles.uploadTitle}>Upload Image</Text>
-                    <Text style={styles.uploadSubtitle}>Analyze your crop images</Text>
+                    <Text style={[styles.uploadTitle, { color: theme.text }]}>Upload Image</Text>
+                    <Text style={[styles.uploadSubtitle, { color: theme.subText }]}>
+                        Analyze your crop images
+                    </Text>
                 </View>
-                <View style={styles.uploadIconContainer}>
+                <View style={[styles.uploadIconContainer, { backgroundColor: theme.border }]}>
                     <Text style={styles.uploadIcon}>📸</Text>
                 </View>
             </View>
@@ -209,7 +231,6 @@ const UploadImageCard: React.FC = () => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#202124', // Slightly lighter dark background
         flex: 1,
     },
     contentContainer: {
@@ -227,7 +248,6 @@ const styles = StyleSheet.create({
         marginBottom: 24,
     },
     sectionTitle: {
-        color: '#FFFFFF',
         fontSize: 20,
         fontWeight: '600',
         marginBottom: 24,
@@ -235,26 +255,21 @@ const styles = StyleSheet.create({
     },
     welcomeContainer: {
         padding: 20,
-        backgroundColor: '#2D2F31', // Lighter card background
         borderRadius: 15,
-        shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
         elevation: 5,
     },
     greetingText: {
-        color: '#B4B8C0', // Brighter secondary text
         fontSize: 16,
         marginBottom: 8,
     },
     welcomeText: {
-        color: '#FFFFFF',
         fontSize: 28,
         fontWeight: 'bold',
     },
     loadingText: {
-        color: '#9DA3B4',
         fontSize: 16,
         textAlign: 'center',
     },
@@ -269,32 +284,34 @@ const styles = StyleSheet.create({
         marginBottom: 12,
     },
     cardContainer: {
-        backgroundColor: '#2D2F31', // Lighter card background
         borderRadius: 12,
         overflow: 'hidden',
         borderWidth: 1,
-        borderColor: '#404144', // Lighter border
         height: 180, // Increased height for better proportion
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
     },
     image: {
         width: '100%',
         height: 140, // Increased height for better image display
-        backgroundColor: '#353839',
     },
     cardTitle: {
         fontSize: 14,
         fontWeight: '600',
-        color: '#FFFFFF',
         textAlign: 'center',
         padding: 10,
     },
     uploadCard: {
-        backgroundColor: '#2D2F31', // Lighter card background
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: '#404144', // Lighter border
         padding: 16,
         marginBottom: 16,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
     },
     uploadContent: {
         flexDirection: 'row',
@@ -304,43 +321,30 @@ const styles = StyleSheet.create({
     uploadTitle: {
         fontSize: 18,
         fontWeight: '600',
-        color: '#FFFFFF',
         marginBottom: 4,
     },
     uploadSubtitle: {
-        color: '#B4B8C0', // Brighter secondary text
         fontSize: 14,
     },
     uploadIconContainer: {
-        backgroundColor: '#404144', // Lighter icon background
         padding: 12,
         borderRadius: 12,
     },
     uploadIcon: {
         fontSize: 24,
     },
-    signOutContainer: {
-        alignItems: 'center',
-        marginTop: 16,
-        marginBottom: 24,
-    },
-    signOutButton: {
-        backgroundColor: '#2D2F31', // Lighter button background
-        paddingVertical: 12,
-        paddingHorizontal: 32,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: '#FF4B4B',
-        minWidth: 140,
-    },
-    signOutButtonText: {
-        color: '#FF4B4B',
-        fontSize: 16,
-        fontWeight: '600',
-        textAlign: 'center',
-    },
     cropSection: {
         gap: 16,
+    },
+    headerRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center', 
+    },
+    settingsButton: {
+        padding: 8,
+        borderRadius: 20,
+        alignSelf: 'center',
     },
 });
 

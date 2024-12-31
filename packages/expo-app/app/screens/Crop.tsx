@@ -20,6 +20,7 @@ import DatePicker from 'react-datepicker'; // For Web
 import 'react-datepicker/dist/react-datepicker.css'; // Required CSS for react-datepicker on Web
 import CustomRadioButton from '@/components/CustomRadioButton'; // Ensure the path is correct
 import i18n from '../i18n'; // Import the shared i18n instance
+import { useTheme, themes } from '../components/ThemeContext';
 
 // Testing
 import {SelectList} from 'react-native-dropdown-select-list'
@@ -62,6 +63,8 @@ const Crop: React.FC = () => {
     const [selectedLocationValue, setSelectedLocationValue] = useState<string>(""); // Initialize to empty string
     const [isAutoDisabled, setIsAutoDisabled] = useState<boolean>(false); // To disable 'auto' if location fetching fails
     const [showDatePicker, setShowDatePicker] = useState(false);
+    const { isDarkMode } = useTheme();
+    const theme = isDarkMode ? themes.dark : themes.light;
 
     const bahrainLocations: LocationOption[] = [
         {label: "Manama", value: "manama", latitude: 26.2041, longitude: 50.5860},
@@ -348,25 +351,33 @@ const Crop: React.FC = () => {
 
     return (
         <ScrollView 
-            style={styles.container} 
+            style={[styles.container, { backgroundColor: theme.background }]} 
             contentContainerStyle={styles.contentContainer}
             showsVerticalScrollIndicator={false}
         >
-            <View style={styles.header}>
-                <Text style={styles.title}>{nameEN}</Text>
+            <View style={[styles.header, { 
+                backgroundColor: theme.card,
+                shadowColor: theme.shadow 
+            }]}>
+                <Text style={[styles.title, { color: theme.text }]}>{nameEN}</Text>
                 {ImageURL ? (
                     <Image source={{uri: ImageURL}} style={styles.image}/>
                 ) : (
-                    <View style={styles.placeholderImage}>
-                        <Text style={styles.placeholderText}>No Image Available</Text>
+                    <View style={[styles.placeholderImage, { backgroundColor: theme.border }]}>
+                        <Text style={[styles.placeholderText, { color: theme.subText }]}>
+                            No Image Available
+                        </Text>
                     </View>
                 )}
             </View>
 
             <View style={styles.mainContent}>
                 {/* Location Selection Section */}
-                <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>{i18n.t('chooseloc')}</Text>
+                <View style={[styles.section, { 
+                    backgroundColor: theme.card,
+                    borderColor: theme.border 
+                }]}>
+                    <Text style={[styles.sectionTitle, { color: theme.text }]}>{i18n.t('chooseloc')}</Text>
                     <View style={styles.radioButtonsRow}>
                         <CustomRadioButton
                             label={i18n.t('bylocation')}
@@ -390,17 +401,20 @@ const Crop: React.FC = () => {
                                 }}
                                 data={locationDataForSelect}
                                 placeholder="Select your location in Bahrain"
-                                boxStyles={styles.selectBox}
-                                dropdownStyles={styles.dropdown}
-                                inputStyles={styles.selectInput}
-                                dropdownTextStyles={styles.dropdownText}
+                                boxStyles={[styles.selectBox, { backgroundColor: theme.border }]}
+                                dropdownStyles={[styles.dropdown, { backgroundColor: theme.border }]}
+                                inputStyles={[styles.selectInput, { color: theme.text }]}
+                                dropdownTextStyles={[styles.dropdownText, { color: theme.text }]}
                             />
                         </View>
                     )}
                 </View>
 
                 {/* Growth Stage Selection Section */}
-                <View style={styles.section}>
+                <View style={[styles.section, { 
+                    backgroundColor: theme.card,
+                    borderColor: theme.border 
+                }]}>
                     <View style={styles.radioButtonsRow}>
                         <CustomRadioButton
                             label={i18n.t('datep')}
@@ -418,10 +432,13 @@ const Crop: React.FC = () => {
                     {selectedOption === 'datePlanted' && (
                         <View style={styles.datePickerContainer}>
                             <TouchableOpacity 
-                                style={styles.dateButton}
+                                style={[styles.dateButton, { 
+                                    backgroundColor: theme.border,
+                                    borderColor: theme.border 
+                                }]}
                                 onPress={handleOpenDatePicker}
                             >
-                                <Text style={styles.dateButtonText}>
+                                <Text style={[styles.dateButtonText, { color: theme.text }]}>
                                     {selectedDate ? selectedDate.toLocaleDateString() : 'Select Date'}
                                 </Text>
                             </TouchableOpacity>
@@ -464,11 +481,17 @@ const Crop: React.FC = () => {
                                     key={stage.value}
                                     style={[
                                         styles.stageBox,
-                                        growthStage === stage.value && styles.selectedStageBox
+                                        { backgroundColor: theme.border, borderColor: theme.border },
+                                        growthStage === stage.value && [
+                                            styles.selectedStageBox,
+                                            { borderColor: theme.accent }
+                                        ]
                                     ]}
                                     onPress={() => handleStageSelection(stage.value)}
                                 >
-                                    <Text style={styles.stageLabel}>{stage.label}</Text>
+                                    <Text style={[styles.stageLabel, { color: theme.text }]}>
+                                        {stage.label}
+                                    </Text>
                                     <Image source={{uri: stage.imageSource}} style={styles.stageImage}/>
                                     <CustomRadioButton
                                         label=""
@@ -485,12 +508,19 @@ const Crop: React.FC = () => {
                 <TouchableOpacity
                     style={[
                         styles.calculateButton,
-                        (!isButtonEnabled || !isLocationAvailable) && styles.disabledButton
+                        (!isButtonEnabled || !isLocationAvailable) 
+                            ? [styles.disabledButton, { backgroundColor: theme.border, opacity: 0.7 }]
+                            : { backgroundColor: '#4CAF50' }
                     ]}
                     onPress={navigateToRecommendation}
                     disabled={!isButtonEnabled || !isLocationAvailable}
                 >
-                    <Text style={styles.calculateButtonText}>Calculate Water Need</Text>
+                    <Text style={[
+                        styles.calculateButtonText, 
+                        { color: (!isButtonEnabled || !isLocationAvailable) ? theme.subText : '#FFFFFF' }
+                    ]}>
+                        Calculate Water Need
+                    </Text>
                 </TouchableOpacity>
             </View>
         </ScrollView>
@@ -499,7 +529,6 @@ const Crop: React.FC = () => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#202124',
         flex: 1,
     },
     contentContainer: {
@@ -508,10 +537,8 @@ const styles = StyleSheet.create({
     header: {
         alignItems: 'center',
         padding: 20,
-        backgroundColor: '#2D2F31',
         borderRadius: 15,
         margin: 16,
-        shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
@@ -521,17 +548,14 @@ const styles = StyleSheet.create({
         padding: 16,
     },
     section: {
-        backgroundColor: '#2D2F31',
         borderRadius: 12,
         padding: 16,
         marginBottom: 16,
         borderWidth: 1,
-        borderColor: '#404144',
     },
     title: {
         fontSize: 28,
         fontWeight: 'bold',
-        color: '#FFFFFF',
         marginBottom: 16,
     },
     image: {
@@ -543,17 +567,14 @@ const styles = StyleSheet.create({
         width: 200,
         height: 200,
         borderRadius: 12,
-        backgroundColor: '#404144',
         justifyContent: 'center',
         alignItems: 'center',
     },
     placeholderText: {
-        color: '#B4B8C0',
     },
     sectionTitle: {
         fontSize: 18,
         fontWeight: '600',
-        color: '#FFFFFF',
         marginBottom: 16,
         textAlign: 'center',
     },
@@ -567,57 +588,44 @@ const styles = StyleSheet.create({
         marginTop: 16,
     },
     selectBox: {
-        backgroundColor: '#404144',
-        borderColor: '#505259',
     },
     selectInput: {
-        color: '#FFFFFF',
     },
     dropdown: {
-        backgroundColor: '#404144',
-        borderColor: '#505259',
     },
     dropdownText: {
-        color: '#FFFFFF',
     },
     datePickerContainer: {
         alignItems: 'center',
         marginTop: 16,
     },
     dateButton: {
-        backgroundColor: '#404144',
         paddingVertical: 12,
         paddingHorizontal: 24,
         borderRadius: 8,
         borderWidth: 1,
-        borderColor: '#505259',
         marginTop: 8,
         minWidth: 200,
         alignItems: 'center',
     },
     dateButtonText: {
-        color: '#FFFFFF',
         fontSize: 16,
     },
     growthStagesScroll: {
         marginTop: 16,
     },
     stageBox: {
-        backgroundColor: '#404144',
         borderRadius: 12,
         padding: 16,
         marginRight: 12,
         width: 160,
         alignItems: 'center',
         borderWidth: 1,
-        borderColor: '#505259',
     },
     selectedStageBox: {
-        borderColor: '#4CAF50',
         borderWidth: 2,
     },
     stageLabel: {
-        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '600',
         marginBottom: 8,
@@ -629,20 +637,22 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     calculateButton: {
-        backgroundColor: '#4CAF50',
         paddingVertical: 16,
         paddingHorizontal: 32,
         borderRadius: 12,
         alignItems: 'center',
         marginTop: 24,
         marginBottom: 32,
+        elevation: 3,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
     },
     disabledButton: {
-        backgroundColor: '#404144',
         opacity: 0.7,
     },
     calculateButtonText: {
-        color: '#FFFFFF',
         fontSize: 16,
         fontWeight: '600',
     },
