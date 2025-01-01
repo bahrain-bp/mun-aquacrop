@@ -38,7 +38,7 @@ const parseCrops = (data: any): Crop[] => {
         GrowthStage: item.GrowthStage,
         kc: item.kc,
         CropID: item.CropID,
-        ImageURL: item.ImageURL
+        ImageURL: item.ImageURL,
     }));
 };
 
@@ -159,27 +159,34 @@ const Index: React.FC = () => {
 };
 
 interface CardProps {
-    CropData: Crop;
+    CropData?: Crop;
+    title?: string;
+    onPress?: () => void;
+    isUploadCard?: boolean; // Flag to identify the Upload Image card
 }
 
-const Card: React.FC<CardProps> = ({ CropData }) => {
-    const { nameEN, nameAR, GrowthStage, kc, CropID, ImageURL } = CropData;
+const Card: React.FC<CardProps> = ({ CropData, title, onPress, isUploadCard }) => {
+    const { nameEN, nameAR, GrowthStage, kc, CropID, ImageURL } = CropData || {};
     const router = useRouter();
     const { isDarkMode } = useTheme();
     const theme = isDarkMode ? themes.dark : themes.light;
 
     const handlePress = () => {
-        router.push({
-            pathname: '/screens/Crop',
-            params: {
-                nameEN: nameEN.S,
-                nameAR: nameAR.S,
-                GrowthStage: JSON.stringify(GrowthStage),
-                kc: JSON.stringify(kc),
-                CropID: CropID.S,
-                ImageURL: ImageURL.S,
-            },
-        });
+        if (onPress) {
+            onPress(); // If onPress exists, execute the passed handler
+        } else {
+            router.push({
+                pathname: '/screens/Crop',
+                params: {
+                    nameEN: nameEN?.S,
+                    nameAR: nameAR?.S,
+                    GrowthStage: JSON.stringify(GrowthStage),
+                    kc: JSON.stringify(kc),
+                    CropID: CropID?.S,
+                    ImageURL: ImageURL?.S,
+                },
+            });
+        }
     };
 
     return (
@@ -345,6 +352,11 @@ const styles = StyleSheet.create({
         padding: 8,
         borderRadius: 20,
         alignSelf: 'center',
+    },
+    uploadCardText: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: 'bold',
     },
 });
 
