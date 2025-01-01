@@ -219,7 +219,7 @@ const UploadImageCard: React.FC = () => {
                 borderColor: theme.border,
                 shadowColor: theme.shadow
             }]}
-            onPress={() => router.push({ pathname: '/screens/CropImage' })}
+            onPress={() => router.push({ pathname: '/screens/UploadCrop' })}
         >
             <View style={styles.uploadContent}>
                 <View>

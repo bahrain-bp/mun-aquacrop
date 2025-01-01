@@ -1,7 +1,7 @@
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
-import { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button, StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
-import { Ionicons } from 'react-native-vector-icons'; // For icon support
+import Ionicons from 'react-native-vector-icons/Ionicons'; // For icon support
 
 const UploadCrop: React.FC = () => {
     const [facing, setFacing] = useState<CameraType>('back');
