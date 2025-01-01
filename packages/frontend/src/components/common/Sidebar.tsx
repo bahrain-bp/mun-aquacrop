@@ -18,7 +18,8 @@ const ALL_SIDEBAR_ITEMS =[
         icon: MapPinHouse, 
         color: '#6EE7B7', 
         path:'/Farms',
-        adminRequired: false
+        adminRequired: false,
+        hideFromAdmin: true
     },
     {
         name: 'Crops', 
@@ -73,7 +74,10 @@ const Sidebar: React.FC = () => {
         return null; // or a loading spinner
     }
 
-    const visibleItems = ALL_SIDEBAR_ITEMS.filter(item => !item.adminRequired || isAdmin);
+    const visibleItems = ALL_SIDEBAR_ITEMS.filter(item => 
+        (!item.adminRequired || isAdmin) && 
+        !(item.hideFromAdmin && isAdmin)
+    );
 
     return (
         <motion.div

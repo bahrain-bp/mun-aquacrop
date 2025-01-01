@@ -35,6 +35,7 @@ const Dashboard: React.FC = () => {
     const [activeTab, setActiveTab] = useState('manual');
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingZones, setIsLoadingZones] = useState(false);
+    const [isLoadingFarms, setIsLoadingFarms] = useState(true);  
     const [confirmationDialog, setConfirmationDialog] = useState<{
         isOpen: boolean;
         action: 'start' | 'stop' | null;
@@ -59,6 +60,7 @@ const Dashboard: React.FC = () => {
      */
     useEffect(() => {
         const fetchFarmsAndZones = async () => {
+            setIsLoadingFarms(true);  
             try {
                 const idToken = await fetchToken();
                 if (!idToken) {
@@ -101,6 +103,8 @@ const Dashboard: React.FC = () => {
                 setFarms(fetchedFarms); // Update farms with prefetched zones
             } catch (error) {
                 console.error('Error fetching farms and zones:', error);
+            } finally {
+                setIsLoadingFarms(false); 
             }
         };
 
@@ -251,68 +255,113 @@ const Dashboard: React.FC = () => {
                                 Registered Farms
                             </div>
                             <div style={{padding: '20px'}}>
-                                <div
-                                    style={{
-                                        display: 'grid',
-                                        gridTemplateColumns: 'repeat(3, 1fr)',
-                                        gap: '10px',
-                                        marginBottom: '20px',
-                                    }}
-                                >
-                                    {farms.map((farm) => (
-                                        <button
-                                            key={farm.id}
-                                            onClick={() => handleFarmSelect(farm)}
-                                            className={`bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 ${selectedFarm?.id === farm.id ? 'bg-blue-500 text-white' : ''}`}
-                                            style={{
-                                                backgroundImage: `url('https://albilad.s3.me-south-1.amazonaws.com/images/news/2022/07/11/thumbnails/600x314/f11231809.jpg')`,
-                                                backgroundSize: 'cover',
-                                                backgroundPosition: 'center',
-                                                cursor: 'pointer',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'center',
-                                                fontSize: '16px',
-                                                textAlign: 'center',
-                                                transition: 'background-color 0.3s ease',
-                                                height: '200px', // Fixed height
-                                                minHeight: '200px', // Minimum height for smaller screens
-                                                maxHeight: '250px', // Max height to prevent it from growing too large
-                                            }}
-                                        >
-                                            {farm.name}
-                                        </button>
-                                    ))}
-                                </div>
+                                {isLoadingFarms ? (
+                                    <div className="flex items-center justify-center p-8">
+                                        <div className="flex items-center gap-2 text-gray-400">
+                                            <div className="w-6 h-6 border-2 border-teal-400 border-t-transparent rounded-full animate-spin"/>
+                                            <span>Loading farms...</span>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                        {farms.map((farm) => (
+                                            <div
+                                                key={farm.id}
+                                                onClick={() => handleFarmSelect(farm)}
+                                                className={`relative group cursor-pointer rounded-2xl overflow-hidden transition-all duration-500 
+                                                    ${selectedFarm?.id === farm.id 
+                                                        ? 'ring-2 ring-teal-500 shadow-teal-500/20 shadow-lg' 
+                                                        : 'hover:shadow-xl hover:scale-105'}`}
+                                                style={{ height: '220px', borderRadius: '1rem' }}
+                                            >
+                                                {/* Background Image with Overlay */}
+                                                <div 
+                                                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                                                    style={{
+                                                        backgroundImage: `url('https://albilad.s3.me-south-1.amazonaws.com/images/news/2022/07/11/thumbnails/600x314/f11231809.jpg')`,
+                                                    }}
+                                                />
+                                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent"/>
+                                                
+                                                {/* Content */}
+                                                <div className="absolute inset-0 p-6 flex flex-col justify-between">
+                                                    <div className="backdrop-blur-sm bg-white/10 rounded-lg px-3 py-1 self-start">
+                                                        <span className="text-white/90 text-sm font-medium">Farm</span>
+                                                    </div>
+                                                    <div>
+                                                        <h3 className="text-2xl font-bold text-white mb-2">{farm.name}</h3>
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-white/60 text-sm">
+                                                                {farm.zones?.length || 0} Zones
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
 
                                 {selectedFarm && (
-                                    <div style={{display: 'flex', gap: '20px', justifyContent: 'center'}}>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
                                         {isLoadingZones ? (
-                                            <div style={{
-                                                padding: '20px',
-                                                color: '#666',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: '10px'
-                                            }}>
-                                                <div style={{
-                                                    width: '20px',
-                                                    height: '20px',
-                                                    border: '2px solid #00BFA6',
-                                                    borderTopColor: 'transparent',
-                                                    borderRadius: '50%',
-                                                    animation: 'spin 1s linear infinite'
-                                                }}/>
+                                            <div className="flex items-center gap-2 p-4 text-gray-400 col-span-full justify-center">
+                                                <div className="w-5 h-5 border-2 border-teal-400 border-t-transparent rounded-full animate-spin"/>
                                                 Loading zones...
                                             </div>
                                         ) : (
                                             zones.map(zone => (
-                                                <ZoneCard
+                                                <div
                                                     key={zone.id}
-                                                    zone={zone}
-                                                    onZoneSelect={handleZoneSelect}
-                                                    onImageLoad={handleImageLoad}
-                                                />
+                                                    onClick={() => handleZoneSelect(zone)}
+                                                    className="group relative overflow-hidden rounded-2xl cursor-pointer transition-all duration-500 hover:shadow-xl hover:scale-105"
+                                                    style={{ height: '300px' }}
+                                                >
+                                                    {/* Background Image */}
+                                                    <div 
+                                                        className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                                                        style={{
+                                                            backgroundImage: `url(${zone.CropImageURL || 'default-crop-image.jpg'})`,
+                                                        }}
+                                                    />
+                                                    
+                                                    {/* Gradient Overlay */}
+                                                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"/>
+                                                    
+                                                    {/* Content */}
+                                                    <div className="absolute inset-0 p-6 flex flex-col justify-between">
+                                                        <div className="flex justify-between items-start">
+                                                            <div className="backdrop-blur-sm bg-white/10 rounded-lg px-3 py-1">
+                                                                <span className="text-white/90 text-sm font-medium">Zone</span>
+                                                            </div>
+                                                            <span className={`px-3 py-1 rounded-full text-sm backdrop-blur-sm
+                                                                ${zone.irrigationStatus === 'active' 
+                                                                    ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+                                                                    : 'bg-gray-500/20 text-gray-400 border border-gray-500/30'}`}>
+                                                                {zone.irrigationStatus === 'active' ? '● Active' : '○ Inactive'}
+                                                            </span>
+                                                        </div>
+                                                        
+                                                        <div>
+                                                            <h3 className="text-2xl font-bold text-white mb-4">{zone.name}</h3>
+                                                            <button 
+                                                                className="w-full bg-white/10 backdrop-blur-sm hover:bg-white/20 text-white 
+                                                                    py-3 px-4 rounded-xl transition-all duration-300 flex items-center justify-center gap-2
+                                                                    group-hover:bg-teal-500"
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleZoneSelect(zone);
+                                                                }}
+                                                            >
+                                                                <span>Manage Zone</span>
+                                                                <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" 
+                                                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                                                                </svg>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
                                             ))
                                         )}
                                     </div>
@@ -371,19 +420,5 @@ const Dashboard: React.FC = () => {
     )
         ;
 };
-
-const styleSheet = document.createElement('style');
-styleSheet.textContent = `
-@keyframes spin {
-    to
-    {
-        transform: rotate(360
-        deg
-    )
-        ;
-    }
-}
-`;
-document.head.appendChild(styleSheet);
 
 export default Dashboard;
