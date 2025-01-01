@@ -126,6 +126,19 @@ export function ApiStack({stack}: StackContext) {
                 },
             },
 
+            //app upload image (Ai)
+            "POST /Upload/camera": {
+                function: {
+                    handler: "packages/functions/src/GenerateUploadUrl.uploadCameraImage",
+                    environment: {
+                        indexBucket: indexBucket.bucketName,
+                    },
+                    permissions: [indexBucket],
+                },
+                authorizer: "mobileauthApi",
+            },
+
+
             "PUT /update/crop": {
                 function: {
                     handler: "packages/functions/src/AdminDashboard/CropsManager.update",
@@ -275,6 +288,8 @@ export function ApiStack({stack}: StackContext) {
             //   },
             //   authorizer: "adminAuthApi",
             // },
+
+           
 
         },
     });
