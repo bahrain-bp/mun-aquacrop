@@ -143,6 +143,7 @@ const imageResult = new Table(stack, "ImageResult", {
             TotalRecommendations: "number",
             TotalUsers: "number",
             TotalCrops: "number",
+            TotalWaterUsage: "number"
         },
         primaryIndex: { partitionKey: "StatID" },
     });

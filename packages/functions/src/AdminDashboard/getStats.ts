@@ -46,7 +46,8 @@ const initializeStats = async () => {
             "StatID": { S: "MAIN_STATS" },
             "TotalRecommendations": { N: "0" },
             "TotalUsers": { N: totalUsers.toString() },
-            "TotalCrops": { N: totalCrops.toString() }
+            "TotalCrops": { N: totalCrops.toString() },
+            "TotalWaterUsage": { N: "0" }
         }
     };
 
@@ -61,7 +62,20 @@ const initializeStats = async () => {
 
 export const handler = async (event: any) => {
     try {
-        // Get real-time counts
+        // Handle OPTIONS request
+        if (event.httpMethod === 'OPTIONS') {
+            return {
+                statusCode: 200,
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                    "Access-Control-Allow-Methods": "GET, OPTIONS",
+                    "Access-Control-Allow-Headers": "Content-Type,Authorization"
+                },
+                body: ""
+            };
+        }
+
+        // Get current stats
         const [totalUsers, totalCrops] = await Promise.all([
             getTotalUsers(),
             getTotalCrops()
@@ -77,7 +91,7 @@ export const handler = async (event: any) => {
         const command = new GetItemCommand(params);
         let result = await client.send(command);
 
-        // If no stats record exists, initialize one
+        // Initialize if no stats exist
         if (!result.Item) {
             result = { 
                 Item: await initializeStats(),
@@ -85,19 +99,19 @@ export const handler = async (event: any) => {
             };
         }
 
-        const stats = {
-            totalRecommendations: Number(result.Item?.TotalRecommendations?.N || "0"),
-            totalUsers: totalUsers,
-            totalCrops: totalCrops
-        };
-
+        // Return stats
         return {
             statusCode: 200,
             headers: {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*"
             },
-            body: JSON.stringify(stats)
+            body: JSON.stringify({
+                totalRecommendations: Number(result.Item?.TotalRecommendations?.N || "0"),
+                totalUsers,
+                totalCrops,
+                totalWaterUsage: Number(result.Item?.TotalWaterUsage?.N || "0")
+            })
         };
     } catch (error) {
         console.error("Error fetching stats:", error);

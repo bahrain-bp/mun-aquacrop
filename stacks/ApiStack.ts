@@ -307,6 +307,19 @@ export function ApiStack({stack}: StackContext) {
                 
             },
 
+            "POST /adminDashboard/stats/updateWaterUsage": {
+                function: {
+                    handler: "packages/functions/src/AdminDashboard/updateWaterUsage.handler",
+                    environment: {
+                        statsTable: statsTable.tableName,
+                        userTable: userTable.tableName,
+                        cropTable: cropTable.tableName
+                    },
+                    permissions: [statsTable, userTable, cropTable],
+                },
+               
+            },
+
         },
     });
 

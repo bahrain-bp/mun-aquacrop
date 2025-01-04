@@ -1,22 +1,52 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import html2canvas from 'html2canvas';
-import jsPDF from 'jspdf'; // Make sure jsPDF is imported
+import jsPDF from 'jspdf';
+import axios from 'axios';
 import Header from "../components/common/Header.tsx";
 import RecommendationsOverviewChart from "../components/AdminDashboard/RecommendationsOverviewChart.tsx";
 
 const ReportPDF: React.FC = () => {
-    // Dummy data for the report
+    const [stats, setStats] = useState({
+        totalCrops: 0,
+        totalRecommendations: 0,
+        totalWaterUsage: 0
+    });
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                setLoading(true);
+                const response = await axios.get(`${import.meta.env.VITE_API_URL}/adminDashboard/stats`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                setStats(response.data);
+                setError(null);
+            } catch (err) {
+                console.error('Error fetching stats:', err);
+                setError(err.response?.data?.message || 'Failed to load statistics');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchStats();
+    }, []);
+
     const reportData = {
         companyName: 'SAQI',
         logoURL: 'https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/saqi-logo-1', // Placeholder for the logo
         introduction: `SAQI Solutions presents the latest report on water usage and irrigation recommendations for your crops. 
         This report includes detailed insights into the water consumption patterns and the need for irrigation adjustments.`,
         statistics: {
-            totalCrops: 11,
-            totalWaterUsage: 122, // in liters
-            averageWaterPerCrop: 8.387, // in liters per crop
-            recommendations: 30, // number of recommendations for water adjustment
+            totalCrops: loading ? 0 : stats.totalCrops,
+            totalWaterUsage: loading ? 0 : stats.totalWaterUsage,
+            averageWaterPerCrop: loading ? 0 : (stats.totalCrops > 0 ? stats.totalWaterUsage / stats.totalCrops : 0),
+            recommendations: loading ? 0 : stats.totalRecommendations,
         }
     };
 
@@ -53,6 +83,11 @@ const ReportPDF: React.FC = () => {
         <div className="flex-1 overflow-auto relative z-10">
             <Header title="Report Generation" />
             <main className="max-w-7xl mx-auto py-6 px-4 lg:px-8">
+                {error && (
+                    <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                        {error}
+                    </div>
+                )}
                 <motion.div
                     className="bg-gray-800 bg-opacity-50 backdrop-blur-md shadow-lg rounded-xl p-6 border border-gray-700 mb-8 m-auto"
                     initial={{ opacity: 0, y: 20 }}
@@ -94,7 +129,7 @@ const ReportPDF: React.FC = () => {
                                     </div>
                                     <div className="bg-gray-100 p-4 rounded-lg">
                                         <h3 className="text-lg font-medium text-gray-700">Average Water per Crop</h3>
-                                        <p className="text-xl text-gray-900">{reportData.statistics.averageWaterPerCrop} Liters</p>
+                                        <p className="text-xl text-gray-900">{reportData.statistics.averageWaterPerCrop.toFixed(2)} Liters</p>
                                     </div>
                                     <div className="bg-gray-100 p-4 rounded-lg">
                                         <h3 className="text-lg font-medium text-gray-700">Recommendations</h3>
