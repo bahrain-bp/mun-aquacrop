@@ -137,7 +137,15 @@ const imageResult = new Table(stack, "ImageResult", {
         primaryIndex: { partitionKey: "FarmID", sortKey: "ZoneID" },
     });
 
-
+    const statsTable = new Table(stack, "Stats", {
+        fields: {
+            StatID: "string",
+            TotalRecommendations: "number",
+            TotalUsers: "number",
+            TotalCrops: "number",
+        },
+        primaryIndex: { partitionKey: "StatID" },
+    });
 
     stack.addOutputs({
         ImageResult: imageResult.tableName,
@@ -150,6 +158,7 @@ const imageResult = new Table(stack, "ImageResult", {
         farmAdminTableName: farmAdminTable.tableName,
         farmTableName: farmTable.tableName,
         zonesTableName: zonesTable.tableName,
+        statsTableName: statsTable.tableName,
     });
 
     return {
@@ -164,6 +173,7 @@ const imageResult = new Table(stack, "ImageResult", {
         farmAdminTable,
         farmTable,
         zonesTable,
+        statsTable,
     };
 
 }

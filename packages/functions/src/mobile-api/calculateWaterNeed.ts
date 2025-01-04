@@ -1,5 +1,5 @@
 import {APIGatewayProxyHandler, AttributeValue} from 'aws-lambda';
-import {DynamoDBClient, ScanCommand} from "@aws-sdk/client-dynamodb";
+import {DynamoDBClient, ScanCommand, UpdateItemCommand} from "@aws-sdk/client-dynamodb";
 import {ScanCommandOutput} from "@aws-sdk/client-dynamodb";
 
 const client = new DynamoDBClient({});
@@ -55,6 +55,26 @@ interface WeatherReading {
     ET0: number;
 }
 
+async function updateTotalRecommendations() {
+    const params = {
+        TableName: process.env.statsTable,
+        Key: {
+            "StatID": { S: "MAIN_STATS" }
+        },
+        UpdateExpression: "ADD TotalRecommendations :inc",
+        ExpressionAttributeValues: {
+            ":inc": { N: "1" }
+        },
+        ReturnValues: "UPDATED_NEW"
+    };
+
+    try {
+        const command = new UpdateItemCommand(params);
+        await client.send(command);
+    } catch (error) {
+        console.error("Error updating stats:", error);
+    }
+}
 
 // Lambda function to find the nearest station
 export const handler = async (event: any) => {
@@ -200,6 +220,9 @@ export const handler = async (event: any) => {
 
         // Return the nearest station's ID
         if (nearestStationId) {
+            // Update total recommendations counter
+            await updateTotalRecommendations();
+
             return {
                 statusCode: 200,
                 body: JSON.stringify({
