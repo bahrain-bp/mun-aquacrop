@@ -9,6 +9,7 @@ import {Cloud, TreePine, Users, Droplet} from "lucide-react";
 import RecommendationsOverviewChart from "../components/AdminDashboard/RecommendationsOverviewChart.tsx";
 import CategoryChart from "../components/AdminDashboard/CategoryChart.tsx";
 import CropsChart from "../components/AdminDashboard/CropsChart";
+import WaterUsageChart from "../components/AdminDashboard/WaterUsageChart.tsx";
 
 interface Stats {
     totalRecommendations: number;
@@ -85,10 +86,15 @@ const DashboardContent: React.FC = () => {
                 </motion.div>
 
                 <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>
-                    <RecommendationsOverviewChart/>
-                    <CategoryChart/>
+
+                    <WaterUsageChart />
+                    <CategoryChart />
+                    <div className='lg:col-span-2'> {/* This makes the first chart span across both columns */}
+                        <RecommendationsOverviewChart/>
+                    </div>
                     <CropsChart/>
                 </div>
+
             </main>
         </div>
     );
@@ -97,8 +103,8 @@ const DashboardContent: React.FC = () => {
 const AdminDashboard: React.FC = () => {
     return (
         <Authenticator>
-            {({ signOut, user }) => (
-                <DashboardContent />
+            {({signOut, user}) => (
+                <DashboardContent/>
             )}
         </Authenticator>
     );
