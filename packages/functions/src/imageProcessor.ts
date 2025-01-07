@@ -55,7 +55,7 @@ export const handler = async (event: S3Event, context: Context, callback: Callba
             statusCode: 200,
             body: JSON.stringify({
                 message: "Image processed successfully",
-                persons: result, // Adjust based on your SageMaker response structure
+                crops: result,
             }),
         };
     } catch (error: any) {
