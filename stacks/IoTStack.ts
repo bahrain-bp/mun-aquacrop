@@ -15,11 +15,8 @@ export function IoTStack({ stack }: StackContext) {
       Statement: [
         {
           Effect: "Allow",
-          Action: ["iot:Publish", "iot:Subscribe", "iot:Connect", "iot:Receive"],
-          Resource: [
-            `arn:aws:iot:${stack.region}:${stack.account}:topic/pump/control`,
-            `arn:aws:iot:${stack.region}:${stack.account}:client/*`,
-          ],
+          Action: ["*"],
+          Resource: ["*"],
         },
       ],
     },

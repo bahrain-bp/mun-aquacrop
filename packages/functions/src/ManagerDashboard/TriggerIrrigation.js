@@ -37,7 +37,7 @@ export const handler = async (event) => {
       ZoneID,
       timestamp: new Date().toISOString(),
     }),
-    qos: 0, // Quality of Service (0 = At most once)
+    qos: 1, 
   };
 
   try {

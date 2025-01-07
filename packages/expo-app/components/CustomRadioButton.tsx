@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     },
     label: {
         fontSize: 16,
-        color: '#555',
+        color: '#666666',
     },
     disabledLabel: {
         color: '#aaa',

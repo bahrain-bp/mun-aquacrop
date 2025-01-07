@@ -32,6 +32,7 @@ const translations = {
     home: "Home screen",
     loading:"Loading crops...",
     upload:"Upload Image",
+    uploadtxt:"Analyze your crop images",
     dashboard: "Dashboard",
     crop: "Crop",
     chooseloc: "Choose Location Method",
@@ -51,7 +52,11 @@ const translations = {
     rec: "Recommendation for",
     calcwaterneed: "Calculating water need...",
     totwaterneed:"Total Water Needed:",
-    litres:"Litres"
+    litres:"Litres",
+    settings:"Settings",
+    mode:"Light Mode",
+    arabic:"Arabic",
+    so:"Sign out"
   },
   ar: {
     greeting: "مرحبا بك في ساقي",
@@ -83,6 +88,7 @@ const translations = {
     home: "الشاشة الرئيسية",
     loading:"تحميل المحاصيل...",
     upload:"رفع صورة",
+    uploadtxt:"تحليل صور المحصول",
     dashboard: "شاشة التحكم",
     crop: "المحصول",
     chooseloc: "اختر طريقة الموقع",
@@ -102,7 +108,11 @@ const translations = {
     rec: "توصية ل",
     calcwaterneed: "يتم حساب احتياج الماء",
     totwaterneed:"إجمالي احتياج المياه:",
-    litres:"لتر"
+    litres:"لتر",
+    settings:"الاعدادات",
+    mode:"وضع النهار",
+    arabic:"العربية",
+    so:"تسجيل الخروج"
   },
 };
 

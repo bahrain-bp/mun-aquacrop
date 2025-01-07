@@ -4,31 +4,38 @@ import { fetchAuthSession } from 'aws-amplify/auth';
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
+    adminForbidden?: boolean;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
-    const [isAdmin, setIsAdmin] = useState<boolean | null>(null);
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, adminForbidden = false }) => {
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const checkAdmin = async () => {
+        const checkAuth = async () => {
             try {
                 const session = await fetchAuthSession();
-                const groups = session?.tokens?.accessToken?.payload["cognito:groups"];
+                const groups = session?.tokens?.accessToken?.payload["cognito:groups"] || [];
                 setIsAdmin(Array.isArray(groups) && groups.includes("Admin"));
             } catch (error) {
-                console.error("Error checking admin status:", error);
-                setIsAdmin(false);
+                console.error("Auth check failed:", error);
+            } finally {
+                setLoading(false);
             }
         };
 
-        checkAdmin();
+        checkAuth();
     }, []);
 
-    if (isAdmin === null) {
-        return <div>Loading...</div>;
+    if (loading) {
+        return null; // or a loading spinner
     }
 
-    return isAdmin ? <>{children}</> : <Navigate to="/" replace />;
+    if (adminForbidden && isAdmin) {
+        return <Navigate to="/" replace />;
+    }
+
+    return <>{children}</>;
 };
 
 export default ProtectedRoute;

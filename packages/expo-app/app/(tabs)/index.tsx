@@ -169,25 +169,6 @@ export default function Page() {
 
   return (
     <View style={styles.container}>
-      {/* Language Toggle Flags */}
-      <View style={styles.flagsContainer}>
-      <TouchableOpacity onPress={toggleLanguage}>
-        <View style={styles.flagWrapper}>
-          <Image
-            source={{
-              uri: language === 'en'
-                ? 'https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/bahrain-flag.png'
-                : 'https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/english-flag.png',
-            }}
-            style={[styles.flagImage, language === 'en' && styles.selectedFlag]}
-          />
-          <Text style={styles.flagText}>
-            {language === 'en' ? 'العربية' : 'English'}
-          </Text>
-        </View>
-      </TouchableOpacity>
-      </View>
-
       <Image
       source={{ uri: 'https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/saqi-logo-2' }}
       style={styles.logo}

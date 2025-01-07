@@ -29,7 +29,11 @@ const App: React.FC = () => {
                     <Route path="/signin" element={<SignIn />} />
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/AdminDashboard" element={<AdminDashboard />} />
-                    <Route path="/Farms" element={<Farms />} />
+                    <Route path="/Farms" element={
+                        <ProtectedRoute adminForbidden>
+                            <Farms />
+                        </ProtectedRoute>
+                    } />
                     <Route path="/Crops" element={
                         <ProtectedRoute>
                             <Crop />

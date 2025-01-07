@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, ScrollView, Image, TouchableOpacity, useWindowDimensions, Button } from 'react-native';
+import { Text, View, StyleSheet, ScrollView, Image, TouchableOpacity, useWindowDimensions } from 'react-native';
 import { useRouter } from 'expo-router';
 import { storage } from '../utils/storage';
 import AWS from 'aws-sdk';
 import i18n from '../i18n'; // Import the shared i18n instance
+import { MaterialIcons } from '@expo/vector-icons';
+import SettingsPopup from '../components/SettingsPopup';
+import { useTheme, themes } from '../components/ThemeContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
@@ -37,7 +40,7 @@ const parseCrops = (data: any): Crop[] => {
         GrowthStage: item.GrowthStage,
         kc: item.kc,
         CropID: item.CropID,
-        ImageURL: item.ImageURL
+        ImageURL: item.ImageURL,
     }));
 };
 
@@ -51,6 +54,9 @@ const Index: React.FC = () => {
     const [userName, setUserName] = useState<string>('Guest');
     const { width } = useWindowDimensions();
     const router = useRouter();
+    const [isSettingsVisible, setIsSettingsVisible] = useState(false);
+    const { isDarkMode } = useTheme();
+    const theme = isDarkMode ? themes.dark : themes.light;
 
     useEffect(() => {
         const fetchData = async () => {
@@ -98,40 +104,74 @@ const Index: React.FC = () => {
         fetchData();
     }, []);
 
-    return (
-        <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
-            <View style={styles.welcomeContainer}>
-                <Text style={styles.greetingText}>{i18n.t('welcome')}</Text>
-                <Text style={styles.welcomeText}>{userName} 👋</Text>
+    const handleSettings = () => {
+        setIsSettingsVisible(true);
+    };
 
-            </View>
-            <Text style={styles.text}>{i18n.t('home')}</Text>
-            <View style={styles.grid}>
-                {/* Fixed Upload Image Card */}
-                <View style={styles.row2}>
-                    <UploadImageCard />
-                </View>
-                {crops.length > 0 ? (
-                    <View style={styles.row}>
-                        {crops.map((crop, index) => (
-                            <Card key={index} CropData={crop} />
-                        ))}
+    return (
+        <>
+            <ScrollView 
+                style={[styles.container, { backgroundColor: theme.background }]} 
+                contentContainerStyle={styles.contentContainer}
+                showsVerticalScrollIndicator={false}
+            >
+                <View style={styles.header}>
+                    <View style={[styles.welcomeContainer, { 
+                        backgroundColor: theme.card,
+                        shadowColor: isDarkMode ? '#000' : '#666'
+                    }]}>
+                        <View style={styles.headerRow}>
+                            <View>
+                                <Text style={[styles.greetingText, { color: theme.subText }]}>{i18n.t('welcome')}</Text>
+                                <Text style={[styles.welcomeText, { color: theme.text }]}>{userName} 👋</Text>
+                            </View>
+                            <TouchableOpacity 
+                                onPress={handleSettings} 
+                                style={[styles.settingsButton, { backgroundColor: theme.border }]}
+                            >
+                                <MaterialIcons name="settings" size={24} color={theme.text} />
+                            </TouchableOpacity>
+                        </View>
                     </View>
-                ) : (
-                    <Text style={styles.text}>{i18n.t('loading')}</Text>
-                )}
-            </View>
-        </ScrollView>
+                </View>
+
+                <View style={styles.mainContent}>
+                    <Text style={[styles.sectionTitle, { color: theme.text }]}>{i18n.t('home')}</Text>
+                    
+                    <View style={styles.cropSection}>
+                        <UploadImageCard />
+                        {crops.length > 0 ? (
+                            <View style={styles.cropGrid}>
+                                {crops.map((crop, index) => (
+                                    <Card key={index} CropData={crop} />
+                                ))}
+                            </View>
+                        ) : (
+                            <Text style={[styles.loadingText, { color: theme.subText }]}>{i18n.t('loading')}</Text>
+                        )}
+                    </View>
+                </View>
+            </ScrollView>
+            <SettingsPopup 
+                visible={isSettingsVisible} 
+                onClose={() => setIsSettingsVisible(false)} 
+            />
+        </>
     );
 };
 
 interface CardProps {
-    CropData: Crop;
+    CropData?: Crop;
+    title?: string;
+    onPress?: () => void;
+    isUploadCard?: boolean; // Flag to identify the Upload Image card
 }
 
-const Card: React.FC<CardProps> = ({ CropData }) => {
-    const { nameEN, nameAR, GrowthStage, kc, CropID, ImageURL } = CropData;
+const Card: React.FC<CardProps> = ({ CropData, title, onPress, isUploadCard }) => {
+    const { nameEN, nameAR, GrowthStage, kc, CropID, ImageURL } = CropData || {};
     const router = useRouter();
+    const { isDarkMode } = useTheme();
+    const theme = isDarkMode ? themes.dark : themes.light;
     const [language, setLanguage] = useState<string | null>(null);
 
     //retrieve language selected
@@ -153,44 +193,65 @@ const Card: React.FC<CardProps> = ({ CropData }) => {
       }, []);
 
     const handlePress = () => {
-        router.push({
-            pathname: '/screens/Crop',
-            params: {
-                nameEN: nameEN.S,
-                nameAR: nameAR.S,
-                GrowthStage: JSON.stringify(GrowthStage),
-                kc: JSON.stringify(kc),
-                CropID: CropID.S,
-                ImageURL: ImageURL.S,
-            },
-        });
+        if (onPress) {
+            onPress(); // If onPress exists, execute the passed handler
+        } else {
+            router.push({
+                pathname: '/screens/Crop',
+                params: {
+                    nameEN: nameEN?.S,
+                    nameAR: nameAR?.S,
+                    GrowthStage: JSON.stringify(GrowthStage),
+                    kc: JSON.stringify(kc),
+                    CropID: CropID?.S,
+                    ImageURL: ImageURL?.S,
+                },
+            });
+        }
     };
 
     return (
-        <TouchableOpacity onPress={handlePress} style={styles.cardLink}>
-            <View style={styles.cardContainer}>
-                <Image source={{ uri: ImageURL.S }} style={styles.image} />
-                <Text style={styles.cardTitle}>{language === 'ar' ? nameAR.S : nameEN.S}</Text>
+        <TouchableOpacity onPress={handlePress} style={styles.cardWrapper}>
+            <View style={[styles.cardContainer, { 
+                backgroundColor: theme.card, 
+                borderColor: theme.border,
+                shadowColor: theme.shadow
+            }]}>
+                <Image 
+                    source={{ uri: ImageURL.S }} 
+                    style={[styles.image, { backgroundColor: theme.border }]}
+                    resizeMode="cover"
+                />
+                <Text style={[styles.cardTitle, { color: theme.text }]}>{language === 'ar' ? nameAR.S : nameEN.S}</Text>
             </View>
         </TouchableOpacity>
     );
 };
 
 const UploadImageCard: React.FC = () => {
-    const router = useRouter();  // Initialize the router
-
-    // Handle the press action to navigate to the "Test" page
-    const handlePress = () => {
-        router.push({
-            pathname: '/screens/CropImage',
-
-        });  // Navigate to the "Test" page (adjust the path as needed)
-    };
+    const router = useRouter();
+    const { isDarkMode } = useTheme();
+    const theme = isDarkMode ? themes.dark : themes.light;
 
     return (
-        <TouchableOpacity style={styles.cardLink} onPress={handlePress}>  {/* Add onPress handler */}
-            <View style={styles.cardContainer}>
-                <Text style={styles.cardTitle}>{i18n.t('upload')}</Text>
+        <TouchableOpacity 
+            style={[styles.uploadCard, { 
+                backgroundColor: theme.card, 
+                borderColor: theme.border,
+                shadowColor: theme.shadow
+            }]}
+            onPress={() => router.push({ pathname: '/screens/UploadCrop' })}
+        >
+            <View style={styles.uploadContent}>
+                <View>
+                    <Text style={[styles.uploadTitle, { color: theme.text }]}>{i18n.t('upload')}</Text>
+                    <Text style={[styles.uploadSubtitle, { color: theme.subText }]}>
+                    {i18n.t('uploadtxt')}
+                    </Text>
+                </View>
+                <View style={[styles.uploadIconContainer, { backgroundColor: theme.border }]}>
+                    <Text style={styles.uploadIcon}>📸</Text>
+                </View>
             </View>
         </TouchableOpacity>
     );
@@ -198,85 +259,125 @@ const UploadImageCard: React.FC = () => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#25292e',
-        padding: 20,
+        flex: 1,
     },
     contentContainer: {
-        alignItems: 'center',
-        paddingBottom: 20,
+        flexGrow: 1,
     },
-    text: {
-        color: '#fff',
-        fontSize: 24,
-        marginBottom: 20,
+    header: {
+        paddingHorizontal: 16,
+        paddingTop: 20,
+        paddingBottom: 10,
     },
-    grid: {
-        alignItems: 'center',
-        justifyContent: 'center',
+    mainContent: {
+        padding: 16,
     },
-    row: {
-        flexDirection: 'row',  // Align the cards horizontally
-        flexWrap: 'wrap',      // Allow cards to wrap to the next row
-        justifyContent: 'space-between',  // Distribute cards evenly across rows
-        width: '100%',  // Ensure the row takes the full width of the parent container
+    section: {
+        marginBottom: 24,
     },
-    row2: {
-        flexDirection: 'row',  // Align the cards horizontally
-        flexWrap: 'wrap',      // Allow cards to wrap to the next row
-        justifyContent: 'center',  // Distribute cards evenly across rows
-        width: '100%',  // Ensure the row takes the full width of the parent container
-    },
-    cardLink: {
-        width: '48%',  // 2 cards per row with 2% margin for spacing
-        marginBottom: 20,
-    },
-    cardContainer: {
-        backgroundColor: '#D3D3D3',
-        borderRadius: 10,
-        elevation: 5,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.2,
-        shadowRadius: 2,
-        padding: 10,
-        alignItems: 'center',
-        justifyContent: 'center',
-        width: '100%',  // Ensure the card takes the full width of the parent container
-    },
-    image: {
-        width: 100,
-        height: 100,
-        borderRadius: 10,
-    },
-    cardTitle: {
-        marginVertical: 10,
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#333',
-    },
-    welcomeText: {
-        color: '#fff',
-        fontSize: 32,
-        fontWeight: 'bold',
-        marginBottom: 8,
+    sectionTitle: {
+        fontSize: 20,
+        fontWeight: '600',
+        marginBottom: 24,
         textAlign: 'center',
     },
     welcomeContainer: {
-        marginBottom: 30,
-        alignItems: 'center',
-        alignSelf: 'stretch',
-        paddingHorizontal: 20,
+        padding: 20,
+        borderRadius: 15,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
     },
     greetingText: {
-        color: '#9DA3B4',
-        fontSize: 18,
-        marginBottom: 5,
-        textAlign: 'center',
+        fontSize: 16,
+        marginBottom: 8,
     },
-    subText: {
-        color: '#9DA3B4',
+    welcomeText: {
+        fontSize: 28,
+        fontWeight: 'bold',
+    },
+    loadingText: {
         fontSize: 16,
         textAlign: 'center',
+    },
+    cropGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+        gap: 12,
+    },
+    cardWrapper: {
+        width: '48%',
+        marginBottom: 12,
+    },
+    cardContainer: {
+        borderRadius: 12,
+        overflow: 'hidden',
+        borderWidth: 1,
+        height: 180, // Increased height for better proportion
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    image: {
+        width: '100%',
+        height: 140, // Increased height for better image display
+    },
+    cardTitle: {
+        fontSize: 14,
+        fontWeight: '600',
+        textAlign: 'center',
+        padding: 10,
+    },
+    uploadCard: {
+        borderRadius: 12,
+        borderWidth: 1,
+        padding: 16,
+        marginBottom: 16,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    uploadContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    uploadTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+        marginBottom: 4,
+    },
+    uploadSubtitle: {
+        fontSize: 14,
+    },
+    uploadIconContainer: {
+        padding: 12,
+        borderRadius: 12,
+    },
+    uploadIcon: {
+        fontSize: 24,
+    },
+    cropSection: {
+        gap: 16,
+    },
+    headerRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center', 
+    },
+    settingsButton: {
+        padding: 8,
+        borderRadius: 20,
+        alignSelf: 'center',
+    },
+    uploadCardText: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: 'bold',
     },
 });
 

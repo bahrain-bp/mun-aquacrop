@@ -132,3 +132,42 @@ export async function uploadImageForCrop(event: any) {
         };
     }
 }
+
+export async function uploadCameraImage(event: any) {
+    const claims = event.requestContext?.authorizer?.jwt?.claims;
+    if (!claims || !claims.sub) {
+        return {
+            statusCode: 401,
+            body: JSON.stringify({message: "Unauthorized: Missing claims or sub"}),
+        };
+    }
+
+    const { fileName, fileType, metadata } = JSON.parse(event.body);
+    const bucketName = "saqidev-mun-aquacrop-s3stack-indexbucket6733024c-szupac9axond";
+
+    const params = {
+        Bucket: bucketName,
+        Key: fileName,
+        Expires: 300,
+        ContentType: fileType,
+        Metadata: metadata,
+    };
+
+    try {
+        const uploadURL = await s3.getSignedUrlPromise("putObject", params);
+        return {
+            statusCode: 200,
+            body: JSON.stringify({
+                uploadURL,
+                imageURL: `https://${bucketName}.s3.amazonaws.com/${fileName}`,
+                metadata
+            }),
+        };
+    } catch (error) {
+        console.error("Error generating signed URL:", error);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({error: "Could not generate signed URL"}),
+        };
+    }
+}
