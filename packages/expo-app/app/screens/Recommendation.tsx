@@ -140,7 +140,7 @@ const Recommendation: React.FC = () => {
                             onPress={() => router.replace('/screens/DashBoard')}
                         >
                             <Text style={[styles.returnButtonText, { color: theme.accent }]}>
-                                ← Return to Dashboard
+                                ← {i18n.t('bktodbtn')}
                             </Text>
                         </TouchableOpacity>
                     </>

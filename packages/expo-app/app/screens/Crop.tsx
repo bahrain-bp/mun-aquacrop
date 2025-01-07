@@ -60,11 +60,11 @@ const Crop: React.FC = () => {
     const [language, setLanguage] = useState<string | null>(null); // to keep track of the language preference
 
     const bahrainLocations: LocationOption[] = [
-        {label: "Manama", value: "manama", latitude: 26.2041, longitude: 50.5860},
-        {label: "Riffa", value: "riffa", latitude: 26.1500, longitude: 50.5556},
-        {label: "Muharraq", value: "muharraq", latitude: 26.2521, longitude: 50.6233},
-        {label: "Sitra", value: "sitra", latitude: 26.0890, longitude: 50.6135},
-        {label: "Isa Town", value: "isa_town", latitude: 26.2069, longitude: 50.5278},
+        {label: i18n.t('l1'), value: "manama", latitude: 26.2041, longitude: 50.5860},
+        {label: i18n.t('l2'), value: "riffa", latitude: 26.1500, longitude: 50.5556},
+        {label: i18n.t('l3'), value: "muharraq", latitude: 26.2521, longitude: 50.6233},
+        {label: i18n.t('l4'), value: "sitra", latitude: 26.0890, longitude: 50.6135},
+        {label: i18n.t('l5'), value: "isa_town", latitude: 26.2069, longitude: 50.5278},
         // Add more locations as needed...
     ];
 
@@ -413,7 +413,7 @@ const Crop: React.FC = () => {
                                     handleLocationSelect(val);
                                 }}
                                 data={locationDataForSelect}
-                                placeholder="Select your location in Bahrain"
+                                placeholder={i18n.t('locationtxt')}
                                 boxStyles={[styles.selectBox, { backgroundColor: theme.border }]}
                                 dropdownStyles={[styles.dropdown, { backgroundColor: theme.border }]}
                                 inputStyles={[styles.selectInput, { color: theme.text }]}

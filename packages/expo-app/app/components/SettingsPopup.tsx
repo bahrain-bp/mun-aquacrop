@@ -60,9 +60,7 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({ visible, onClose }) => {
           await AsyncStorage.setItem('language', newLang);
           // Force page refresh
           router.push('/screens/DashBoard') // Navigate to the same route
-
-          // await router.replace('/screens/DashBoard');
-          // await Updates.reloadAsync();
+          await router.replace('/screens/DashBoard');
         } catch (error) {
           console.error('Error saving language:', error);
         }
