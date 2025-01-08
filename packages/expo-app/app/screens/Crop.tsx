@@ -650,6 +650,7 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     calculateButton: {
+        color:"#2B6CB0",
         paddingVertical: 16,
         paddingHorizontal: 32,
         borderRadius: 12,

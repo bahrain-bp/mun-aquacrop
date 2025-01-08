@@ -185,12 +185,7 @@ export default function Page() {
         >
           <Text style={styles.buttonText}>{i18n.t('signup')}</Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.button, styles.skipButton]}
-          onPress={() => router.push('/screens/DashBoard')}
-        >
-          <Text style={styles.buttonText}>{i18n.t('skipauth')}</Text>
-        </TouchableOpacity>
+        
       </View>
     </View>
   );
@@ -221,7 +216,7 @@ const styles = StyleSheet.create({
     marginVertical: 20,
   },
   button: {
-    width: '15%',
+    width: '30%',
     paddingVertical: 12,
     paddingHorizontal: 24,
     borderRadius: 8,

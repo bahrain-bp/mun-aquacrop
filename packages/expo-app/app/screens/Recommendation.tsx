@@ -103,7 +103,7 @@ const Recommendation: React.FC = () => {
                 borderColor: theme.border,
                 shadowColor: theme.shadow 
             }]}>
-                <Text style={[styles.title, { color: theme.text }]}>{i18n.t('rec')}{language === 'ar' ? nameAR : nameEN}</Text>
+                <Text style={[styles.title, { color: theme.text }]}>{i18n.t('rec')} {language === 'ar' ? nameAR : nameEN}</Text>
                 {imageSource && (
                     <Image source={{ uri: imageSource }} style={styles.image} />
                 )}
