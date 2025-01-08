@@ -237,10 +237,10 @@ const Dashboard: React.FC = () => {
                             animate={{opacity: 1, y: 0}}
                             transition={{duration: 1}}
                         >
-                            <StatCard name='Total Recommendations' icon={Droplet} value='12345' color='#6366F1'/>
-                            <StatCard name='Total Farms' icon={House} value='1234' color='#8B5CF6'/>
-                            <StatCard name='Total Crops' icon={TreePine} value='11' color='#EC4899'/>
-                            <StatCard name='Weather' icon={Cloud} value='12.5°C' color='#10B981'/>
+                            {/*<StatCard name='Total Recommendations' icon={Droplet} value='12345' color='#6366F1'/>*/}
+                            {/*<StatCard name='Total Farms' icon={House} value='1234' color='#8B5CF6'/>*/}
+                            {/*<StatCard name='Total Crops' icon={TreePine} value='11' color='#EC4899'/>*/}
+                            {/*<StatCard name='Weather' icon={Cloud} value='12.5°C' color='#10B981'/>*/}
                         </motion.div>
 
                         {/*    Test*/}
