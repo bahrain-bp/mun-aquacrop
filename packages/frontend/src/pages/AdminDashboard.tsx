@@ -50,7 +50,7 @@ const DashboardContent: React.FC = () => {
 
     return (
         <div className='flex-1 overflow-auto relative z-10'>
-            <Header title='Admin Dashboard'/>
+            <Header title='MUN officer Dashboard'/>
             <main className='max-w-7xl mx-auto py-6 px-4 lg:px-8'>
                 {error && (
                     <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
