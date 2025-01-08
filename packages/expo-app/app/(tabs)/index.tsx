@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Button ,ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Button, ActivityIndicator, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import AWS, { CognitoIdentityServiceProvider } from 'aws-sdk';
 import { storage } from '../utils/storage';
@@ -122,16 +122,15 @@ const isAuthenticated = async () => {
 
 export default function Page() {
   const router = useRouter();
-    const [loading, setLoading] = useState(true);
-    const [language, setLanguage] = useState('en');
+  const [loading, setLoading] = useState(true);
+  const [language, setLanguage] = useState('en');
   const [_, forceUpdate] = useState(0); // Used to force a re-render
-
 
   useEffect(() => {
     i18n.locale = language;
     forceUpdate((prev) => prev + 1); // Trigger a re-render
   }, [language]);
-
+  
   const toggleLanguage = () => {
     const newLang = language === 'en' ? 'ar' : 'en';
     setLanguage(newLang);
@@ -146,40 +145,24 @@ export default function Page() {
           params: { userName }
         });
       } else {
-        setLoading(false);
+        // redirect to AuthScreen after a delay to imitate loading (yes, a delay for loading to imitate how other apps load,)
+        setTimeout(() => {
+          router.replace('/screens/AuthScreen');
+        }, 1400); //  1.4 second delay before redirect
       }
     };
     checkAuth();
   }, []);
 
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
-  }
-
+  // Always show loading screen
   return (
     <View style={styles.container}>
-      {/* Display greeting text */}
-      <Text style={styles.title}>{i18n.t('greeting')}</Text>
-
-      {/* Navigation Buttons */}
-      <Button
-        title={i18n.t('signup')}
-        onPress={() => router.push('/screens/AuthScreen')}
+      <Image
+        source={{ uri: 'https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/saqi-logo-1' }}
+        style={styles.logo}
+        resizeMode="contain"
       />
-      <Button
-        title={i18n.t('skipauth')}
-        onPress={() => router.push('/screens/DashBoard')}
-      />
-
-      {/* Language Toggle Button */}
-      <Button
-        title={language === 'en' ? 'عربي' : 'English'}
-        onPress={toggleLanguage}
-      />
+      <ActivityIndicator size="large" color="#0000ff" style={styles.spinner} />
     </View>
   );
 }
@@ -191,6 +174,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#fff',
     padding: 16,
+  },
+  logo: {
+    width: 200,
+    height: 200,
+    marginBottom: 20,
+  },
+  spinner: {
+    marginTop: 20,
   },
   title: {
     fontSize: 24,
