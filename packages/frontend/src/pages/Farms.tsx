@@ -18,7 +18,7 @@ const Farms: React.FC = () => {
                     animate={{opacity: 1, y: 0}}
                     transition={{duration: 1}}
                 >
-                    <StatCard name='Total Farms' icon={House } value={1234} color='#6366F1' />
+                    <StatCard name='Total Farms' icon={House } value={2} color='#6366F1' />
                     <StatCard name='Weather' icon={Cloud} value='12.5°C' color='#10B981'/>
                 </motion.div>
 

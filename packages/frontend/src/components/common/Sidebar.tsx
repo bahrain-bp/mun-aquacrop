@@ -1,5 +1,5 @@
-import React, {useState, useEffect} from 'react';
-import {BarChart2, Menu, TrendingUp, MapPinHouse, TreePine} from "lucide-react";
+import React, {useState, useEffect, useRef, ChangeEvent} from 'react';
+import {BarChart2, Menu, TrendingUp, MapPinHouse, TreePine, CloudUpload} from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { fetchAuthSession } from 'aws-amplify/auth';
@@ -41,6 +41,8 @@ const Sidebar: React.FC = () => {
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [modalOpen, setModalOpen] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const checkAdminStatus = async () => {
         try {
@@ -52,6 +54,62 @@ const Sidebar: React.FC = () => {
             setIsAdmin(false);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleUpload = async (event: ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            try {
+                console.log("Starting file upload...");
+                
+                // Get the current session token
+                const session = await fetchAuthSession();
+                const token = session.tokens?.accessToken?.toString();
+                
+                if (!token) {
+                    throw new Error("No authentication token available");
+                }
+
+                
+                const response = await fetch(`${import.meta.env.VITE_API_URL}/Upload/CSV`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": token
+                    },
+                    body: JSON.stringify({
+                        fileName: file.name,
+                        fileType: file.type,
+                    }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log("Got upload URL:", data.uploadURL);
+
+                // Then upload the file
+                const uploadResponse = await fetch(data.uploadURL, {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": file.type,
+                    },
+                    body: file,
+                });
+
+                if (!uploadResponse.ok) {
+                    throw new Error(`Upload failed! status: ${uploadResponse.status}`);
+                }
+
+                console.log('File uploaded successfully');
+                alert('Weather data uploaded successfully!');
+            } catch (error) {
+                console.error("Upload failed:", error);
+                alert('Failed to upload weather data. Please try again.');
+            }
         }
     };
 
@@ -120,6 +178,37 @@ const Sidebar: React.FC = () => {
                         </Link>
                     ))}
                 </nav>
+
+                {isAdmin && (
+                    <>
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleUpload}
+                            className="hidden"
+                            accept=".csv,.xlsx,.xls"
+                        />
+                        <button
+                            onClick={() => fileInputRef.current?.click()}
+                            className='flex items-center p-4 text-sm font-medium rounded-lg hover:bg-gray-700 transition-colors mb-2'
+                        >
+                            <CloudUpload size={20} style={{ color: '#F59E0B', minWidth: "20px" }} />
+                            <AnimatePresence>
+                                {isSidebarOpen && (
+                                    <motion.span
+                                        className='ml-4 whitespace-nowrap'
+                                        initial={{ opacity: 0, width: 0 }}
+                                        animate={{ opacity: 1, width: "auto" }}
+                                        exit={{ opacity: 0, width: 0 }}
+                                        transition={{ duration: 0.2, delay: 0.3 }}
+                                    >
+                                        Upload Weather Data
+                                    </motion.span>
+                                )}
+                            </AnimatePresence>
+                        </button>
+                    </>
+                )}
             </div>
         </motion.div>
     );

@@ -100,6 +100,7 @@ export function ApiStack({stack}: StackContext) {
                     environment: {
                         CSVReadings: CSVReadings.bucketName,
                     },
+                    permissions: [CSVReadings],
                 },
                 authorizer: "authApi",
             },
