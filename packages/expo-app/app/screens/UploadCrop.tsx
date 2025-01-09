@@ -1,6 +1,6 @@
-
+import * as Location from 'expo-location';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Button, StyleSheet, Text, TouchableOpacity, View, Image, Alert } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons'; // For icon support
 import { storage } from '../utils/storage';
@@ -13,6 +13,25 @@ const UploadCrop: React.FC = () => {
     const cameraRef = useRef<any>(null);
     const [image, setImage] = useState<string | null>(null);  // Manage image URI
     const [isUploading, setIsUploading] = useState(false);
+    const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+
+    useEffect(() => {
+        const getLocation = async () => {
+            const { status } = await Location.requestForegroundPermissionsAsync();
+            if (status !== 'granted') {
+                Alert.alert('Permission Denied', 'Location access is required for this feature.');
+                return;
+            }
+
+            const location = await Location.getCurrentPositionAsync({});
+            setLocation({
+                latitude: location.coords.latitude,
+                longitude: location.coords.longitude,
+            });
+        };
+
+        getLocation();
+    }, []);
 
     if (permission === null) {
         return <View />; // Loading state while waiting for permission response
@@ -69,8 +88,13 @@ const UploadCrop: React.FC = () => {
             // Prepare metadata
             const metadata = {
                 timestamp: new Date().toISOString(),
-                source: 'camera-upload'
+                source: 'camera-upload',
+                location: location ? JSON.stringify(location) : null, // Convert location object to string
             };
+
+            if (typeof metadata.location !== 'string') {
+                console.error('Error: Metadata.location is not a string');
+            }
 
             // Get signed URL
             const signedUrlResponse = await fetch(`${API_URL}/Upload/camera`, {
@@ -83,7 +107,7 @@ const UploadCrop: React.FC = () => {
                 body: JSON.stringify({
                     fileName,
                     fileType: 'image/jpeg',
-                    metadata
+                    metadata,
                 }),
             });
 

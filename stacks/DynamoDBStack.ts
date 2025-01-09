@@ -115,14 +115,25 @@ export function DynamoDBStack({ stack }: StackContext) {
         primaryIndex: { partitionKey: "OwnerID", sortKey: "FarmID" },
     });
 
-const imageResult = new Table(stack, "ImageResult", {
-    fields: {
-        result: "string",
-        userId: "string",
-        imageid: "string",
-    },
-    primaryIndex: { partitionKey: "result"},
-});
+    const imageResult = new Table(stack, "ImageResult", {
+        fields: {
+            result: "string",
+            userId: "string",
+            imageid: "string",
+        },
+        primaryIndex: { partitionKey: "result"},
+    });
+
+    const aiResult = new Table(stack, "aiResult", {
+        fields: {
+            filename: "string",
+            crop: "string",
+            stage: "string",
+            longitude: "number",
+            latitude: "number"
+        },
+        primaryIndex: { partitionKey: "filename"},
+    });
 
 
     const zonesTable = new Table(stack, "Zones", {
@@ -152,6 +163,7 @@ const imageResult = new Table(stack, "ImageResult", {
         ImageResult: imageResult.tableName,
         UserTableName: userTable.tableName,
         CropTableName: cropTable.tableName,
+        aiResult: aiResult.tableName,
         // CropCoefficientTableName: cropCoefficientTable.tableName,
         WeatherReadingsTableName: weatherReadingsTable.tableName,
         StationTableName: stationTable.tableName,
@@ -164,6 +176,7 @@ const imageResult = new Table(stack, "ImageResult", {
 
     return {
         imageResult,
+        aiResult,
         userTable,
         cropTable,
         // cropCoefficientTable,
