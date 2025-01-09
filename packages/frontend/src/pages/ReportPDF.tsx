@@ -47,6 +47,8 @@ const ReportPDF: React.FC = () => {
             totalWaterUsage: loading ? 0 : stats.totalWaterUsage,
             averageWaterPerCrop: loading ? 0 : (stats.totalCrops > 0 ? stats.totalWaterUsage / stats.totalCrops : 0),
             recommendations: loading ? 0 : stats.totalRecommendations,
+            totalWaterCost: loading ? 0 : (stats.totalWaterUsage * 0.00075 ), // 0.750 fils per 1000 Liter according to EWA BH
+            waterCostMonthly: loading ? 0 : ((stats.totalWaterUsage * 0.00075) / 12)
         }
     };
 
@@ -124,6 +126,10 @@ const ReportPDF: React.FC = () => {
                                         <p className="text-xl text-gray-900">{reportData.statistics.totalCrops}</p>
                                     </div>
                                     <div className="bg-gray-100 p-4 rounded-lg">
+                                        <h3 className="text-lg font-medium text-gray-700">Recommendations</h3>
+                                        <p className="text-xl text-gray-900">{reportData.statistics.recommendations} Recommendations</p>
+                                    </div>
+                                    <div className="bg-gray-100 p-4 rounded-lg">
                                         <h3 className="text-lg font-medium text-gray-700">Total Water Usage</h3>
                                         <p className="text-xl text-gray-900">{reportData.statistics.totalWaterUsage} Liters</p>
                                     </div>
@@ -131,9 +137,14 @@ const ReportPDF: React.FC = () => {
                                         <h3 className="text-lg font-medium text-gray-700">Average Water per Crop</h3>
                                         <p className="text-xl text-gray-900">{reportData.statistics.averageWaterPerCrop.toFixed(2)} Liters</p>
                                     </div>
+                                    
                                     <div className="bg-gray-100 p-4 rounded-lg">
-                                        <h3 className="text-lg font-medium text-gray-700">Recommendations</h3>
-                                        <p className="text-xl text-gray-900">{reportData.statistics.recommendations} Recommendations</p>
+                                        <h3 className="text-lg font-medium text-gray-700">Total Water Cost</h3>
+                                        <p className="text-xl text-gray-900">${reportData.statistics.totalWaterCost.toFixed(2)} BHD</p>
+                                    </div>
+                                    <div className="bg-gray-100 p-4 rounded-lg">
+                                        <h3 className="text-lg font-medium text-gray-700">Monthly Water Cost</h3>
+                                        <p className="text-xl text-gray-900">${reportData.statistics.waterCostMonthly.toFixed(2)} BHD</p>
                                     </div>
                                 </div>
                             </div>
