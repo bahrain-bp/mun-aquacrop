@@ -11,8 +11,8 @@ export default function Layout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         
         {/* Define standalone screens */}
-        <Stack.Screen name="screens/AuthScreen" options={{ title: 'Sign Up' }} />
-        <Stack.Screen name="screens/DashBoard" options={{ title: 'Dashboard' }} />
+        <Stack.Screen name="screens/AuthScreen" options={{ headerShown: false,title: 'Sign Up' }} />
+        <Stack.Screen name="screens/DashBoard" options={{ headerShown: false,title: 'Dashboard' }} />
         <Stack.Screen name="screens/Recommendation" options={{ title: 'Recommendation' }} />
         <Stack.Screen name="screens/Crop" options={{ title: 'Crop' }} />
       </Stack>

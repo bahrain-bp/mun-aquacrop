@@ -49,10 +49,7 @@ const AuthScreen = () => {
         setSession(session);
         setSub(sub);
         setIsChallengeStep(true);
-        Alert.alert('Challenge Sent', 'Please enter the verification code sent to your phone.');
-      } else {
-        Alert.alert('Error', 'Unexpected authentication flow.');
-      }
+      } 
     } catch (error) {
       const errorMessage = axios.isAxiosError(error) && error.response?.data?.error 
         ? error.response.data.error 
@@ -96,9 +93,7 @@ const AuthScreen = () => {
       await saveToken(idToken);
 
       if (idToken && accessToken) {
-        Alert.alert('Success', 'Authentication successful!');
-        // Navigate to the home screen
-        router.push('/screens/DashBoard');
+        router.replace ('/screens/DashBoard');
       } else {
         Alert.alert('Error', 'Unexpected response. Contact support.');
       }
@@ -124,6 +119,13 @@ const AuthScreen = () => {
       return;
     }
     await handleAuthentication();
+  };
+
+  const handleBack = () => {
+    setIsChallengeStep(false);
+    setChallengeResponse('');
+    setSession('');
+    setSub('');
   };
 
   const renderTabs = () => (
@@ -180,6 +182,9 @@ const AuthScreen = () => {
             resizeMode="contain"
           />
           <View style={styles.card}>
+            <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+              <Text style={styles.backButtonText}>← Back</Text>
+            </TouchableOpacity>
             <Text style={styles.title}>Verification</Text>
             <Text style={styles.subtitle}>Enter the code sent to your phone</Text>
             <TextInput
@@ -403,6 +408,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     backgroundColor: '#F7FAFC',
     color: '#2D3748',
+  },
+  backButton: {
+    position: 'absolute',
+    left: 25,
+    top: 25,
+    zIndex: 1,
+  },
+  backButtonText: {
+    fontSize: 16,
+    color: '#2B6CB0',
+    fontWeight: '600',
   },
 });
 
