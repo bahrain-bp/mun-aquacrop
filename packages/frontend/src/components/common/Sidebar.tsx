@@ -1,7 +1,7 @@
 import React, {useState, useEffect, useRef, ChangeEvent} from 'react';
 import {BarChart2, Menu, TrendingUp, MapPinHouse, TreePine, CloudUpload} from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { fetchAuthSession } from 'aws-amplify/auth';
 import { Hub } from 'aws-amplify/utils';
 
@@ -10,8 +10,16 @@ const ALL_SIDEBAR_ITEMS =[
         name: 'Dashboard', 
         icon: BarChart2, 
         color: '#6366f1', 
-        path:'/',
-        adminRequired: false
+        path:'/dashboard',
+        adminRequired: false,
+        hideFromAdmin: true
+    },
+    {
+        name: 'Dashboard', 
+        icon: BarChart2, 
+        color: '#6366f1', 
+        path:'/AdminDashboard',
+        adminRequired: true
     },
     {
         name: 'Farms', 
@@ -38,19 +46,22 @@ const ALL_SIDEBAR_ITEMS =[
 ]
 
 const Sidebar: React.FC = () => {
+    const location = useLocation();
     const [isSidebarOpen, setIsSidebarOpen] = useState(true);
     const [isAdmin, setIsAdmin] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const checkAdminStatus = async () => {
+    const checkAuthStatus = async () => {
         try {
             const session = await fetchAuthSession();
+            setIsAuthenticated(!!session.tokens);
             const groups = session?.tokens?.accessToken?.payload["cognito:groups"] || [];
             setIsAdmin(Array.isArray(groups) && groups.includes("Admin"));
         } catch (error) {
-            console.error("Error checking admin status:", error);
+            setIsAuthenticated(false);
             setIsAdmin(false);
         } finally {
             setLoading(false);
@@ -114,12 +125,12 @@ const Sidebar: React.FC = () => {
     };
 
     useEffect(() => {
-        checkAdminStatus();
+        checkAuthStatus();
 
         // Subscribe to auth events
         const unsubscribe = Hub.listen('auth', ({ payload }) => {
             if (payload.event === 'signedIn' || payload.event === 'signedOut') {
-                checkAdminStatus();
+                checkAuthStatus();
             }
         });
 
@@ -132,6 +143,11 @@ const Sidebar: React.FC = () => {
         return null; // or a loading spinner
     }
 
+    // Hide sidebar when not authenticated or on signin page
+    if (!isAuthenticated || location.pathname === '/signin') {
+        return null;
+    }
+
     const visibleItems = ALL_SIDEBAR_ITEMS.filter(item => 
         (!item.adminRequired || isAdmin) && 
         !(item.hideFromAdmin && isAdmin)
@@ -139,7 +155,7 @@ const Sidebar: React.FC = () => {
 
     return (
         <motion.div
-            className={`relative z-10 transition-all duration-300 ease-in-out flex-shrink-0 ${
+            className={`sidebar relative z-10 transition-all duration-300 ease-in-out flex-shrink-0 ${
                 isSidebarOpen ? "w-64" : "w-20"
             }`}
             animate={{width: isSidebarOpen ? 256 : 80}}
