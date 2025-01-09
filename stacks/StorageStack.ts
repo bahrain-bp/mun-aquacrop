@@ -26,15 +26,39 @@ export function S3Stack({stack}: StackContext) {
         },
     });
 
+        // Define the AI Lambda function
+        /*const aiProcessor = new Function(stack, "aiProcessor", {
+            handler: "packages/functions/src/aiProcessor.handler", // Ensure this path is correct
+            environment: {
+                SAGEMAKER_ENDPOINT: "jumpstart-dft-imagenet-mobilenet-v3-20241227-042804", // SageMaker endpoint
+            },
+            permissions: [
+                indexBucket, // Grants permission to access the indexBucket
+                "sagemaker:InvokeEndpoint", // Grants permission to invoke SageMaker endpoint
+            ],
+        });*/
+    
+
     const imageProcessor = new Function(stack, "imageProcessor", {
         handler: "packages/functions/src/imageProcessor.handler", // Ensure this path is correct
         environment: {
             imageResult: imageResult.tableName,
             stationTable: stationTable.tableName,
-            weatherReadingsTable: weatherReadingsTable.tableName
+            weatherReadingsTable: weatherReadingsTable.tableName,
+            SAGEMAKER_ENDPOINT: "jumpstart-dft-imagenet-mobilenet-v3-20241227-042804", // SageMaker endpoint
         },
-        permissions: [imageResult, stationTable, weatherReadingsTable], // Grants necessary permissions
+        permissions: [imageResult, stationTable, weatherReadingsTable,                
+            indexBucket, // Grants permission to access the indexBucket
+            "sagemaker:InvokeEndpoint",] // Grants permission to invoke SageMaker endpoint], // Grants necessary permissions
     });
+
+    // Add notification for the AI Lambda
+    /*indexBucket.addNotifications(stack, {
+        objectCreatedForAI: {
+            function: aiProcessor,
+            events: ["object_created"], // Triggers on object creation
+        },
+    });*/
 
     indexBucket.addNotifications(stack, {
         objectCreatedInIndexBucket: {

@@ -37,6 +37,11 @@ export const handler = async (event: S3Event, context: Context, callback: Callba
         const imageBuffer = await streamToBuffer(response.Body as Readable);
         console.log("Image successfully retrieved from S3");
 
+        // Get the metadata of the object
+        const headObjectCommand = new HeadObjectCommand({ Bucket: bucket, Key: key });
+        const metadataResponse = await s3Client.send(headObjectCommand);
+        console.log("Metadata:", metadataResponse.Metadata);
+
         // Send the image to SageMaker endpoint
         console.log(`Sending image to SageMaker endpoint: ${SAGEMAKER_ENDPOINT}`);
         const invokeCommand = new InvokeEndpointCommand({
