@@ -56,13 +56,48 @@ export const handler = async (event: S3Event, context: Context, callback: Callba
         const result = JSON.parse(new TextDecoder().decode(sageMakerResponse.Body));
         console.log("SageMaker response:", result);
 
-        return {
-            statusCode: 200,
-            body: JSON.stringify({
-                message: "Image processed successfully",
-                crops: result,
-            }),
-        };
+        // Labels for probabilities
+        const labels = [
+            "corn-end",
+            "corn-ini",
+            "corn-mid",
+            "cucumber-end",
+            "cucumber-ini",
+            "cucumber-mid",
+            "tomato-end",
+            "tomato-ini",
+            "tomato-mid"
+        ];
+
+        // Find the maximum probability and its label
+        const probabilities = result.probabilities;
+        if (!Array.isArray(probabilities)) {
+            throw new Error("Unexpected SageMaker response format: 'probabilities' is not an array");
+        }
+
+        const maxProbability = Math.max(...probabilities);
+        const maxIndex = probabilities.indexOf(maxProbability);
+        const maxLabel = labels[maxIndex];
+
+        console.log("Maximum probability:", maxProbability);
+        console.log("Label of maximum probability:", maxLabel);
+
+        if (maxProbability >= 0.75) {
+            return {
+                statusCode: 200,
+                body: JSON.stringify({
+                    maxProbability,
+                    maxLabel,
+                }),
+            };
+        } else {
+            return {
+                statusCode: 200,
+                body: JSON.stringify({
+                    message: "No prediction met the confidence threshold.",
+                }),
+            };
+        }
     } catch (error: any) {
         console.error("Error processing event:", error);
         return {
