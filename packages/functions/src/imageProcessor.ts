@@ -1,3 +1,5 @@
+import { PutCommand } from "@aws-sdk/lib-dynamodb";
+import { CopyObjectCommand } from "@aws-sdk/client-s3";
 import {APIGatewayProxyHandler} from "aws-lambda";
 import {GetObjectCommand, S3Client, HeadObjectCommand} from "@aws-sdk/client-s3";
 import {DynamoDBClient} from "@aws-sdk/client-dynamodb";
@@ -22,15 +24,161 @@ export const handler = async (event: any) => {
             const getObjectCommand = new GetObjectCommand({ Bucket: bucket, Key: key });
             const response = await s3Client.send(getObjectCommand);
 
-            // Get the metadata of the object
-            const headObjectCommand = new HeadObjectCommand({ Bucket: bucket, Key: key });
-            const metadataResponse = await s3Client.send(headObjectCommand);
-            console.log("Metadata:", metadataResponse.Metadata);
+        const streamToBuffer = async (stream: Readable): Promise<Buffer> => {
+            const chunks: Uint8Array[] = [];
+            for await (const chunk of stream) {
+                chunks.push(chunk);
+            }
+            return Buffer.concat(chunks);
+        };
 
-        } catch (error: any) {
+        const imageBuffer = await streamToBuffer(response.Body as Readable);
+        console.log("Image successfully retrieved from S3");
+
+        // Get the metadata of the object
+        const headObjectCommand = new HeadObjectCommand({ Bucket: bucket, Key: key });
+        const metadataResponse = await s3Client.send(headObjectCommand);
+
+        // Ensure Metadata is not undefined
+        const metadata = metadataResponse.Metadata || {}; // Default to an empty object if Metadata is undefined
+
+        console.log("Metadata:", metadataResponse.Metadata);
+
+        // Extract location from metadata (assuming it's in JSON format)
+        const locationMetadata = metadataResponse.Metadata?.['location'] || null;
+
+
+        // Initialize latitude and longitude
+        let latitude: number | null = null;
+        let longitude: number | null = null;
+
+        if (locationMetadata) {
+            try {
+                const location = JSON.parse(locationMetadata);
+                latitude = location.latitude || null;
+                longitude = location.longitude || null;
+
+                console.log("Latitude:", latitude);
+                console.log("Longitude:", longitude);
+            } catch (error) {
+                console.error("Error parsing location metadata:", error);
+            }
+        }
+
+        // Send the image to SageMaker endpoint
+        console.log(`Sending image to SageMaker endpoint: ${SAGEMAKER_ENDPOINT}`);
+        const invokeCommand = new InvokeEndpointCommand({
+            EndpointName: SAGEMAKER_ENDPOINT,
+            Body: imageBuffer,
+            ContentType: "application/x-image",
+        });
+
+        const sageMakerResponse = await sageMakerClient.send(invokeCommand);
+
+        // Parse the response
+        const result = JSON.parse(new TextDecoder().decode(sageMakerResponse.Body));
+        console.log("SageMaker response:", result);
+
+        // Labels for probabilities
+        const labels = [
+            "corn-end",
+            "corn-ini",
+            "corn-mid",
+            "cucumber-end",
+            "cucumber-ini",
+            "cucumber-mid",
+            "tomato-end",
+            "tomato-ini",
+            "tomato-mid"
+        ];
+
+        const kcValues: Record<string, number> = {
+            "corn-ini": 0.3,
+            "corn-mid": 1.15,
+            "corn-end": 1.79,
+            "cucumber-ini": 0.6,
+            "cucumber-mid": 1,
+            "cucumber-end": 0.75,
+            "tomato-ini": 0.6,
+            "tomato-mid": 1.3225,
+            "tomato-end": 0.8,
+        };
+
+        // Helper function to parse label into crop and growth stage
+        const parseLabel = (label: string) => {
+            const [crop, stage] = label.split("-");
+            return { crop, stage };
+        };
+
+        // Find the maximum probability and its label
+        const probabilities = result.probabilities;
+        if (!Array.isArray(probabilities)) {
+            throw new Error("Unexpected SageMaker response format: 'probabilities' is not an array");
+        }
+
+        const maxProbability = Math.max(...probabilities);
+        const maxIndex = probabilities.indexOf(maxProbability);
+        const maxLabel = labels[maxIndex];
+        const { crop, stage } = parseLabel(maxLabel);
+        const kc = kcValues[maxLabel] || null; // Retrieve the `kc` value
+
+        console.log("Maximum probability:", maxProbability);
+        console.log("Crop:", crop);
+        console.log("Growth Stage:", stage);
+        console.log("Crop Coefficient (kc):", kc);
+        
+
+        if (maxProbability >= 0.75) {
+            const sourceBucket = bucket; // Source bucket from the event
+            const destinationBucket = "crop-images-30-class"; // Destination bucket
+            const destinationKey = `Directory/${maxLabel}/${key.split('/').pop()}`; // Path in the destination bucket
+
+            console.log(`Copying file from ${sourceBucket}/${key} to ${destinationBucket}/${destinationKey}`);
+
+            const copyObjectCommand = new CopyObjectCommand({
+                Bucket: destinationBucket, // Destination bucket
+                CopySource: `${sourceBucket}/${key}`, // Source bucket and key
+                Key: destinationKey, // Destination key
+            });
+
+            await s3Client.send(copyObjectCommand);
+            console.log(`File successfully copied to: ${destinationBucket}/${destinationKey}`);
+
+                // Generate the public object URL
+                const imageSource = `https://${destinationBucket}.s3.amazonaws.com/${destinationKey}`;
+
+            // Add a record to the DynamoDB table
+            const item = {
+                filename: key.split('/').pop(), // Extract the filename from the S3 key
+                imageSource,
+                crop,
+                stage,
+                kc,
+                latitude,
+                longitude,
+                timestamp: new Date().toISOString(),
+            };
+
+            const tableName = process.env.aiResult;
+            const putCommand = new PutCommand({
+                TableName: tableName,
+                Item: item,
+            });
+
+            await ddbDocClient.send(putCommand);
+            console.log("Record added to DynamoDB:", item);
+
+
             return {
-                statusCode: 400,
-                body: JSON.stringify({error: error.message}),
+                statusCode: 200,
+                body: JSON.stringify(item),
+            };
+        } else {
+            return {
+                statusCode: 200,
+                body: JSON.stringify({
+                    message: "No prediction met the confidence threshold.",
+                }),
             };
         }
     } catch (error: any) {
