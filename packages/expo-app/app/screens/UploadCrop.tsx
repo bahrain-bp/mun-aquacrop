@@ -79,6 +79,10 @@ const UploadCrop: React.FC = () => {
                 },
             });
 
+            if (!response.ok) {
+                throw new Error('Failed to fetch classification');
+            }
+
             return await response.json(); // Contains classification data or empty if not classified
         } catch (error) {
             console.error('Still Waiting classification:', error);
@@ -98,13 +102,9 @@ const UploadCrop: React.FC = () => {
                 return null;
             }
 
-            try {
-                const record = await fetchClassification(fileName);
-                if (record) {
-                    return record; // Return the classification result
-                }
-            } catch (error) {
-                console.warn("Waiting for classification..."); // Log a warning but don't throw
+            const record = await fetchClassification(fileName);
+            if (record) {
+                return record; // Classification result
             }
 
             return new Promise((resolve) =>
@@ -197,6 +197,7 @@ const UploadCrop: React.FC = () => {
                 if (!fileNameDB) {
                     throw new Error('File upload failed.');
                 }
+                
                 console.log(fileNameDB);
                 const classification = await pollForClassification(fileNameDB);
             
@@ -205,8 +206,7 @@ const UploadCrop: React.FC = () => {
                     router.push({
                         pathname: '/screens/Recommendation',
                         params: {
-
-                            title: `${classification.crop} in ${classification.stage} growth stage`,
+                            title: classification.crop,
                             imageSource: classification.imageSource,
                             growthStage: classification.stage,
                             kcForCrop: classification.kc,
@@ -216,6 +216,8 @@ const UploadCrop: React.FC = () => {
                             
                         },
                     });
+                }else {
+                    Alert.alert('Error', 'The AI could not classify the image.');
                 }
             } else {
                 Alert.alert('Error', 'No image found to upload.');
