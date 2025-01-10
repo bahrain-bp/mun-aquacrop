@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import * as Location from 'expo-location';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import React, { useEffect, useState, useRef } from 'react';
@@ -8,6 +9,7 @@ import { storage } from '../utils/storage';
 const API_URL = process.env.EXPO_PUBLIC_PROD_API_URL;
 
 const UploadCrop: React.FC = () => {
+    const router = useRouter();
     const [facing, setFacing] = useState<CameraType>('back');
     const [permission, requestPermission] = useCameraPermissions();
     const cameraRef = useRef<any>(null);
@@ -66,6 +68,51 @@ const UploadCrop: React.FC = () => {
 
     const retakePicture = () => {
         setImage(null); // Reset the image state to null, so we can retake the picture
+    };
+
+    const fetchClassification = async (fileName: string): Promise<any> => {
+        try {
+            const idToken = await storage.getItem('idToken');
+            const response = await fetch(`${API_URL}/classification?fileName=${fileName}`, {
+                headers: {
+                    Authorization: `Bearer ${idToken}`,
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch classification');
+            }
+
+            return await response.json(); // Contains classification data or empty if not classified
+        } catch (error) {
+            console.error('Error fetching classification:', error);
+            return null;
+        }
+    };
+
+    const pollForClassification = async (fileName: string) => {
+        const timeout = 20000; // 20 seconds
+        const interval = 2000; // 2 seconds
+        const startTime = Date.now();
+
+        const checkRecord = async () => {
+            const elapsed = Date.now() - startTime;
+            if (elapsed > timeout) {
+                Alert.alert('Classification Failed', 'The AI could not classify the image.');
+                return null;
+            }
+
+            const record = await fetchClassification(fileName);
+            if (record) {
+                return record; // Classification result
+            }
+
+            return new Promise((resolve) =>
+                setTimeout(() => resolve(checkRecord()), interval)
+            );
+        };
+
+        return checkRecord();
     };
 
     const uploadImage = async (uri: string) => {
@@ -130,8 +177,10 @@ const UploadCrop: React.FC = () => {
                 },
             });
 
+            
             Alert.alert('Success', 'Image uploaded successfully!');
             setImage(null);
+            return fileName; // Return fileName for further use
         } catch (error) {
             console.error('Upload error:', error);
             Alert.alert('Error', 'Failed to upload image');
@@ -141,8 +190,47 @@ const UploadCrop: React.FC = () => {
     };
 
     const savePicture = async () => {
-        if (image) {
-            await uploadImage(image);
+        try {
+            if (image) {
+                const fileName = await uploadImage(image);
+                if (!fileName) {
+                    throw new Error('File upload failed.');
+                }
+                const classification = await pollForClassification(fileName);
+            
+                if (classification) {
+                    // Navigate to the recommendation page
+                    router.push({
+                        pathname: '/screens/Recommendation',
+                        params: {
+
+                            title: classification.crop,
+                            imageSource: classification.imageSource,
+                            growthStage: classification.stage,
+                            kcForCrop: classification.kc,
+                            latitude: classification.latitude,
+                            longitude: classification.longitude,
+
+                            
+                        },
+                    });
+                }
+            } else {
+                Alert.alert('Error', 'No image found to upload.');
+            }
+            
+        } catch(error: any) {
+            // Reset loading state if applicable
+        setIsUploading(false);
+
+        // Log the error for debugging
+        console.error('Error in savePicture:', error);
+
+        // Show an alert to the user
+        Alert.alert(
+            'Error',
+            'Something went wrong while processing the image. Please try again later.'
+        );
         }
     };
 
@@ -190,6 +278,12 @@ const UploadCrop: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+    message: {
+        fontSize: 18,
+        color: 'white',
+        textAlign: 'center',
+        marginBottom: 20,
+    },
     container: {
         flex: 1,
         justifyContent: 'center',
