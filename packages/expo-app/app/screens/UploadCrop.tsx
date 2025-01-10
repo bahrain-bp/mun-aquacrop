@@ -73,6 +73,9 @@ const UploadCrop: React.FC = () => {
     const fetchClassification = async (fileName: string): Promise<any> => {
         try {
             const idToken = await storage.getItem('idToken');
+            if (!idToken) {
+                throw new Error('No ID token found. Please log in again.');
+            }    
             const response = await fetch(`${API_URL}/classification?fileName=${fileName}`, {
                 headers: {
                     Authorization: `Bearer ${idToken}`,
@@ -80,12 +83,19 @@ const UploadCrop: React.FC = () => {
             });
 
             if (!response.ok) {
-                throw new Error('Failed to fetch classification');
+                if (response.status === 404) {
+                    console.warn('Classification not available yet.');
+                    return null; // Indicate no classification yet, allowing pollForClassification to retry
+                }
+
+                // For other errors, log and throw a generic error
+                console.error(`Fetch classification failed: ${response.status} ${response.statusText}`);
+                throw new Error(`API error: ${response.status} ${response.statusText}`);
             }
 
             return await response.json(); // Contains classification data or empty if not classified
         } catch (error) {
-            console.error('Still Waiting classification:', error);
+            console.error('Error in fetchClassification:', error);
             return null;
         }
     };
@@ -206,7 +216,7 @@ const UploadCrop: React.FC = () => {
                     router.push({
                         pathname: '/screens/Recommendation',
                         params: {
-                            title: classification.crop,
+                            title: `${classification.crop} in ${classification.stage} growth stage`,
                             imageSource: classification.imageSource,
                             growthStage: classification.stage,
                             kcForCrop: classification.kc,

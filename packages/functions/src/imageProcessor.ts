@@ -45,7 +45,6 @@ export const handler = async (event: S3Event, context: Context, callback: Callba
 
         // Ensure Metadata is not undefined
         const metadata = metadataResponse.Metadata || {}; // Default to an empty object if Metadata is undefined
-
         console.log("Metadata:", metadataResponse.Metadata);
 
         // Extract location from metadata (assuming it's in JSON format)
@@ -108,6 +107,13 @@ export const handler = async (event: S3Event, context: Context, callback: Callba
             "tomato-end": 0.8,
         };
 
+        // Define crop-specific images
+        const cropImages: Record<string, string> = {
+            corn: "https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/corn.png",
+            cucumber: "https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/cucumber.png",
+            tomato: "https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/tomato.png",
+        };
+
         // Helper function to parse label into crop and growth stage
         const parseLabel = (label: string) => {
             const [crop, stage] = label.split("-");
@@ -133,6 +139,7 @@ export const handler = async (event: S3Event, context: Context, callback: Callba
         
 
         if (maxProbability >= 0.75) {
+            const imageSource = cropImages[crop];
             const sourceBucket = bucket; // Source bucket from the event
             const destinationBucket = "crop-images-30-class"; // Destination bucket
             const destinationKey = `Directory/${maxLabel}/${key.split('/').pop()}`; // Path in the destination bucket
@@ -147,9 +154,6 @@ export const handler = async (event: S3Event, context: Context, callback: Callba
 
             await s3Client.send(copyObjectCommand);
             console.log(`File successfully copied to: ${destinationBucket}/${destinationKey}`);
-
-                // Generate the public object URL
-                const imageSource = `https://${destinationBucket}.amazonaws.com/${destinationKey}`;
 
             // Add a record to the DynamoDB table
             const item = {
