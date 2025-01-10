@@ -11,7 +11,7 @@ export function ApiStack({stack}: StackContext) {
     const auth = use(AuthStack);
     const {CSVReadings, indexBucket,imageBucket} = use(S3Stack);
     const {userPoolId, userPoolClientId, mobileUserPoolId, mobileUserPoolClientId} = use(AuthStack);
-    const {userTable,statsTable,stationTable, cropTable, weatherReadingsTable} = use(DynamoDBStack);
+    const {userTable,statsTable,stationTable, cropTable, weatherReadingsTable, aiResult} = use(DynamoDBStack);
 
     const authApi = {
         userPoolId,
@@ -321,7 +321,16 @@ export function ApiStack({stack}: StackContext) {
                
             },
 
-        },
+            "GET /classification": {
+                function: {
+                    handler: "packages/functions/src/ClassificationHandler.getClassification",
+                    environment: {
+                        ClassificationTableName: aiResult.tableName, // Replace with your classification table
+                    },
+                    permissions: [aiResult], // Grant read access to the table
+                },
+            },
+        }
     });
 
     // Cache policy to use with CloudFront as reverse proxy to avoid CORS

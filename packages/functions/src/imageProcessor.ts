@@ -149,7 +149,7 @@ export const handler = async (event: S3Event, context: Context, callback: Callba
             console.log(`File successfully copied to: ${destinationBucket}/${destinationKey}`);
 
                 // Generate the public object URL
-                const imageSource = `https://${destinationBucket}.s3.amazonaws.com/${destinationKey}`;
+                const imageSource = `https://${destinationBucket}.amazonaws.com/${destinationKey}`;
 
             // Add a record to the DynamoDB table
             const item = {

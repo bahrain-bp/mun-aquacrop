@@ -79,32 +79,32 @@ const UploadCrop: React.FC = () => {
                 },
             });
 
-            if (!response.ok) {
-                throw new Error('Failed to fetch classification');
-            }
-
             return await response.json(); // Contains classification data or empty if not classified
         } catch (error) {
-            console.error('Error fetching classification:', error);
+            console.error('Still Waiting classification:', error);
             return null;
         }
     };
 
     const pollForClassification = async (fileName: string) => {
-        const timeout = 20000; // 20 seconds
+        const timeout = 40000; // 40 seconds
         const interval = 2000; // 2 seconds
         const startTime = Date.now();
 
         const checkRecord = async () => {
             const elapsed = Date.now() - startTime;
             if (elapsed > timeout) {
-                Alert.alert('Classification Failed', 'The AI could not classify the image.');
+                Alert.alert('Timeout', 'The AI could not classify the image.');
                 return null;
             }
 
-            const record = await fetchClassification(fileName);
-            if (record) {
-                return record; // Classification result
+            try {
+                const record = await fetchClassification(fileName);
+                if (record) {
+                    return record; // Return the classification result
+                }
+            } catch (error) {
+                console.warn("Waiting for classification..."); // Log a warning but don't throw
             }
 
             return new Promise((resolve) =>
@@ -131,6 +131,7 @@ const UploadCrop: React.FC = () => {
             const randomId = Math.random().toString(36).substring(2, 15);
             const fileExtension = uri.split('.').pop();
             const fileName = `camera_uploads/image_${timestamp}_${randomId}.${fileExtension}`;
+            const fileNameDB = `image_${timestamp}_${randomId}.${fileExtension}`;
 
             // Prepare metadata
             const metadata = {
@@ -180,7 +181,7 @@ const UploadCrop: React.FC = () => {
             
             Alert.alert('Success', 'Image uploaded successfully!');
             setImage(null);
-            return fileName; // Return fileName for further use
+            return fileNameDB; // Return fileName for further use
         } catch (error) {
             console.error('Upload error:', error);
             Alert.alert('Error', 'Failed to upload image');
@@ -192,11 +193,12 @@ const UploadCrop: React.FC = () => {
     const savePicture = async () => {
         try {
             if (image) {
-                const fileName = await uploadImage(image);
-                if (!fileName) {
+                const fileNameDB = await uploadImage(image);
+                if (!fileNameDB) {
                     throw new Error('File upload failed.');
                 }
-                const classification = await pollForClassification(fileName);
+                console.log(fileNameDB);
+                const classification = await pollForClassification(fileNameDB);
             
                 if (classification) {
                     // Navigate to the recommendation page
@@ -204,7 +206,7 @@ const UploadCrop: React.FC = () => {
                         pathname: '/screens/Recommendation',
                         params: {
 
-                            title: classification.crop,
+                            title: `${classification.crop} in ${classification.stage} growth stage`,
                             imageSource: classification.imageSource,
                             growthStage: classification.stage,
                             kcForCrop: classification.kc,
