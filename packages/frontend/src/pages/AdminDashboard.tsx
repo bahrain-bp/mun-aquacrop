@@ -76,10 +76,10 @@ const DashboardContent: React.FC = () => {
                         value={loading ? '...' : stats.totalUsers.toString()} 
                         color='#8B5CF6'
                     />
-                    <StatCard 
-                        name='Total Crops' 
-                        icon={TreePine} 
-                        value={loading ? '...' : stats.totalCrops.toString()} 
+                    <StatCard
+                        name='Total Crops'
+                        icon={TreePine}
+                        value={loading ? '...' : stats.totalCrops.toString()}
                         color='#EC4899'
                     />
                     <StatCard name='Weather' icon={Cloud} value='12.5' color='#10B981'/>
@@ -89,7 +89,7 @@ const DashboardContent: React.FC = () => {
 
                     <WaterUsageChart />
                     <CategoryChart />
-                    <div className='lg:col-span-2'> {/* This makes the first chart span across both columns */}
+                    <div className='lg:col-span-2'>
                         <RecommendationsOverviewChart/>
                     </div>
                     <CropsChart/>

@@ -4,11 +4,11 @@ import { motion } from "framer-motion";
 
 const Water_Data = [
     { name: 'October', "Before SAQI": 4000, "After SAQI": 2400 },
-    { name: 'November', "Before SAQI": 3000, "After SAQI": 1398 },
-    { name: 'December', "Before SAQI": 2000, "After SAQI": 9800 },
-    { name: 'January', "Before SAQI": 2780, "After SAQI": 3908 },
-    { name: 'February', "Before SAQI": 1890, "After SAQI": 4800 },
-    { name: 'March', "Before SAQI": 2390, "After SAQI": 3800 },
+    { name: 'November', "Before SAQI": 3000, "After SAQI": 1998 },
+    { name: 'December', "Before SAQI": 2000, "After SAQI": 2025 },
+    { name: 'January', "Before SAQI": 2780, "After SAQI": 3008 },
+    { name: 'February', "Before SAQI": 1890, "After SAQI": 3100 },
+    { name: 'March', "Before SAQI": 2390, "After SAQI": 3200 },
 ];
 
 const WaterUsageChart: React.FC = () => {
