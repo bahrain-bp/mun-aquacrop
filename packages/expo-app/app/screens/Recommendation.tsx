@@ -96,6 +96,7 @@ const Recommendation: React.FC = () => {
                 shadowColor: theme.shadow 
             }]}>
                 <Text style={[styles.title, { color: theme.text }]}>{title}</Text>
+                <Text style={[styles.title, { color: theme.text }]}>{growthStage} growth stage</Text>
                 {imageSource && (
                     <Image source={{ uri: imageSource }} style={styles.image} />
                 )}

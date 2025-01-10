@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import * as Location from 'expo-location';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import React, { useEffect, useState, useRef } from 'react';
@@ -8,12 +9,14 @@ import { storage } from '../utils/storage';
 const API_URL = process.env.EXPO_PUBLIC_PROD_API_URL;
 
 const UploadCrop: React.FC = () => {
+    const router = useRouter();
     const [facing, setFacing] = useState<CameraType>('back');
     const [permission, requestPermission] = useCameraPermissions();
     const cameraRef = useRef<any>(null);
     const [image, setImage] = useState<string | null>(null);  // Manage image URI
     const [isUploading, setIsUploading] = useState(false);
     const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+    const [loading, setLoading] = useState(false); // State for loading during classification
 
     useEffect(() => {
         const getLocation = async () => {
@@ -68,6 +71,61 @@ const UploadCrop: React.FC = () => {
         setImage(null); // Reset the image state to null, so we can retake the picture
     };
 
+    const fetchClassification = async (fileName: string): Promise<any> => {
+        try {
+            const idToken = await storage.getItem('idToken');
+            if (!idToken) {
+                throw new Error('No ID token found. Please log in again.');
+            }    
+            const response = await fetch(`${API_URL}/classification?fileName=${fileName}`, {
+                headers: {
+                    Authorization: `Bearer ${idToken}`,
+                },
+            });
+
+            if (!response.ok) {
+                if (response.status === 404) {
+                    console.warn('Classification not available yet.');
+                    return null; // Indicate no classification yet, allowing pollForClassification to retry
+                }
+
+                // For other errors, log and throw a generic error
+                console.error(`Fetch classification failed: ${response.status} ${response.statusText}`);
+                throw new Error(`API error: ${response.status} ${response.statusText}`);
+            }
+
+            return await response.json(); // Contains classification data or empty if not classified
+        } catch (error) {
+            console.error('Error in fetchClassification:', error);
+            return null;
+        }
+    };
+
+    const pollForClassification = async (fileName: string) => {
+        const timeout = 40000; // 40 seconds
+        const interval = 2000; // 2 seconds
+        const startTime = Date.now();
+
+        const checkRecord = async () => {
+            const elapsed = Date.now() - startTime;
+            if (elapsed > timeout) {
+                Alert.alert('Timeout', 'The AI could not classify the image.');
+                return null;
+            }
+
+            const record = await fetchClassification(fileName);
+            if (record) {
+                return record; // Classification result
+            }
+
+            return new Promise((resolve) =>
+                setTimeout(() => resolve(checkRecord()), interval)
+            );
+        };
+
+        return checkRecord();
+    };
+
     const uploadImage = async (uri: string) => {
         try {
             setIsUploading(true);
@@ -84,6 +142,7 @@ const UploadCrop: React.FC = () => {
             const randomId = Math.random().toString(36).substring(2, 15);
             const fileExtension = uri.split('.').pop();
             const fileName = `camera_uploads/image_${timestamp}_${randomId}.${fileExtension}`;
+            const fileNameDB = `image_${timestamp}_${randomId}.${fileExtension}`;
 
             // Prepare metadata
             const metadata = {
@@ -130,8 +189,10 @@ const UploadCrop: React.FC = () => {
                 },
             });
 
+            
             Alert.alert('Success', 'Image uploaded successfully!');
             setImage(null);
+            return fileNameDB; // Return fileName for further use
         } catch (error) {
             console.error('Upload error:', error);
             Alert.alert('Error', 'Failed to upload image');
@@ -141,11 +202,61 @@ const UploadCrop: React.FC = () => {
     };
 
     const savePicture = async () => {
-        if (image) {
-            await uploadImage(image);
+        try {
+            if (image) {
+                setLoading(true); // Start loading
+                const fileNameDB = await uploadImage(image);
+                if (!fileNameDB) {
+                    throw new Error('File upload failed.');
+                }
+                
+                console.log(fileNameDB);
+                const classification = await pollForClassification(fileNameDB);
+                setLoading(false); // Stop loading
+            
+                if (classification) {
+                    // Navigate to the recommendation page
+                    router.push({
+                        pathname: '/screens/Recommendation',
+                        params: {
+                            title: classification.title,
+                            imageSource: classification.imageSource,
+                            growthStage: classification.stage,
+                            kcForCrop: classification.kc,
+                            latitude: classification.latitude,
+                            longitude: classification.longitude,
+                        },
+                    });
+                }else {
+                    Alert.alert('Error', 'The AI could not classify the image.');
+                }
+            } else {
+                Alert.alert('Error', 'No image found to upload.');
+            }
+            
+        } catch(error: any) {
+            // Reset loading state if applicable
+        setIsUploading(false);
+
+        // Log the error for debugging
+        console.error('Error in savePicture:', error);
+
+        // Show an alert to the user
+        Alert.alert(
+            'Error',
+            'Something went wrong while processing the image. Please try again later.'
+        );
         }
     };
 
+    if (loading) {
+        // Display loading state when classification is being fetched
+        return (
+            <View style={styles.container}>
+                <Text style={styles.message}>Processing your image...</Text>
+            </View>
+        );
+    }
     return (
         <View style={styles.container}>
             {!image ? (
@@ -190,6 +301,12 @@ const UploadCrop: React.FC = () => {
 };
 
 const styles = StyleSheet.create({
+    message: {
+        fontSize: 18,
+        color: 'white',
+        textAlign: 'center',
+        marginBottom: 20,
+    },
     container: {
         flex: 1,
         justifyContent: 'center',
