@@ -107,6 +107,12 @@ export const handler = async (event: S3Event, context: Context, callback: Callba
             "tomato-end": 0.8,
         };
 
+        const cropTitle: Record<string, String> = {
+            corn: 'Sweet corn',
+            cucumber: 'Cucumber',
+            tomato: 'Tomato',
+        };
+
         // Define crop-specific images
         const cropImages: Record<string, string> = {
             corn: "https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/corn.png",
@@ -140,6 +146,7 @@ export const handler = async (event: S3Event, context: Context, callback: Callba
 
         if (maxProbability >= 0.75) {
             const imageSource = cropImages[crop];
+            const title= cropTitle[crop];
             const sourceBucket = bucket; // Source bucket from the event
             const destinationBucket = "crop-images-30-class"; // Destination bucket
             const destinationKey = `Directory/${maxLabel}/${key.split('/').pop()}`; // Path in the destination bucket
@@ -160,6 +167,7 @@ export const handler = async (event: S3Event, context: Context, callback: Callba
                 filename: key.split('/').pop(), // Extract the filename from the S3 key
                 imageSource,
                 crop,
+                title,
                 stage,
                 kc,
                 latitude,

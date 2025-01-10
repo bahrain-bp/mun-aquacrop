@@ -16,6 +16,7 @@ const UploadCrop: React.FC = () => {
     const [image, setImage] = useState<string | null>(null);  // Manage image URI
     const [isUploading, setIsUploading] = useState(false);
     const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+    const [loading, setLoading] = useState(false); // State for loading during classification
 
     useEffect(() => {
         const getLocation = async () => {
@@ -203,6 +204,7 @@ const UploadCrop: React.FC = () => {
     const savePicture = async () => {
         try {
             if (image) {
+                setLoading(true); // Start loading
                 const fileNameDB = await uploadImage(image);
                 if (!fileNameDB) {
                     throw new Error('File upload failed.');
@@ -210,20 +212,19 @@ const UploadCrop: React.FC = () => {
                 
                 console.log(fileNameDB);
                 const classification = await pollForClassification(fileNameDB);
+                setLoading(false); // Stop loading
             
                 if (classification) {
                     // Navigate to the recommendation page
                     router.push({
                         pathname: '/screens/Recommendation',
                         params: {
-                            title: `${classification.crop} in ${classification.stage} growth stage`,
+                            title: classification.title,
                             imageSource: classification.imageSource,
                             growthStage: classification.stage,
                             kcForCrop: classification.kc,
                             latitude: classification.latitude,
                             longitude: classification.longitude,
-
-                            
                         },
                     });
                 }else {
@@ -248,6 +249,14 @@ const UploadCrop: React.FC = () => {
         }
     };
 
+    if (loading) {
+        // Display loading state when classification is being fetched
+        return (
+            <View style={styles.container}>
+                <Text style={styles.message}>Processing your image...</Text>
+            </View>
+        );
+    }
     return (
         <View style={styles.container}>
             {!image ? (
