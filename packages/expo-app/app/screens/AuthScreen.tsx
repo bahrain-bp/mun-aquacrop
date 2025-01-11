@@ -1,10 +1,13 @@
 // app/screens/AuthScreen.tsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
 import { storage } from '../utils/storage';
 import i18n from '../i18n'; // Import the shared i18n instance
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
 import CountrySelect from '../components/CountrySelect';
 
 const API_URL = process.env.EXPO_PUBLIC_API_ENDPOINT; // Replace with your actual API Gateway URL
@@ -23,7 +26,26 @@ const AuthScreen = () => {
   const [countryFlag, setCountryFlag] = useState('🇧🇭');
   const [countryPickerVisible, setCountryPickerVisible] = useState(false);
   const router = useRouter();
+  const [language, setLanguage] = useState(null);
 
+  // Load the language preference
+  useEffect(() => {
+    const loadLanguage = async () => {
+      try {
+        const savedLanguage = await AsyncStorage.getItem('language');
+        const activeLanguage = savedLanguage || 'en'; // Default to English if no preference exists
+        setLanguage(activeLanguage);
+        i18n.locale = activeLanguage;
+      } catch (error) {
+        console.error("Error loading language:", error);
+        setLanguage('en'); // Fallback to English on error
+        i18n.locale = 'en';
+      }
+    };
+
+    loadLanguage();
+  }, []);
+  
   const onSelectCountry = (country: { code: string; dial_code: string; flag: string }) => {
     setCountryCode(country.code);
     setCallingCode(country.dial_code);
@@ -134,13 +156,13 @@ const AuthScreen = () => {
         style={[styles.tab, activeTab === 'login' && styles.activeTab]}
         onPress={() => setActiveTab('login')}
       >
-        <Text style={[styles.tabText, activeTab === 'login' && styles.activeTabText]}>Login</Text>
+        <Text style={[styles.tabText, activeTab === 'login' && styles.activeTabText]}>{i18n.t('login')}</Text>
       </TouchableOpacity>
       <TouchableOpacity 
         style={[styles.tab, activeTab === 'register' && styles.activeTab]}
         onPress={() => setActiveTab('register')}
       >
-        <Text style={[styles.tabText, activeTab === 'register' && styles.activeTabText]}>Register</Text>
+        <Text style={[styles.tabText, activeTab === 'register' && styles.activeTabText]}>{i18n.t('register')}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -158,7 +180,7 @@ const AuthScreen = () => {
         style={styles.phoneInput}
         value={phoneNumber}
         onChangeText={setPhoneNumber}
-        placeholder="Phone number"
+        placeholder={i18n.t('loginph')}
         keyboardType="phone-pad"
       />
       <CountrySelect
@@ -182,16 +204,18 @@ const AuthScreen = () => {
             resizeMode="contain"
           />
           <View style={styles.card}>
+
             <TouchableOpacity style={styles.backButton} onPress={handleBack}>
-              <Text style={styles.backButtonText}>← Back</Text>
+            <Text style={styles.backButtonText}>← Back</Text>
             </TouchableOpacity>
-            <Text style={styles.title}>Verification</Text>
-            <Text style={styles.subtitle}>Enter the code sent to your phone</Text>
+            <Text style={styles.title}>{i18n.t('ver')}</Text>
+            <Text style={styles.subtitle}>{i18n.t('vertxt')}</Text>
+
             <TextInput
               style={styles.input}
               value={challengeResponse}
               onChangeText={setChallengeResponse}
-              placeholder="Enter verification code"
+              placeholder={i18n.t('entercodetxt')}
               keyboardType="numeric"
             />
             <TouchableOpacity
@@ -199,7 +223,7 @@ const AuthScreen = () => {
               onPress={handleVerifyChallenge}
               disabled={loading || !challengeResponse}
             >
-              <Text style={styles.buttonText}>{loading ? 'Verifying...' : 'Verify'}</Text>
+              <Text style={styles.buttonText}>{loading ? i18n.t('vering') : i18n.t('verbtn')}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -222,37 +246,37 @@ const AuthScreen = () => {
         <View style={styles.card}>
           {activeTab === 'login' ? (
             <>
-              <Text style={styles.title}>Welcome Back</Text>
-              <Text style={styles.subtitle}>Login with your phone number</Text>
+              <Text style={styles.title}>{i18n.t('wlbk')}</Text>
+              <Text style={styles.subtitle}>{i18n.t('logintxt')}</Text>
               {renderPhoneInput()}
               <TouchableOpacity onPress={() => setActiveTab('register')}>
-                <Text style={styles.redirectText}>New to the app? Register Here!</Text>
+                <Text style={styles.redirectText}>{i18n.t('reglink')}</Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.button}
                 onPress={handleLoginSubmit}
                 disabled={loading || !phoneNumber}
               >
-                <Text style={styles.buttonText}>{loading ? 'Processing...' : 'Login'}</Text>
+                <Text style={styles.buttonText}>{loading ? i18n.t('proc') : i18n.t('loginbtn')}</Text>
               </TouchableOpacity>
             </>
           ) : (
             <>
-              <Text style={styles.title}>Create Account</Text>
-              <Text style={styles.subtitle}>Register with your details</Text>
+              <Text style={styles.title}>{i18n.t('crtacc')}</Text>
+              <Text style={styles.subtitle}>{i18n.t('regtxt')}</Text>
               {renderPhoneInput()}
               <TextInput
                 style={styles.input}
                 value={fullname}
                 onChangeText={setFullname}
-                placeholder="Full Name"
+                placeholder={i18n.t('fullname')}
               />
               <TouchableOpacity
                 style={styles.button}
                 onPress={handleRegisterSubmit}
                 disabled={loading || !phoneNumber || !fullname}
               >
-                <Text style={styles.buttonText}>{loading ? 'Processing...' : 'Register'}</Text>
+                <Text style={styles.buttonText}>{loading ? i18n.t('proc') : i18n.t('regbtn')}</Text>
               </TouchableOpacity>
             </>
           )}

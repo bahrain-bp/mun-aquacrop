@@ -1,16 +1,6 @@
 // app/screens/Crop.tsx
-
 import React, {useState, useEffect} from 'react';
-import {
-    Text,
-    View,
-    Image,
-    TouchableOpacity,
-    StyleSheet,
-    ScrollView,
-    Platform,
-    Alert,
-} from 'react-native';
+import { Text, View, Image, TouchableOpacity, StyleSheet, ScrollView, Platform, Alert, } from 'react-native';
 import {useRouter} from "expo-router";
 import {useLocalSearchParams} from 'expo-router';
 import * as Location from 'expo-location';
@@ -21,6 +11,7 @@ import 'react-datepicker/dist/react-datepicker.css'; // Required CSS for react-d
 import CustomRadioButton from '@/components/CustomRadioButton'; // Ensure the path is correct
 import i18n from '../i18n'; // Import the shared i18n instance
 import { useTheme, themes } from '../components/ThemeContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Testing
 import {SelectList} from 'react-native-dropdown-select-list'
@@ -42,15 +33,16 @@ interface GrowthStageOption {
 
 const Crop: React.FC = () => {
     const router = useRouter();
-    const {nameEN, GrowthStage, kc, CropID, ImageURL} = useLocalSearchParams<{
+    const {nameEN, nameAR, GrowthStage, kc, CropID, ImageURL} = useLocalSearchParams<{
         nameEN: string;
+        nameAR: string;
         GrowthStage: string;
         kc: string;
         CropID: string;
         ImageURL: string;
     }>();
 
-    console.log('Received Params:', {nameEN, GrowthStage, kc, CropID, ImageURL});
+    console.log('Received Params:', {nameEN, nameAR, GrowthStage, kc, CropID, ImageURL});
 
     // State Variables
     const [selectedOption, setSelectedOption] = useState<"datePlanted" | "growthStage">("datePlanted");
@@ -65,29 +57,48 @@ const Crop: React.FC = () => {
     const [showDatePicker, setShowDatePicker] = useState(false);
     const { isDarkMode } = useTheme();
     const theme = isDarkMode ? themes.dark : themes.light;
+    const [language, setLanguage] = useState<string | null>(null); // to keep track of the language preference
 
     const bahrainLocations: LocationOption[] = [
-        {label: "Manama", value: "manama", latitude: 26.2041, longitude: 50.5860},
-        {label: "Riffa", value: "riffa", latitude: 26.1500, longitude: 50.5556},
-        {label: "Muharraq", value: "muharraq", latitude: 26.2521, longitude: 50.6233},
-        {label: "Sitra", value: "sitra", latitude: 26.0890, longitude: 50.6135},
-        {label: "Isa Town", value: "isa_town", latitude: 26.2069, longitude: 50.5278},
+        {label: i18n.t('l1'), value: "manama", latitude: 26.2041, longitude: 50.5860},
+        {label: i18n.t('l2'), value: "riffa", latitude: 26.1500, longitude: 50.5556},
+        {label: i18n.t('l3'), value: "muharraq", latitude: 26.2521, longitude: 50.6233},
+        {label: i18n.t('l4'), value: "sitra", latitude: 26.0890, longitude: 50.6135},
+        {label: i18n.t('l5'), value: "isa_town", latitude: 26.2069, longitude: 50.5278},
         // Add more locations as needed...
     ];
 
+    //retrieve language selected
+    useEffect(() => {
+        const loadLanguage = async () => {
+          try {
+            const savedLanguage = await AsyncStorage.getItem('language');
+            const activeLanguage = savedLanguage || 'en'; // Default to English if no preference exists
+            setLanguage(activeLanguage);
+            i18n.locale = activeLanguage;
+          } catch (error) {
+            console.error("Error loading language:", error);
+            setLanguage('en'); // Fallback to English on error
+            i18n.locale = 'en';
+          }
+        };
+      
+        loadLanguage();
+      }, []);
+
     const growthStages: GrowthStageOption[] = [
         {
-            label: "Stage 1",
+            label: i18n.t('s1'),
             value: "stage1",
             imageSource: "https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/Plant+Intial+Stage.png"
         },
         {
-            label: "Stage 2",
+            label: i18n.t('s2'),
             value: "stage2",
             imageSource: "https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/Plant+Middle+Stage.png"
         },
         {
-            label: "Stage 3",
+            label: i18n.t('s3'),
             value: "stage3",
             imageSource: "https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/Plant+End+Stage.png"
         },
@@ -177,6 +188,7 @@ const Crop: React.FC = () => {
     };
 
     // Handle stage selection
+    
     const handleStageSelection = (stage: string) => {
         console.log('Selected Growth Stage:', stage);
         setGrowthStage(stage);
@@ -296,6 +308,8 @@ const Crop: React.FC = () => {
         let recommendationParams: any = {
             // Data from the previous page
             title: nameEN,
+            nameEN: nameEN,
+            nameAR:nameAR,
             imageSource: ImageURL,
             kcForCrop: cropKC,
             // New data from this page
@@ -342,11 +356,10 @@ const Crop: React.FC = () => {
 
     const isButtonEnabled = (selectedOption === 'datePlanted' && isDateSelected) ||
         (selectedOption === 'growthStage' && isGrowthStageSelected);
-
+        
     // testing
-    const [selected, setSelected] = React.useState("");
 
-
+    
     // testing end
 
     return (
@@ -359,7 +372,7 @@ const Crop: React.FC = () => {
                 backgroundColor: theme.card,
                 shadowColor: theme.shadow 
             }]}>
-                <Text style={[styles.title, { color: theme.text }]}>{nameEN}</Text>
+                <Text style={[styles.title, { color: theme.text }]}>{language === 'ar' ? nameAR : nameEN}</Text>
                 {ImageURL ? (
                     <Image source={{uri: ImageURL}} style={styles.image}/>
                 ) : (
@@ -400,7 +413,7 @@ const Crop: React.FC = () => {
                                     handleLocationSelect(val);
                                 }}
                                 data={locationDataForSelect}
-                                placeholder="Select your location in Bahrain"
+                                placeholder={i18n.t('locationtxt')}
                                 boxStyles={[styles.selectBox, { backgroundColor: theme.border }]}
                                 dropdownStyles={[styles.dropdown, { backgroundColor: theme.border }]}
                                 inputStyles={[styles.selectInput, { color: theme.text }]}
@@ -439,7 +452,7 @@ const Crop: React.FC = () => {
                                 onPress={handleOpenDatePicker}
                             >
                                 <Text style={[styles.dateButtonText, { color: theme.text }]}>
-                                    {selectedDate ? selectedDate.toLocaleDateString() : 'Select Date'}
+                                    {selectedDate ? selectedDate.toLocaleDateString() : i18n.t('date')}
                                 </Text>
                             </TouchableOpacity>
 
@@ -453,7 +466,7 @@ const Crop: React.FC = () => {
                                         }}
                                         dateFormat="yyyy-MM-dd"
                                         className="dark-theme-datepicker"
-                                        placeholderText="Select a date"
+                                        placeholderText={i18n.t('date')}
                                     />
                                 )
                             ) : (
@@ -519,7 +532,7 @@ const Crop: React.FC = () => {
                         styles.calculateButtonText, 
                         { color: (!isButtonEnabled || !isLocationAvailable) ? theme.subText : '#FFFFFF' }
                     ]}>
-                        Calculate Water Need
+                        {i18n.t('calcbtn')}
                     </Text>
                 </TouchableOpacity>
             </View>
@@ -637,6 +650,7 @@ const styles = StyleSheet.create({
         marginBottom: 8,
     },
     calculateButton: {
+        color:"#2B6CB0",
         paddingVertical: 16,
         paddingHorizontal: 32,
         borderRadius: 12,

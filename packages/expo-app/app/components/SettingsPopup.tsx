@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Modal, StyleSheet, TouchableOpacity, Pressable, Switch } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { storage } from '../utils/storage';
 import { useTheme, themes } from './ThemeContext';
+import i18n from '../i18n';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface SettingsPopupProps {
     visible: boolean;
@@ -14,6 +16,7 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({ visible, onClose }) => {
     const router = useRouter();
     const { isDarkMode, toggleTheme } = useTheme();
     const theme = isDarkMode ? themes.dark : themes.light;
+    const [language, setLanguage] = useState<string | null>(null); // to keep track of the language preference
 
     const preventClose = (e: any) => {
         e.stopPropagation();
@@ -30,6 +33,39 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({ visible, onClose }) => {
         }
     };
 
+    //Retrieve language selected
+    useEffect(() => {
+        const loadLanguage = async () => {
+            try {
+                const savedLanguage = await AsyncStorage.getItem('language');
+                const activeLanguage = savedLanguage || 'en'; // Default to English if no preference exists
+                setLanguage(activeLanguage);
+                i18n.locale = activeLanguage;
+            } catch (error) {
+                console.error("Error loading language:", error);
+                setLanguage('en'); // Fallback to English on error
+                i18n.locale = 'en';
+            }
+        };
+    
+        loadLanguage();
+    }, []);
+
+    // Toggle the language and save the preference
+    const toggleLanguage = async () => {
+        const newLang = language === 'en' ? 'ar' : 'en';
+        setLanguage(newLang);
+        i18n.locale = newLang;
+        try {
+          await AsyncStorage.setItem('language', newLang);
+          // Force page refresh
+          router.push('/screens/DashBoard') // Navigate to the same route
+          await router.replace('/screens/DashBoard');
+        } catch (error) {
+          console.error('Error saving language:', error);
+        }
+      };
+
     return (
         <Modal
             transparent
@@ -43,7 +79,7 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({ visible, onClose }) => {
                     onPress={preventClose}
                 >
                     <View style={styles.header}>
-                        <Text style={[styles.title, { color: theme.text }]}>Settings</Text>
+                        <Text style={[styles.title, { color: theme.text }]}>{i18n.t('settings')}</Text>
                         <TouchableOpacity onPress={onClose}>
                             <MaterialIcons name="close" size={24} color={theme.text} />
                         </TouchableOpacity>
@@ -52,7 +88,7 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({ visible, onClose }) => {
                     <View style={styles.content}>
                         <View style={[styles.option, { backgroundColor: theme.border }]}>
                             <MaterialIcons name="brightness-6" size={24} color={theme.text} />
-                            <Text style={[styles.optionText, { color: theme.text }]}>Light Mode</Text>
+                            <Text style={[styles.optionText, { color: theme.text }]}>{i18n.t('mode')}</Text>
                             <Switch
                                 style={styles.toggle}
                                 value={!isDarkMode}
@@ -64,11 +100,11 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({ visible, onClose }) => {
 
                         <View style={[styles.option, { backgroundColor: theme.border }]}>
                             <MaterialIcons name="language" size={24} color={theme.text} />
-                            <Text style={[styles.optionText, { color: theme.text }]}>Arabic</Text>
+                            <Text style={[styles.optionText, { color: theme.text }]}>{i18n.t('arabic')}</Text>
                             <Switch
                                 style={styles.toggle}
-                                value={false}
-                                //onValueChange={}
+                                value={language === 'ar'}
+                                onValueChange={toggleLanguage}
                                 trackColor={{ false: '#767577', true: '#81b0ff' }}
                                 thumbColor={!isDarkMode ? '#f5dd4b' : '#f4f3f4'}
                                 
@@ -84,7 +120,7 @@ const SettingsPopup: React.FC<SettingsPopupProps> = ({ visible, onClose }) => {
                         >
                             <MaterialIcons name="logout" size={24} color="#FF4B4B" />
                             <Text style={[styles.signOutButtonText, { color: '#FF4B4B' }]}>
-                                Sign Out
+                                {i18n.t('so')}
                             </Text>
                         </TouchableOpacity>
                     </View>

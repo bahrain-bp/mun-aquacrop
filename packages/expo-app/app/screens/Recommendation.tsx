@@ -7,11 +7,15 @@ import axios from 'axios';
 import i18n from '../i18n';
 import { storage } from "@/app/utils/storage";
 import { useTheme, themes } from '../components/ThemeContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const Recommendation: React.FC = () => {
     const router = useRouter();
     const {
         title,
+        nameEN,
+        nameAR,
         imageSource,
         latitude,
         longitude,
@@ -26,6 +30,8 @@ const Recommendation: React.FC = () => {
         // @ts-ignore
     } = useLocalSearchParams<{
         title: string;
+        nameEN: string;
+        nameAR: string;
         imageSource: string;
         latitude: number;
         longitude: number;
@@ -42,6 +48,25 @@ const Recommendation: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [ET0, setET0] = useState<number | null>(null);
     const API_URL = process.env.EXPO_PUBLIC_PROD_API_URL;
+    const [language, setLanguage] = useState<string | null>(null); // to keep track of the language preference
+
+    //retrieve language selected
+    useEffect(() => {
+        const loadLanguage = async () => {
+            try {
+                const savedLanguage = await AsyncStorage.getItem('language');
+                const activeLanguage = savedLanguage || 'en'; // Default to English if no preference exists
+                setLanguage(activeLanguage);
+                i18n.locale = activeLanguage;
+            } catch (error) {
+                console.error("Error loading language:", error);
+                setLanguage('en'); // Fallback to English on error
+                i18n.locale = 'en';
+            }
+        };
+    
+        loadLanguage();
+    }, []);
     const { isDarkMode } = useTheme();
     const theme = isDarkMode ? themes.dark : themes.light;
 
@@ -95,8 +120,9 @@ const Recommendation: React.FC = () => {
                 borderColor: theme.border,
                 shadowColor: theme.shadow 
             }]}>
-                <Text style={[styles.title, { color: theme.text }]}>{title}</Text>
+                <Text style={[styles.title, { color: theme.text }]}>{i18n.t('rec')} {language === 'ar' ? nameAR : nameEN}</Text>
                 <Text style={[styles.title, { color: theme.text }]}>{growthStage} growth stage</Text>
+
                 {imageSource && (
                     <Image source={{ uri: imageSource }} style={styles.image} />
                 )}
@@ -121,7 +147,7 @@ const Recommendation: React.FC = () => {
                                     {i18n.t('totwaterneed')}
                                 </Text>
                                 <Text style={[styles.resultValue, { color: theme.accent }]}>
-                                    {ET0.toFixed(2)} Liters
+                                    {ET0.toFixed(2)} {i18n.t('litres')}
                                 </Text>
                             </View>
                         )}
@@ -133,7 +159,7 @@ const Recommendation: React.FC = () => {
                             onPress={() => router.replace('/screens/DashBoard')}
                         >
                             <Text style={[styles.returnButtonText, { color: theme.accent }]}>
-                                ← Return to Dashboard
+                                ← {i18n.t('bktodbtn')}
                             </Text>
                         </TouchableOpacity>
                     </>

@@ -7,6 +7,8 @@ import i18n from '../i18n'; // Import the shared i18n instance
 import { MaterialIcons } from '@expo/vector-icons';
 import SettingsPopup from '../components/SettingsPopup';
 import { useTheme, themes } from '../components/ThemeContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const API_URL = process.env.EXPO_PUBLIC_PROD_API_URL;
 
@@ -120,10 +122,12 @@ const Index: React.FC = () => {
                     }]}>
                         <View style={styles.headerRow}>
                             <View>
-                                <Text style={[styles.greetingText, { color: theme.subText }]}>Welcome</Text>
-                                {userName && (
+
+                                <Text style={[styles.greetingText, { color: theme.subText }]}>{i18n.t('welcome')}</Text>
+                                 {userName && (
                                     <Text style={[styles.welcomeText, { color: theme.text }]}>{userName} 👋</Text>
                                 )}
+
                             </View>
                             <TouchableOpacity 
                                 onPress={handleSettings} 
@@ -172,6 +176,25 @@ const Card: React.FC<CardProps> = ({ CropData, title, onPress, isUploadCard }) =
     const router = useRouter();
     const { isDarkMode } = useTheme();
     const theme = isDarkMode ? themes.dark : themes.light;
+    const [language, setLanguage] = useState<string | null>(null);
+
+    //retrieve language selected
+    useEffect(() => {
+        const loadLanguage = async () => {
+          try {
+            const savedLanguage = await AsyncStorage.getItem('language');
+            const activeLanguage = savedLanguage || 'en'; // Default to English if no preference exists
+            setLanguage(activeLanguage);
+            i18n.locale = activeLanguage;
+          } catch (error) {
+            console.error("Error loading language:", error);
+            setLanguage('en'); // Fallback to English on error
+            i18n.locale = 'en';
+          }
+        };
+      
+        loadLanguage();
+      }, []);
 
     const handlePress = () => {
         if (onPress) {
@@ -203,7 +226,7 @@ const Card: React.FC<CardProps> = ({ CropData, title, onPress, isUploadCard }) =
                     style={[styles.image, { backgroundColor: theme.border }]}
                     resizeMode="cover"
                 />
-                <Text style={[styles.cardTitle, { color: theme.text }]}>{nameEN.S}</Text>
+                <Text style={[styles.cardTitle, { color: theme.text }]}>{language === 'ar' ? nameAR.S : nameEN.S}</Text>
             </View>
         </TouchableOpacity>
     );
@@ -225,9 +248,9 @@ const UploadImageCard: React.FC = () => {
         >
             <View style={styles.uploadContent}>
                 <View>
-                    <Text style={[styles.uploadTitle, { color: theme.text }]}>Upload Image</Text>
+                    <Text style={[styles.uploadTitle, { color: theme.text }]}>{i18n.t('upload')}</Text>
                     <Text style={[styles.uploadSubtitle, { color: theme.subText }]}>
-                        Analyze your crop images
+                    {i18n.t('uploadtxt')}
                     </Text>
                 </View>
                 <View style={[styles.uploadIconContainer, { backgroundColor: theme.border }]}>
