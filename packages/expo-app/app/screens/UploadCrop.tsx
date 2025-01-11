@@ -219,7 +219,9 @@ const UploadCrop: React.FC = () => {
                     router.push({
                         pathname: '/screens/Recommendation',
                         params: {
-                            title: classification.title,
+                            title: classification.crop,
+                            nameEN: classification.nameEN,
+                            nameAR: classification.nameAR,
                             imageSource: classification.imageSource,
                             growthStage: classification.stage,
                             kcForCrop: classification.kc,
