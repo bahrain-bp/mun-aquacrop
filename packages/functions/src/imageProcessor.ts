@@ -1,28 +1,30 @@
 import { PutCommand } from "@aws-sdk/lib-dynamodb";
 import { CopyObjectCommand } from "@aws-sdk/client-s3";
-import {APIGatewayProxyHandler} from "aws-lambda";
+import { S3Event, Context, Callback } from "aws-lambda";
+import { Readable } from "stream";
 import {GetObjectCommand, S3Client, HeadObjectCommand} from "@aws-sdk/client-s3";
 import {DynamoDBClient} from "@aws-sdk/client-dynamodb";
 import {DynamoDBDocumentClient} from "@aws-sdk/lib-dynamodb";
+import { InvokeEndpointCommand, SageMakerRuntimeClient } from "@aws-sdk/client-sagemaker-runtime";
 
 const s3Client = new S3Client({});
 const dynamoDBClient = new DynamoDBClient({});
 const ddbDocClient = DynamoDBDocumentClient.from(dynamoDBClient);
 const client = new DynamoDBClient({});
+const sageMakerClient = new SageMakerRuntimeClient({});
+const SAGEMAKER_ENDPOINT = "jumpstart-dft-imagenet-mobilenet-v3-20241227-042804";
 
-export const handler = async (event: any) => {
+export const handler = async (event: S3Event, context: Context, callback: Callback) => {
     try {
-        console.log("Received event:", JSON.stringify(event, null, 2));
-        try {
-            const record = event.Records[0];
-            const bucket = record.s3.bucket.name;
-            const key = decodeURIComponent(record.s3.object.key.replace(/\+/g, ' '));
+        const record = event.Records[0];
+        const bucket = record.s3.bucket.name;
+        const key = decodeURIComponent(record.s3.object.key.replace(/\+/g, ' '));
 
-            console.log(`Processing file from bucket: ${bucket}, key: ${key}`);
+        console.log(`Processing file from bucket: ${bucket}, key: ${key}`);
 
-            // Get the CSV file from S3
-            const getObjectCommand = new GetObjectCommand({ Bucket: bucket, Key: key });
-            const response = await s3Client.send(getObjectCommand);
+        // Get the image file from S3
+        const getObjectCommand = new GetObjectCommand({ Bucket: bucket, Key: key });
+        const response = await s3Client.send(getObjectCommand);
 
         const streamToBuffer = async (stream: Readable): Promise<Buffer> => {
             const chunks: Uint8Array[] = [];
@@ -41,7 +43,6 @@ export const handler = async (event: any) => {
 
         // Ensure Metadata is not undefined
         const metadata = metadataResponse.Metadata || {}; // Default to an empty object if Metadata is undefined
-        console.log("Metadata:", metadataResponse.Metadata);
 
         // Extract location from metadata (assuming it's in JSON format)
         const locationMetadata = metadataResponse.Metadata?.['location'] || null;
@@ -57,8 +58,6 @@ export const handler = async (event: any) => {
                 latitude = location.latitude || null;
                 longitude = location.longitude || null;
 
-                console.log("Latitude:", latitude);
-                console.log("Longitude:", longitude);
             } catch (error) {
                 console.error("Error parsing location metadata:", error);
             }
@@ -197,7 +196,7 @@ export const handler = async (event: any) => {
         console.error("Error processing event:", error);
         return {
             statusCode: 500,
-            body: JSON.stringify({error: "Internal Server Error"}),
+            body: JSON.stringify({ error: "Internal Server Error", details: error.message }),
         };
     }
 };

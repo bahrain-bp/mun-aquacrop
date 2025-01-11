@@ -204,8 +204,8 @@ const UploadCrop: React.FC = () => {
     const savePicture = async () => {
         try {
             if (image) {
-                setLoading(true); // Start loading
                 const fileNameDB = await uploadImage(image);
+                setLoading(true); // Start loading
                 if (!fileNameDB) {
                     throw new Error('File upload failed.');
                 }
@@ -253,7 +253,7 @@ const UploadCrop: React.FC = () => {
         // Display loading state when classification is being fetched
         return (
             <View style={styles.container}>
-                <Text style={styles.message}>Processing your image...</Text>
+                <Text style={styles.message}>AI is processing your image...</Text>
             </View>
         );
     }
