@@ -50,6 +50,18 @@ const Recommendation: React.FC = () => {
     const API_URL = process.env.EXPO_PUBLIC_PROD_API_URL;
     const [language, setLanguage] = useState<string | null>(null); // to keep track of the language preference
 
+    const stageAR = (() => {
+        if (growthStage === 'ini') {
+            return 'الأولى';
+        } else if (growthStage === 'mid') {
+            return 'الوسطى ';
+        } else if (growthStage === 'end') {
+            return 'الأخيرة';
+        } else {
+            return null; // or an appropriate default value
+        }
+    })();
+
     //retrieve language selected
     useEffect(() => {
         const loadLanguage = async () => {
@@ -121,7 +133,11 @@ const Recommendation: React.FC = () => {
                 shadowColor: theme.shadow 
             }]}>
                 <Text style={[styles.title, { color: theme.text }]}>{i18n.t('rec')} {language === 'ar' ? nameAR : nameEN}</Text>
-                <Text style={[styles.title, { color: theme.text }]}>{growthStage} growth stage</Text>
+                {stageAR && (
+                <Text style={[styles.title, { color: theme.text }]}>
+                    {language === 'ar' ? `في مرحلة النمو ${stageAR} ` : `in ${growthStage} growth stage`}
+                </Text>
+                )}
 
                 {imageSource && (
                     <Image source={{ uri: imageSource }} style={styles.image} />
