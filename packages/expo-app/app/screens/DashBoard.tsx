@@ -51,7 +51,7 @@ AWS.config.update({
 
 const Index: React.FC = () => {
     const [crops, setCrops] = useState<Crop[]>([]);
-    const [userName, setUserName] = useState<string>('Guest');
+    const [userName, setUserName] = useState<string>('');
     const { width } = useWindowDimensions();
     const router = useRouter();
     const [isSettingsVisible, setIsSettingsVisible] = useState(false);
@@ -122,8 +122,12 @@ const Index: React.FC = () => {
                     }]}>
                         <View style={styles.headerRow}>
                             <View>
+
                                 <Text style={[styles.greetingText, { color: theme.subText }]}>{i18n.t('welcome')}</Text>
-                                <Text style={[styles.welcomeText, { color: theme.text }]}>{userName} 👋</Text>
+                                 {userName && (
+                                    <Text style={[styles.welcomeText, { color: theme.text }]}>{userName} 👋</Text>
+                                )}
+
                             </View>
                             <TouchableOpacity 
                                 onPress={handleSettings} 

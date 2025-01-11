@@ -11,7 +11,7 @@ export function ApiStack({stack}: StackContext) {
     const auth = use(AuthStack);
     const {CSVReadings, indexBucket,imageBucket} = use(S3Stack);
     const {userPoolId, userPoolClientId, mobileUserPoolId, mobileUserPoolClientId} = use(AuthStack);
-    const {stationTable, cropTable, weatherReadingsTable} = use(DynamoDBStack);
+    const {userTable,statsTable,stationTable, cropTable, weatherReadingsTable, aiResult} = use(DynamoDBStack);
 
     const authApi = {
         userPoolId,
@@ -100,6 +100,7 @@ export function ApiStack({stack}: StackContext) {
                     environment: {
                         CSVReadings: CSVReadings.bucketName,
                     },
+                    permissions: [CSVReadings],
                 },
                 authorizer: "authApi",
             },
@@ -180,8 +181,9 @@ export function ApiStack({stack}: StackContext) {
                         cropTable: cropTable.tableName,
                         stationTable: stationTable.tableName,
                         weatherReadingsTable: weatherReadingsTable.tableName,
+                        statsTable: statsTable.tableName, 
                     },
-                    permissions: [stationTable, cropTable, weatherReadingsTable],
+                    permissions: [stationTable, cropTable, weatherReadingsTable, statsTable],  
                 },
                 authorizer: "mobileauthApi",
             },
@@ -198,7 +200,7 @@ export function ApiStack({stack}: StackContext) {
                 function: {
                     handler: "packages/functions/src/Authentication/VerifyChallenge.handler",
                     runtime: "nodejs18.x",
-                    permissions: ["dynamodb:PutItem","dynamodb:UpdateItem"],
+                    permissions: ["dynamodb:PutItem","dynamodb:UpdateItem","dynamodb:GetItem"],
                 },
             },
 
@@ -289,9 +291,46 @@ export function ApiStack({stack}: StackContext) {
             //   authorizer: "adminAuthApi",
             // },
 
-           
+            
+           // Stats //
 
-        },
+
+            "GET /adminDashboard/stats": {
+                function: {
+                    handler: "packages/functions/src/AdminDashboard/getStats.handler",
+                    environment: {
+                        statsTable: statsTable.tableName,
+                        userTable: userTable.tableName,
+                        cropTable: cropTable.tableName
+                    },
+                    permissions: [statsTable, userTable, cropTable],
+                },
+                
+            },
+
+            "POST /adminDashboard/stats/updateWaterUsage": {
+                function: {
+                    handler: "packages/functions/src/AdminDashboard/updateWaterUsage.handler",
+                    environment: {
+                        statsTable: statsTable.tableName,
+                        userTable: userTable.tableName,
+                        cropTable: cropTable.tableName
+                    },
+                    permissions: [statsTable, userTable, cropTable],
+                },
+               
+            },
+
+            "GET /classification": {
+                function: {
+                    handler: "packages/functions/src/ClassificationHandler.getClassification",
+                    environment: {
+                        ClassificationTableName: aiResult.tableName, // Replace with your classification table
+                    },
+                    permissions: [aiResult], // Grant read access to the table
+                },
+            },
+        }
     });
 
     // Cache policy to use with CloudFront as reverse proxy to avoid CORS

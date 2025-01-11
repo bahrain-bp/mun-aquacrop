@@ -107,8 +107,10 @@ const isAuthenticated = async () => {
 
 export default function Page() {
   const router = useRouter();
+
   const [language, setLanguage] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [_, forceUpdate] = useState(0); // Used to force a re-render
 
   // Load the saved language preference
 
@@ -133,6 +135,7 @@ export default function Page() {
 
   // Toggle the language and save the preference
   const toggleLanguage = async () => {
+
     const newLang = language === 'en' ? 'ar' : 'en';
     setLanguage(newLang);
     i18n.locale = newLang;
@@ -152,7 +155,10 @@ export default function Page() {
           params: { userName }
         });
       } else {
-        setLoading(false);
+        // redirect to AuthScreen after a delay to imitate loading (yes, a delay for loading to imitate how other apps load,)
+        setTimeout(() => {
+          router.replace('/screens/AuthScreen');
+        }, 1400); //  1.4 second delay before redirect
       }
     };
     checkAuth();
@@ -187,6 +193,7 @@ export default function Page() {
         </TouchableOpacity>
         
       </View>
+
     </View>
   );
 }
@@ -200,9 +207,12 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   logo: {
-    width: 100,
-    height: 100,
-    marginBottom: 16,
+    width: 200,
+    height: 200,
+    marginBottom: 20,
+  },
+  spinner: {
+    marginTop: 20,
   },
   title: {
     color: '#032239',

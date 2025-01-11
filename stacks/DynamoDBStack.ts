@@ -115,14 +115,25 @@ export function DynamoDBStack({ stack }: StackContext) {
         primaryIndex: { partitionKey: "OwnerID", sortKey: "FarmID" },
     });
 
-const imageResult = new Table(stack, "ImageResult", {
-    fields: {
-        result: "string",
-        userId: "string",
-        imageid: "string",
-    },
-    primaryIndex: { partitionKey: "result"},
-});
+    const imageResult = new Table(stack, "ImageResult", {
+        fields: {
+            result: "string",
+            userId: "string",
+            imageid: "string",
+        },
+        primaryIndex: { partitionKey: "result"},
+    });
+
+    const aiResult = new Table(stack, "aiResult", {
+        fields: {
+            filename: "string",
+            crop: "string",
+            stage: "string",
+            longitude: "number",
+            latitude: "number"
+        },
+        primaryIndex: { partitionKey: "filename"},
+    });
 
 
     const zonesTable = new Table(stack, "Zones", {
@@ -137,12 +148,22 @@ const imageResult = new Table(stack, "ImageResult", {
         primaryIndex: { partitionKey: "FarmID", sortKey: "ZoneID" },
     });
 
-
+    const statsTable = new Table(stack, "Stats", {
+        fields: {
+            StatID: "string",
+            TotalRecommendations: "number",
+            TotalUsers: "number",
+            TotalCrops: "number",
+            TotalWaterUsage: "number"
+        },
+        primaryIndex: { partitionKey: "StatID" },
+    });
 
     stack.addOutputs({
         ImageResult: imageResult.tableName,
         UserTableName: userTable.tableName,
         CropTableName: cropTable.tableName,
+        aiResult: aiResult.tableName,
         // CropCoefficientTableName: cropCoefficientTable.tableName,
         WeatherReadingsTableName: weatherReadingsTable.tableName,
         StationTableName: stationTable.tableName,
@@ -150,10 +171,12 @@ const imageResult = new Table(stack, "ImageResult", {
         farmAdminTableName: farmAdminTable.tableName,
         farmTableName: farmTable.tableName,
         zonesTableName: zonesTable.tableName,
+        statsTableName: statsTable.tableName,
     });
 
     return {
         imageResult,
+        aiResult,
         userTable,
         cropTable,
         // cropCoefficientTable,
@@ -164,6 +187,7 @@ const imageResult = new Table(stack, "ImageResult", {
         farmAdminTable,
         farmTable,
         zonesTable,
+        statsTable,
     };
 
 }

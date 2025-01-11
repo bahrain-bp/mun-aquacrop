@@ -83,9 +83,26 @@ const Recommendation: React.FC = () => {
                 });
                 // Extract ET0 from the response
                 var { ET0 } = response.data;
-                 ET0 = ET0 * kcForCrop;
-                 ET0 =1.05 * 0.25 * ET0;
+                ET0 = ET0 * kcForCrop;
+                ET0 =1.05 * 0.25 * ET0;
                 setET0(ET0);
+
+                // Update stats with water usages
+                try {
+                    await axios.post(
+                        `${API_URL}/adminDashboard/stats/updateWaterUsage`,  
+                        { waterAmount: Number(ET0.toFixed(2)) },
+                        {
+                            headers: {
+                                'Authorization': `Bearer ${idToken}`,
+                                'Content-Type': 'application/json'
+                            }
+                        }
+                    );
+                    console.log('Water usage updated successfully:', Number(ET0.toFixed(2)));
+                } catch (statsError) {
+                    console.error('Error updating water usage:', statsError);
+                }
             } catch (error) {
                 console.error('Error fetching ET0:', error);
             } finally {
@@ -104,6 +121,8 @@ const Recommendation: React.FC = () => {
                 shadowColor: theme.shadow 
             }]}>
                 <Text style={[styles.title, { color: theme.text }]}>{i18n.t('rec')} {language === 'ar' ? nameAR : nameEN}</Text>
+                <Text style={[styles.title, { color: theme.text }]}>{growthStage} growth stage</Text>
+
                 {imageSource && (
                     <Image source={{ uri: imageSource }} style={styles.image} />
                 )}

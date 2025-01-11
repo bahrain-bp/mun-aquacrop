@@ -32,10 +32,12 @@ export default function Layout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
   
         {/* Define standalone screens */}
-        <Stack.Screen name="screens/AuthScreen" options={{ title: i18n.t('signup') }} />
-      <Stack.Screen name="screens/DashBoard" options={{ title: i18n.t('dashboard') }} />
-      <Stack.Screen name="screens/Recommendation" options={{ title: i18n.t('rectitle') }} />
-      <Stack.Screen name="screens/Crop" options={{ title: i18n.t('crop') }} />
+
+        <Stack.Screen name="screens/AuthScreen" options={{ headerShown: false,title: i18n.t('signup') }} />
+        <Stack.Screen name="screens/DashBoard" options={{ headerShown: false,title: i18n.t('dashboard') }} />
+        <Stack.Screen name="screens/Recommendation" options={{ title: i18n.t('rectitle') }} />
+        <Stack.Screen name="screens/Crop" options={{ title: i18n.t('crop') }} />
+
       </Stack>
     </ThemeProvider>
   );

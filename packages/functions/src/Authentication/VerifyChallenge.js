@@ -1,6 +1,6 @@
 import { CognitoIdentityProviderClient, RespondToAuthChallengeCommand } from "@aws-sdk/client-cognito-identity-provider";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { DynamoDBDocumentClient, PutCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, PutCommand, UpdateCommand, GetCommand } from "@aws-sdk/lib-dynamodb";
 
 const cognitoClient = new CognitoIdentityProviderClient({ region: "us-east-1" });
 const dynamoDBClient = new DynamoDBClient({ region: "us-east-1" });
@@ -33,41 +33,55 @@ export const handler = async (event) => {
     if (response.AuthenticationResult) {
       console.log(`User with sub: ${sub} authenticated successfully.`);
 
-      // Update LastLogged time for existing users
-      const updateParams = {
+      // First, try to get the existing user
+      const getUserParams = {
         TableName: "SaqiDev-mun-aquacrop-User",
         Key: {
           UID: sub
-        },
-        UpdateExpression: "SET LastLogged = :lastLogged",
-        ExpressionAttributeValues: {
-          ":lastLogged": new Date().toISOString()
         }
       };
 
       try {
-        await ddbDocClient.send(new UpdateCommand(updateParams));
-      } catch (dbError) {
-        // If user doesn't exist and fullname is provided (registration case), create new user
-        if (dbError.name === 'ResourceNotFoundException' && fullname) {
+        const existingUser = await ddbDocClient.send(new GetCommand(getUserParams));
+        
+        if (existingUser.Item) {
+          // User exists, update LastLogged
+          const updateParams = {
+            TableName: "SaqiDev-mun-aquacrop-User",
+            Key: {
+              UID: sub
+            },
+            UpdateExpression: "SET LastLogged = :lastLogged",
+            ExpressionAttributeValues: {
+              ":lastLogged": new Date().toISOString()
+            }
+          };
+          await ddbDocClient.send(new UpdateCommand(updateParams));
+        } else {
+          // User doesn't exist, create new user
+          const newUser = {
+            UID: sub,
+            Name: fullname,
+            Mobile: phoneNumber,
+            regDate: new Date().toISOString(),
+            LastLogged: new Date().toISOString(),
+            CollectData: 0,
+            Location: "",
+            Language: ""
+          };
+          
           const putParams = {
             TableName: "SaqiDev-mun-aquacrop-User",
-            Item: {
-              UID: sub,
-              Name: fullname,
-              Mobile: phoneNumber,
-              regDate: new Date().toISOString(),
-              LastLogged: new Date().toISOString(),
-              CollectData: 0,
-              Location: "",
-              Language: "",
-            },
+            Item: newUser
           };
+
+          console.log('Creating new user with data:', newUser);
           await ddbDocClient.send(new PutCommand(putParams));
           console.log(`Successfully created new user ${sub} in DynamoDB`);
-        } else {
-          console.error("Error updating DynamoDB:", dbError);
         }
+      } catch (dbError) {
+        console.error("Error accessing DynamoDB:", dbError);
+        // Continue with the authentication response even if DB operation fails
       }
 
       return {
