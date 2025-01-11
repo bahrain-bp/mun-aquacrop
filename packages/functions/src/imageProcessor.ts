@@ -148,7 +148,7 @@ export const handler = async (event: S3Event, context: Context, callback: Callba
         if (maxProbability >= 0.75) {
             const imageSource = cropImages[crop];
             const nameEN= cropNameEN[crop];
-            const NameAR = cropNameAR[crop];
+            const nameAR = cropNameAR[crop];
             const sourceBucket = bucket; // Source bucket from the event
             const destinationBucket = "crop-images-30-class"; // Destination bucket
             const destinationKey = `Directory/${maxLabel}/${key.split('/').pop()}`; // Path in the destination bucket
@@ -170,7 +170,7 @@ export const handler = async (event: S3Event, context: Context, callback: Callba
                 imageSource,
                 crop,
                 nameEN,
-                NameAR,
+                nameAR,
                 stage,
                 kc,
                 latitude,
