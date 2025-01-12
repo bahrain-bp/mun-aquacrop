@@ -1,8 +1,25 @@
 import { DynamoDBClient, ScanCommand } from "@aws-sdk/client-dynamodb";
+import * as AWS from "aws-sdk";
+
 
 const client = new DynamoDBClient({});
 
-export const main = async () => {
+export const main = async (event: any) => {
+
+
+    // const claims = event.requestContext?.authorizer?.jwt?.claims;
+    // if (!claims || !claims.sub) {
+    //     return {
+    //         statusCode: 401,
+    //         body: JSON.stringify({ message: "Unauthorized: Missing claims or sub" }),
+    //     };
+    // }
+    //
+    // // Extract the authenticated user's ID (sub) from the claims
+    // const ownerId = claims.sub;
+    //
+    // console.log("Authenticated User ID:", ownerId);
+
     try {
         // Define the scan parameters
         const params = {

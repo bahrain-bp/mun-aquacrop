@@ -4,9 +4,7 @@ import { DynamoDBDocumentClient, BatchWriteCommand, UpdateCommand } from "@aws-s
 import { parse } from "csv-parse/sync";
 import { v4 as uuidv4 } from "uuid"; // Import UUID function
 
-const WEATHER_READINGS_TABLE = process.env.WEATHER_READINGS_TABLE ?? "weatherReadingsTable";
-const STATION_TABLE = process.env.STATION_TABLE ?? "stationTable";
-
+// AWS SDK clients
 const s3Client = new S3Client({});
 const dynamoDBClient = new DynamoDBClient({});
 const ddbDocClient = DynamoDBDocumentClient.from(dynamoDBClient);
@@ -22,6 +20,7 @@ interface WeatherReading {
     maxTemp: number;
     wind_speed: number;
     humidity: number;
+    ET0: number;
 }
 
 // Helper: Convert stream to string
@@ -46,6 +45,7 @@ function convertToWeatherReading(record: any): WeatherReading {
         maxTemp: Number(record.maxTemp),
         wind_speed: Number(record.wind_speed),
         humidity: Number(record.humidity),
+        ET0: 0,
     };
 }
 
@@ -67,26 +67,19 @@ export const handler = async (event: any) => {
         const rawRecords = parse(body, { columns: true, skipEmptyLines: true });
         const records: WeatherReading[] = rawRecords.map((r: any) => convertToWeatherReading(r));
 
-        // Insert readings into weatherReadingsTable using batch writes
-        // const CHUNK_SIZE = 25;
-        // for (let i = 0; i < records.length; i += CHUNK_SIZE) {
-        //     const batch = records.slice(i, i + CHUNK_SIZE).map((item) => ({
-        //         PutRequest: { Item: item }
-        //     }));
-        //
-        //     const command = new BatchWriteCommand({
-        //         RequestItems: {
-        //             [process.env.weatherReadingsTable]: batch,
-        //         },
-        //     });
-        //     await ddbDocClient.send(command);
-        // }
+        // Calculate ET0
 
 
         for (let i = 0; i < records.length; i ++) {
 
+           if(!(records[i].StationID == "1" || records[i].StationID == "2") ){
+               continue;
+           }
+
+
             var pk = uuidv4();
 
+            records[i].ET0 = penman(records[i].incomingRadiation, records[i].outgoingRadiation, records[i].minTemp, records[i].maxTemp, records[i].humidity, records[i].wind_speed);
 
             const params = {
                 TableName: process.env.weatherReadingsTable,
@@ -101,6 +94,7 @@ export const handler = async (event: any) => {
                     maxTemp: { N: records[i].maxTemp.toString() },
                     wind_speed: { N: records[i].wind_speed.toString() },
                     humidity: { N: records[i].humidity.toString() },
+                    ET0: { N: records[i].ET0.toString() },
                 },
             };
 
@@ -134,3 +128,41 @@ export const handler = async (event: any) => {
         };
     }
 };
+
+const penman = (Rin: number, Rout: number, Tmin: number, Tmax: number, H: number, U: number, G: number = 0): number => {
+    // Constants
+
+    // Adjust wind speed to 2m height
+    // (windspeed, Inistial height, desired height)
+    U = adjustWindSpeed(U, 6, 2);
+
+
+    const T = (Tmax + Tmin) / 2; // Average temperature
+    const Rn = Rin - Rout; // Net radiation
+    const γ = 0.665 * 0.001 * 101.3; // Psychrometric constant
+    const esmax = 0.6108 * Math.exp((17.27 * Tmax) / (Tmax + 237.3)); // Saturation vapor pressure
+    const esmin = 0.6108 * Math.exp((17.27 * Tmin) / (Tmin + 237.3)); // Saturation vapor pressure
+    const esT = 0.6108 * Math.exp((17.27 * T) / (T + 237.3)); // Saturation vapor pressure
+    const es = (esmax + esmin) / 2; // Average saturation vapor pressure
+    const ea = es * (H / 100); // Actual vapor pressure
+    const Δ = (4098 * esT) / ((T + 237.3) ** 2); // Slope of saturation vapor pressure curve
+
+    // Penman equation
+    const ET =
+        (0.408 * Δ * (Rn - G) + γ * (900 / (T + 273)) * U * (es - ea)) /
+        (Δ + γ * (1 + 0.34 * U));
+
+    return ET;
+}
+
+function adjustWindSpeed(V1: number, H1: number, H2: number): number {
+    // Ensure the heights are valid (greater than 0)
+    if (H1 <= 0 || H2 <= 0) {
+        throw new Error("Heights must be greater than zero.");
+    }
+
+    // Logarithmic wind speed adjustment formula
+    const V2 = V1 * (Math.log(H2) / Math.log(H1));
+
+    return V2;
+}

@@ -1,13 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
-import { Link, useRouter } from 'expo-router';
+import { View, Text, StyleSheet, Button, ActivityIndicator, Image } from 'react-native';
+import { useRouter } from 'expo-router';
 import AWS, { CognitoIdentityServiceProvider } from 'aws-sdk';
 import { storage } from '../utils/storage';
+import i18n from '../i18n';
 
 // Configure AWS SDK with the region from environment variabless
 AWS.config.update({
   region: process.env.EXPO_PUBLIC_AWS_REGION || 'us-east-1', // Default to 'us-east-1' if not set
 });
+
+const toggleLanguage = () => {
+  const newLang = language === 'en' ? 'ar' : 'en';
+  setLanguage(newLang);
+};
+
+
 
 const HomeScreen = () => {
   return (
@@ -19,17 +27,12 @@ const HomeScreen = () => {
 
 const getToken = async () => {
   try {
-    const token = await storage.getItem('accessToken');
-    if (token) {
-      console.log('Retrieved Token:', token);
-      return token;
-    } else {
-      console.log('No token found');
-    }
+    return await storage.getItem('accessToken');
   } catch (error) {
     console.error('Error fetching token:', error);
   }
 };
+
 
 const validateToken = async (accessToken: string) => {
   const cognitoidentityserviceprovider = new AWS.CognitoIdentityServiceProvider();
@@ -39,103 +42,127 @@ const validateToken = async (accessToken: string) => {
 
   try {
     const data = await cognitoidentityserviceprovider.getUser(params).promise();
-    console.log('Token is valid:', data);
-    return data;
+    const userName = data.UserAttributes.find(attr => attr.Name === 'name')?.Value || '';
+    if (userName) {
+      await storage.setItem('userName', userName);
+    }
+    return { isValid: true, userName };
   } catch (error) {
-    console.error('Token validation failed:', error);
-    return null;
+    return { isValid: false, userName: '' };
   }
 };
 
 const refreshToken = async () => {
   try {
     const storedRefreshToken = await storage.getItem('refreshToken');
-    if (!storedRefreshToken) return false;
+    if (!storedRefreshToken) return { success: false, accessToken: null };
 
     const cognito = new CognitoIdentityServiceProvider();
     const params = {
-      AuthFlow: 'REFRESH_TOKEN_AUTH',
       ClientId: process.env.EXPO_PUBLIC_AWS_USERPOOL_CLIENTID || '',
+      AuthFlow: 'REFRESH_TOKEN_AUTH',
       AuthParameters: {
         REFRESH_TOKEN: storedRefreshToken,
+        CLIENT_ID: process.env.EXPO_PUBLIC_AWS_USERPOOL_CLIENTID || '',
       },
     };
 
     const data = await cognito.initiateAuth(params).promise();
 
     if (data.AuthenticationResult) {
-      const { IdToken, AccessToken, RefreshToken } = data.AuthenticationResult;
-      if (IdToken) {
-        await storage.setItem('idToken', IdToken);
-      }
-      if (AccessToken) {
-        await storage.setItem('accessToken', AccessToken);
-      }
-      if (RefreshToken) {
-        await storage.setItem('refreshToken', RefreshToken);
-      }
-      return true;
+      const { AccessToken, IdToken } = data.AuthenticationResult;
+      
+      // Store both tokens
+      if (AccessToken) await storage.setItem('accessToken', AccessToken);
+      if (IdToken) await storage.setItem('idToken', IdToken);
+      
+      return { success: true, accessToken: AccessToken, idToken: IdToken };
     }
-    return false;
+    return { success: false, accessToken: null, idToken: null };
   } catch (e) {
     console.error('Error refreshing token:', e);
-    return false;
+    // Clear all tokens on refresh failure
+    await storage.removeItem('accessToken');
+    await storage.removeItem('idToken');
+    await storage.removeItem('refreshToken');
+    return { success: false, accessToken: null, idToken: null };
   }
 };
 
 const isAuthenticated = async () => {
   try {
-    const idToken = await getToken();
-    if (!idToken) return false;
-
-    const isValid = await validateToken(idToken);
-    if (!isValid) {
-      const refreshed = await refreshToken();
-      return refreshed;
+    const accessToken = await getToken();
+    const idToken = await storage.getItem('idToken');
+    
+    if (!accessToken || !idToken) {
+      const refreshResult = await refreshToken();
+      if (!refreshResult.success) {
+        return { authenticated: false, userName: '' };
+      }
     }
 
-    return true;
+    if (!accessToken) {
+      throw new Error('Access token is missing');
+    }
+    const validation = await validateToken(accessToken);
+    if (!validation.isValid) {
+      const refreshResult = await refreshToken();
+      if (!refreshResult.success) {
+        return { authenticated: false, userName: '' };
+      }
+      return { authenticated: true, userName: validation.userName };
+    }
+
+    return { authenticated: true, userName: validation.userName };
   } catch (e) {
     console.error('Error checking authentication status:', e);
-    return false;
+    return { authenticated: false, userName: '' };
   }
 };
 
 export default function Page() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
+  const [language, setLanguage] = useState('en');
+  const [_, forceUpdate] = useState(0); // Used to force a re-render
+
+  useEffect(() => {
+    i18n.locale = language;
+    forceUpdate((prev) => prev + 1); // Trigger a re-render
+  }, [language]);
+  
+  const toggleLanguage = () => {
+    const newLang = language === 'en' ? 'ar' : 'en';
+    setLanguage(newLang);
+  };
 
   useEffect(() => {
     const checkAuth = async () => {
-      const authenticated = await isAuthenticated();
+      const { authenticated, userName } = await isAuthenticated();
       if (authenticated) {
-        router.replace('/screens/DashBoard');
+        router.replace({
+          pathname: '/screens/DashBoard',
+          params: { userName }
+        });
       } else {
-        setLoading(false);
+        // redirect to AuthScreen after a delay to imitate loading (yes, a delay for loading to imitate how other apps load,)
+        setTimeout(() => {
+          router.replace('/screens/AuthScreen');
+        }, 1400); //  1.4 second delay before redirect
       }
     };
     checkAuth();
   }, []);
 
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    );
-  }
-
+  // Always show loading screen
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Welcome to My App!</Text>
-
-      {/* Navigation Links */}
-      <Link style={styles.link} href="/screens/AuthScreen">
-        Signup
-      </Link>
-      <Link style={styles.link} href="/screens/DashBoard">
-        Skip Auth
-      </Link>
+      <Image
+        source={{ uri: 'https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/saqi-logo-1' }}
+        style={styles.logo}
+        resizeMode="contain"
+      />
+      <ActivityIndicator size="large" color="#0000ff" style={styles.spinner} />
     </View>
   );
 }
@@ -148,14 +175,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 16,
   },
+  logo: {
+    width: 200,
+    height: 200,
+    marginBottom: 20,
+  },
+  spinner: {
+    marginTop: 20,
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
   },
-  link: {
-    fontSize: 18,
-    color: 'blue',
-    marginVertical: 10,
+  button: {
+    marginTop: 10,
   },
 });

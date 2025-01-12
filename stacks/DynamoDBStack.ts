@@ -30,7 +30,6 @@ export function DynamoDBStack({ stack }: StackContext) {
             cropDescriptionEn: "string",
             cropImageURL: "string",
             KC: "map",
-            KC: "map",
             growthStage: "map",
         },
         primaryIndex: { partitionKey: "CropID" },
@@ -59,6 +58,7 @@ export function DynamoDBStack({ stack }: StackContext) {
             maxTemp: "number",
             wind_speed: "number",
             humidity: "number",
+            ET0: "number",
         },
         primaryIndex: { partitionKey: "ReadingID" },
     });
@@ -115,6 +115,27 @@ export function DynamoDBStack({ stack }: StackContext) {
         primaryIndex: { partitionKey: "OwnerID", sortKey: "FarmID" },
     });
 
+    const imageResult = new Table(stack, "ImageResult", {
+        fields: {
+            result: "string",
+            userId: "string",
+            imageid: "string",
+        },
+        primaryIndex: { partitionKey: "result"},
+    });
+
+    const aiResult = new Table(stack, "aiResult", {
+        fields: {
+            filename: "string",
+            crop: "string",
+            stage: "string",
+            longitude: "number",
+            latitude: "number"
+        },
+        primaryIndex: { partitionKey: "filename"},
+    });
+
+
     const zonesTable = new Table(stack, "Zones", {
         fields: {
             FarmID: "string",
@@ -127,11 +148,22 @@ export function DynamoDBStack({ stack }: StackContext) {
         primaryIndex: { partitionKey: "FarmID", sortKey: "ZoneID" },
     });
 
-
+    const statsTable = new Table(stack, "Stats", {
+        fields: {
+            StatID: "string",
+            TotalRecommendations: "number",
+            TotalUsers: "number",
+            TotalCrops: "number",
+            TotalWaterUsage: "number"
+        },
+        primaryIndex: { partitionKey: "StatID" },
+    });
 
     stack.addOutputs({
+        ImageResult: imageResult.tableName,
         UserTableName: userTable.tableName,
         CropTableName: cropTable.tableName,
+        aiResult: aiResult.tableName,
         // CropCoefficientTableName: cropCoefficientTable.tableName,
         WeatherReadingsTableName: weatherReadingsTable.tableName,
         StationTableName: stationTable.tableName,
@@ -139,9 +171,12 @@ export function DynamoDBStack({ stack }: StackContext) {
         farmAdminTableName: farmAdminTable.tableName,
         farmTableName: farmTable.tableName,
         zonesTableName: zonesTable.tableName,
+        statsTableName: statsTable.tableName,
     });
 
     return {
+        imageResult,
+        aiResult,
         userTable,
         cropTable,
         // cropCoefficientTable,
@@ -152,6 +187,7 @@ export function DynamoDBStack({ stack }: StackContext) {
         farmAdminTable,
         farmTable,
         zonesTable,
+        statsTable,
     };
 
 }

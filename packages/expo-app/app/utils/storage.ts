@@ -2,6 +2,7 @@
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 
+
 const isSecureStoreAvailable = async () => {
   if (Platform.OS !== 'web') {
     return await SecureStore.isAvailableAsync();

@@ -1,13 +1,21 @@
 // app/screens/Recommendation.tsx
 
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, ActivityIndicator } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { View, Text, Image, StyleSheet, ActivityIndicator, TouchableOpacity } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import axios from 'axios';
+import i18n from '../i18n';
+import { storage } from "@/app/utils/storage";
+import { useTheme, themes } from '../components/ThemeContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const Recommendation: React.FC = () => {
+    const router = useRouter();
     const {
         title,
+        nameEN,
+        nameAR,
         imageSource,
         latitude,
         longitude,
@@ -22,6 +30,8 @@ const Recommendation: React.FC = () => {
         // @ts-ignore
     } = useLocalSearchParams<{
         title: string;
+        nameEN: string;
+        nameAR: string;
         imageSource: string;
         latitude: number;
         longitude: number;
@@ -38,18 +48,73 @@ const Recommendation: React.FC = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [ET0, setET0] = useState<number | null>(null);
     const API_URL = process.env.EXPO_PUBLIC_PROD_API_URL;
+    const [language, setLanguage] = useState<string | null>(null); // to keep track of the language preference
+
+    const stageAR = (() => {
+        if (growthStage === 'ini') {
+            return 'الأولى';
+        } else if (growthStage === 'mid') {
+            return 'الوسطى ';
+        } else if (growthStage === 'end') {
+            return 'الأخيرة';
+        } else {
+            return null; // or an appropriate default value
+        }
+    })();
+
+    //retrieve language selected
+    useEffect(() => {
+        const loadLanguage = async () => {
+            try {
+                const savedLanguage = await AsyncStorage.getItem('language');
+                const activeLanguage = savedLanguage || 'en'; // Default to English if no preference exists
+                setLanguage(activeLanguage);
+                i18n.locale = activeLanguage;
+            } catch (error) {
+                console.error("Error loading language:", error);
+                setLanguage('en'); // Fallback to English on error
+                i18n.locale = 'en';
+            }
+        };
+    
+        loadLanguage();
+    }, []);
+    const { isDarkMode } = useTheme();
+    const theme = isDarkMode ? themes.dark : themes.light;
 
     useEffect(() => {
         const fetchData = async () => {
             try {
+                var idToken =  await storage.getItem('idToken');
+
                 const response = await axios.post(`${API_URL}/calculate/water`, {
-                    lat:latitude,
-                    lon:longitude,
+                    lat: latitude,
+                    lon: longitude,
+                }, {
+                    headers: { Authorization: `Bearer ${idToken}` },
                 });
                 // Extract ET0 from the response
                 var { ET0 } = response.data;
-                 ET0 = ET0 * kcForCrop;
+                ET0 = ET0 * kcForCrop;
+                ET0 =1.05 * 0.25 * ET0;
                 setET0(ET0);
+
+                // Update stats with water usages
+                try {
+                    await axios.post(
+                        `${API_URL}/adminDashboard/stats/updateWaterUsage`,  
+                        { waterAmount: Number(ET0.toFixed(2)) },
+                        {
+                            headers: {
+                                'Authorization': `Bearer ${idToken}`,
+                                'Content-Type': 'application/json'
+                            }
+                        }
+                    );
+                    console.log('Water usage updated successfully:', Number(ET0.toFixed(2)));
+                } catch (statsError) {
+                    console.error('Error updating water usage:', statsError);
+                }
             } catch (error) {
                 console.error('Error fetching ET0:', error);
             } finally {
@@ -60,50 +125,62 @@ const Recommendation: React.FC = () => {
         fetchData();
     }, [API_URL, latitude, longitude]);
 
-
-
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Recommendation for {title}</Text>
-            {imageSource && <Image source={{ uri: imageSource }} style={styles.image} />}
+        <View style={[styles.container, { backgroundColor: theme.background }]}>
+            <View style={[styles.header, { 
+                backgroundColor: theme.card,
+                borderColor: theme.border,
+                shadowColor: theme.shadow 
+            }]}>
+                <Text style={[styles.title, { color: theme.text }]}>{i18n.t('rec')} {language === 'ar' ? nameAR : nameEN}</Text>
+                {stageAR && (
+                <Text style={[styles.title, { color: theme.text }]}>
+                    {language === 'ar' ? `في مرحلة النمو ${stageAR} ` : `in ${growthStage} growth stage`}
+                </Text>
+                )}
 
-            {isLoading ? (
-                <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color="#00aaff" />
-                    <Text style={styles.loadingText}>Calculating water need...</Text>
-                </View>
-            ) : (
-                <>
-                    {ET0 !== null && (
-                        <View style={styles.resultBox}>
-                            <Text style={styles.resultText}>
-                                Total Water Needed: <Text style={styles.emphasis}>{ET0.toFixed(2)} Liters</Text>
+                {imageSource && (
+                    <Image source={{ uri: imageSource }} style={styles.image} />
+                )}
+            </View>
+
+            <View style={styles.mainContent}>
+                {isLoading ? (
+                    <View style={styles.loadingContainer}>
+                        <ActivityIndicator size="large" color={theme.accent} />
+                        <Text style={[styles.loadingText, { color: theme.text }]}>
+                            {i18n.t('calcwaterneed')}
+                        </Text>
+                    </View>
+                ) : (
+                    <>
+                        {ET0 !== null && (
+                            <View style={[styles.resultBox, { 
+                                backgroundColor: theme.card,
+                                borderColor: theme.border 
+                            }]}>
+                                <Text style={[styles.resultLabel, { color: theme.subText }]}>
+                                    {i18n.t('totwaterneed')}
+                                </Text>
+                                <Text style={[styles.resultValue, { color: theme.accent }]}>
+                                    {ET0.toFixed(2)} {i18n.t('litres')}
+                                </Text>
+                            </View>
+                        )}
+                        <TouchableOpacity 
+                            style={[styles.returnButton, { 
+                                backgroundColor: theme.card,
+                                borderColor: theme.accent 
+                            }]}
+                            onPress={() => router.replace('/screens/DashBoard')}
+                        >
+                            <Text style={[styles.returnButtonText, { color: theme.accent }]}>
+                                ← {i18n.t('bktodbtn')}
                             </Text>
-                        </View>
-                    )}
-
-                    {/*<View style={styles.infoContainer}>*/}
-                    {/*    <Text style={styles.infoText}>kcForCrop : {kcForCrop}</Text>*/}
-                    {/*    <Text style={styles.infoText}>Crop ID: {cropID}</Text>*/}
-                    {/*    <Text style={styles.infoText}>Kc Value: {kc}</Text>*/}
-                    {/*    <Text style={styles.infoText}>Location Method: {locationMethod}</Text>*/}
-                    {/*    <Text style={styles.infoText}>Latitude: {latitude}</Text>*/}
-                    {/*    <Text style={styles.infoText}>Longitude: {longitude}</Text>*/}
-                    {/*    <Text style={styles.infoText}>Selection Method: {selectionMethod}</Text>*/}
-                    {/*    {selectionMethod === 'datePlanted' && (*/}
-                    {/*        <Text style={styles.infoText}>Date Planted: {selectedDate}</Text>*/}
-                    {/*    )}*/}
-                    {/*    {selectionMethod === 'growthStage' && (*/}
-                    {/*        <>*/}
-                    {/*            <Text style={styles.infoText}>Growth Stage: {growthStage}</Text>*/}
-                    {/*            {stageImage && (*/}
-                    {/*                <Image source={{ uri: stageImage }} style={styles.stageImage} />*/}
-                    {/*            )}*/}
-                    {/*        </>*/}
-                    {/*    )}*/}
-                    {/*</View>*/}
-                </>
-            )}
+                        </TouchableOpacity>
+                    </>
+                )}
+            </View>
         </View>
     );
 };
@@ -111,79 +188,77 @@ const Recommendation: React.FC = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        padding: 20,
+    },
+    header: {
         alignItems: 'center',
-        backgroundColor: '#f0f8ff',
+        padding: 20,
+        borderRadius: 15,
+        margin: 16,
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        borderWidth: 1,
+    },
+    mainContent: {
+        padding: 16,
+        flex: 1,
     },
     title: {
-        fontSize: 26,
-        fontWeight: '800',
-        marginBottom: 20,
-        color: '#003366',
-        textShadowColor: '#ccc',
-        textShadowOffset: { width: 1, height: 1 },
-        textShadowRadius: 2,
+        fontSize: 28,
+        fontWeight: 'bold',
+        marginBottom: 16,
+        textAlign: 'center',
     },
     image: {
-        width: 180,
-        height: 180,
-        borderRadius: 15,
-        marginBottom: 20,
-        borderWidth: 2,
-        borderColor: '#ccc',
+        width: 200,
+        height: 200,
+        borderRadius: 12,
+        marginBottom: 16,
     },
     loadingContainer: {
-        marginTop: 50,
+        flex: 1,
+        justifyContent: 'center',
         alignItems: 'center',
     },
     loadingText: {
-        marginTop: 15,
+        marginTop: 16,
         fontSize: 18,
         fontWeight: '500',
-        color: '#333',
     },
     resultBox: {
-        marginVertical: 20,
-        backgroundColor: '#e6f7ff',
-        padding: 20,
-        borderRadius: 15,
-        width: '100%',
-        alignItems: 'center',
+        borderRadius: 12,
+        padding: 24,
         borderWidth: 1,
-        borderColor: '#b3ecff',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.15,
-        shadowRadius: 5,
-        elevation: 3,
+        alignItems: 'center',
+        marginTop: 16,
     },
-    resultText: {
-        fontSize: 20,
-        fontWeight: '600',
-        color: '#005580',
+    resultLabel: {
+        fontSize: 18,
+        marginBottom: 12,
         textAlign: 'center',
     },
-    emphasis: {
-        fontWeight: '700',
-        color: '#007acc',
+    resultValue: {
+        fontSize: 32,
+        fontWeight: 'bold',
+        textAlign: 'center',
     },
-    infoContainer: {
-        marginTop: 20,
-        width: '100%',
-    },
-    infoText: {
-        fontSize: 16,
-        fontWeight: '500',
-        color: '#333',
-        marginVertical: 2,
-    },
-    stageImage: {
-        width: 100,
-        height: 100,
-        borderRadius: 10,
-        marginTop: 10,
+    returnButton: {
+        paddingVertical: 16,
+        paddingHorizontal: 32,
+        borderRadius: 12,
+        alignItems: 'center',
+        marginTop: 24,
         borderWidth: 1,
-        borderColor: '#ccc',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+    },
+    returnButtonText: {
+        fontSize: 16,
+        fontWeight: '600',
+        textAlign: 'center',
     },
 });
 

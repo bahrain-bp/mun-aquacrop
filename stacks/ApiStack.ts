@@ -1,21 +1,21 @@
-import { Api, StackContext, use } from "sst/constructs";
-import { DBStack } from "./DBStack";
-import { DynamoDBStack } from "./DynamoDBStack";
-import { AuthStack } from "./AuthStack"; 
-import { CacheHeaderBehavior, CachePolicy } from "aws-cdk-lib/aws-cloudfront";
-import { Duration } from "aws-cdk-lib/core";
+import {Api, StackContext, use} from "sst/constructs";
+import {DBStack} from "./DBStack";
+import {DynamoDBStack} from "./DynamoDBStack";
+import {AuthStack} from "./AuthStack";
+import {CacheHeaderBehavior, CachePolicy} from "aws-cdk-lib/aws-cloudfront";
+import {Duration} from "aws-cdk-lib/core";
 import {S3Stack} from "./StorageStack";
 
 export function ApiStack({stack}: StackContext) {
     const {table} = use(DBStack);
     const auth = use(AuthStack);
-    const {CSVReadings} = use(S3Stack);
-    const { userPoolId, userPoolClientId } = use(AuthStack);
-    const {stationTable, cropTable, weatherReadingsTable} = use(DynamoDBStack);
+    const {CSVReadings, indexBucket,imageBucket} = use(S3Stack);
+    const {userPoolId, userPoolClientId, mobileUserPoolId, mobileUserPoolClientId} = use(AuthStack);
+    const {userTable,statsTable,stationTable, cropTable, weatherReadingsTable, aiResult} = use(DynamoDBStack);
 
     const authApi = {
-      userPoolId,
-      userPoolClientId,
+        userPoolId,
+        userPoolClientId,
     };
 
     // Create the HTTP API
@@ -30,59 +30,69 @@ export function ApiStack({stack}: StackContext) {
                     WeatherReadingsTableName: weatherReadingsTable.tableName,
                 },
             },
+        
         },
         authorizers: {
-          authApi: { 
-            type: "user_pool",
-            userPool: {
-              id: authApi.userPoolId,
-              clientIds: [authApi.userPoolClientId],
+            mobileauthApi: {
+                type: "user_pool",
+                userPool: {
+                    id: mobileUserPoolId,
+                    clientIds: [mobileUserPoolClientId],
+                },
             },
-          },
-          adminAuthApi: {
-            type: "user_pool",
-            userPool: {
-              id: authApi.userPoolId,
-              clientIds: [authApi.userPoolClientId],
+            authApi: {
+                type: "user_pool",
+                userPool: {
+                    id: authApi.userPoolId,
+                    clientIds: [authApi.userPoolClientId],
+                },
             },
-            // Add admin group authorization
-            identitySource: ["$request.header.Authorization"],
-            // Add group authorization check
-            authorizationScopes: ["aws.cognito.signin.user.admin"],
-            // Ensure admin group validation
-            properties: {
-              AllowedGroupsOverride: ["Admin"]
-            }
-          },
+            adminAuthApi: {
+                type: "user_pool",
+                userPool: {
+                    id: authApi.userPoolId,
+                    clientIds: [authApi.userPoolClientId],
+                },
+                // Add admin group authorization
+                identitySource: ["$request.header.Authorization"],
+                // Add group authorization check
+                authorizationScopes: ["aws.cognito.signin.user.admin"],
+                // Ensure admin group validation
+                properties: {
+                    AllowedGroupsOverride: ["Admin"]
+                }
+            },
         },
         routes: {
             // Sample TypeScript lambda function
             "POST /": "packages/functions/src/lambda.main",
 
-            // Penman equation Lambda function
-            "POST /penman": "packages/functions/src/penman.handler",
 
-
-            "GET /crops": {
+            "GET /admin/crops": {
                 function: {
-                    handler: "packages/functions/src/crops-handler.main",
+                    handler: "packages/functions/src/mobile-api/crops-handler.main",
                     timeout: "30 seconds",
                     environment: {
                         CropTableName: cropTable.tableName,
                     },
                     permissions: [cropTable],
-                }
+                },
+                // authorizer: "authApi",
             },
 
-            "POST /Latest/Weather/Reading": {
+
+            "GET /crops": {
                 function: {
-                    handler: "packages/functions/src/getLatestWeatherReading.handler",
+                    handler: "packages/functions/src/mobile-api/crops-handler.main",
+                    timeout: "30 seconds",
                     environment: {
-                        weatherReadingsTable: weatherReadingsTable.tableName,
+                        CropTableName: cropTable.tableName,
                     },
-                    permissions: [weatherReadingsTable],
+                    permissions: [cropTable],
                 },
+                authorizer: "mobileauthApi",
             },
+
 
             "POST /Upload/CSV": {
                 function: {
@@ -90,25 +100,92 @@ export function ApiStack({stack}: StackContext) {
                     environment: {
                         CSVReadings: CSVReadings.bucketName,
                     },
-                    permissions: [weatherReadingsTable],
+                    permissions: [CSVReadings],
+                },
+                authorizer: "authApi",
+            },
+
+            "POST /Upload/image": {
+                function: {
+                    handler: "packages/functions/src/GenerateUploadUrl.uploadImageForResult",
+                    environment: {
+                        indexBucket: indexBucket.bucketName,
+                    },
+                    permissions: [indexBucket],
+                },
+                // authorizer: "mobileauthApi",
+            },
+
+
+            "POST /Upload/crop/image": {
+                function: {
+                    handler: "packages/functions/src/GenerateUploadUrl.uploadImageForCrop",
+                    environment: {
+                        imageBucket: imageBucket.bucketName,
+                    },
+                    permissions: [imageBucket],
+                },
+            },
+
+            //app upload image (Ai)
+            "POST /Upload/camera": {
+                function: {
+                    handler: "packages/functions/src/GenerateUploadUrl.uploadCameraImage",
+                    environment: {
+                        indexBucket: indexBucket.bucketName,
+                    },
+                    permissions: [indexBucket],
+                },
+                authorizer: "mobileauthApi",
+            },
+
+
+            "PUT /update/crop": {
+                function: {
+                    handler: "packages/functions/src/AdminDashboard/CropsManager.update",
+                    environment: {
+                        cropTable: cropTable.tableName,
+                        imageBucket: imageBucket.bucketName,
+                    },
+                    permissions: [cropTable, imageBucket],
+                },
+            },
+
+            "DELETE /delete/crop/{CropID}": {
+                function: {
+                    handler: "packages/functions/src/AdminDashboard/CropsManager.deleteCrop",
+                    environment: {
+                        cropTable: cropTable.tableName,
+                        imageBucket: imageBucket.bucketName,
+                    },
+                    permissions: [cropTable, imageBucket],
                 },
             },
 
 
+            "POST /add/crop": {
+                function: {
+                    handler: "packages/functions/src/AdminDashboard/CropsManager.add",
+                    environment: {
+                        cropTable: cropTable.tableName,
+                    },
+                },
+            },
 
-            "POST /station": "packages/functions/src/station-handler.main",
 
             // route for calculating water
             "POST /calculate/water": {
                 function: {
-                    handler: "packages/functions/src/calculateWaterNeed.handler",
+                    handler: "packages/functions/src/mobile-api/calculateWaterNeed.handler",
                     environment: {
                         cropTable: cropTable.tableName,
                         stationTable: stationTable.tableName,
                         weatherReadingsTable: weatherReadingsTable.tableName,
+                        statsTable: statsTable.tableName, 
                     },
-                    permissions: [stationTable, cropTable, weatherReadingsTable],
+                    permissions: [stationTable, cropTable, weatherReadingsTable, statsTable],  
                 },
+                authorizer: "mobileauthApi",
             },
 
             // Add new routes for custom authentication
@@ -123,100 +200,137 @@ export function ApiStack({stack}: StackContext) {
                 function: {
                     handler: "packages/functions/src/Authentication/VerifyChallenge.handler",
                     runtime: "nodejs18.x",
-                    permissions: ["dynamodb:PutItem"],
+                    permissions: ["dynamodb:PutItem","dynamodb:UpdateItem","dynamodb:GetItem"],
                 },
             },
-    
-
-      // Manager Dashboard Routing //
 
 
-      "POST /managerDashboard/exportData": {
-        function: {
-          handler: "packages/functions/src/ManagerDashboard/Auth/exportData.handler",
-          runtime: "nodejs18.x",
-          permissions: ["cognito-idp:AdminGetUser","dynamodb:PutItem","dynamodb:GetItem","dynamodb:UpdateItem"],
-        },
-      },
-      "GET /managerDashboard/Farms": {
-        function: {
-          handler: "packages/functions/src/ManagerDashboard/GetFarms.handler",
-          runtime: "nodejs18.x",
-          permissions: ["dynamodb:Query","dynamodb:GetItem"],
-        },
-        authorizer: "authApi",
-      },
-      "GET /managerDashboard/Farms/{FarmID}/Zones": {
-        function: {
-          handler: "packages/functions/src/ManagerDashboard/GetZones.handler",
-          runtime: "nodejs18.x",
-          permissions: ["dynamodb:Query","dynamodb:GetItem","s3:GetObject","s3:ListBucket"],
-        },
-        authorizer: "authApi",
-      },
-      "POST /managerDashboard/Farms/{FarmID}/Zones/{ZoneID}/Irrigate": {
-        function: {
-          handler: "packages/functions/src/ManagerDashboard/TriggerIrrigation.handler",
-          runtime: "nodejs18.x",
-          permissions: ["iot:Publish"],
+            // Manager Dashboard Routing //
+            "POST /managerDashboard/exportData": {
+                function: {
+                    handler: "packages/functions/src/ManagerDashboard/Auth/exportData.handler",
+                    runtime: "nodejs18.x",
+                    permissions: ["cognito-idp:AdminGetUser", "dynamodb:PutItem", "dynamodb:GetItem", "dynamodb:UpdateItem"],
+                },
+            },
+            "GET /managerDashboard/Farms": {
+                function: {
+                    handler: "packages/functions/src/ManagerDashboard/GetFarms.handler",
+                    runtime: "nodejs18.x",
+                    permissions: ["dynamodb:Query", "dynamodb:GetItem"],
+                },
+                authorizer: "authApi",
+            },
+            "GET /managerDashboard/Farms/{FarmID}/Zones": {
+                function: {
+                    handler: "packages/functions/src/ManagerDashboard/GetZones.handler",
+                    runtime: "nodejs18.x",
+                    permissions: ["dynamodb:Query", "dynamodb:GetItem", "s3:GetObject", "s3:ListBucket"],
+                },
+                authorizer: "authApi",
+            },
+            "POST /managerDashboard/Farms/{FarmID}/Zones/{ZoneID}/Irrigate": {
+                function: {
+                    handler: "packages/functions/src/ManagerDashboard/TriggerIrrigation.handler",
+                    runtime: "nodejs18.x",
+                    permissions: ["iot:Publish"],
 
-        },
+                },
 
-      },
-      "POST /managerDashboard/Farms/{FarmID}/Zones/{ZoneID}/UpdateStatus": {
-        function: {
-          handler: "packages/functions/src/ManagerDashboard/UpdateZoneStatus.handler",
-          runtime: "nodejs18.x",
-          
-        },
-        authorizer: "authApi",
-      },
+            },
+            "POST /managerDashboard/Farms/{FarmID}/Zones/{ZoneID}/UpdateStatus": {
+                function: {
+                    handler: "packages/functions/src/ManagerDashboard/UpdateZoneStatus.handler",
+                    runtime: "nodejs18.x",
+
+                },
+                authorizer: "authApi",
+            },
 
 
-      // Admin Dashboard Routing //
+            // Admin Dashboard Routing //
 
-      // "POST /adminDashboard/farms": {
-      //   function: {
-      //     handler: "packages/functions/src/AdminDashboard/AddFarm.handler",
-      //     runtime: "nodejs18.x",
-      //     permissions: ["dynamodb:PutItem"],
-      //   },
-      //   authorizer: "adminAuthApi",
-      // },
-      "DELETE /adminDashboard/farms/{FarmID}": {
-        function: {
-          handler: "packages/functions/src/AdminDashboard/DeleteFarm.handler",
-          runtime: "nodejs18.x",
-          permissions: ["dynamodb:DeleteItem", "dynamodb:GetItem"],
-        },
-        authorizer: "adminAuthApi",
-      },
-      // "POST /adminDashboard/farms/{FarmID}/zones": {
-      //   function: {
-      //     handler: "packages/functions/src/AdminDashboard/AddZone.handler",
-      //     runtime: "nodejs18.x",
-      //     permissions: ["dynamodb:PutItem"],
-      //   },
-      //   authorizer: "adminAuthApi",
-      // },
-      "DELETE /adminDashboard/farms/{FarmID}/zones/{ZoneID}": {
-        function: {
-          handler: "packages/functions/src/AdminDashboard/DeleteZone.handler",
-          runtime: "nodejs18.x",
-          permissions: ["dynamodb:DeleteItem", "dynamodb:GetItem"],
-        },
-        authorizer: "adminAuthApi",
-      },
-      // "POST /adminDashboard/farms/{FarmID}/assign": {
-      //   function: {
-      //     handler: "packages/functions/src/AdminDashboard/AssignFarm.handler",
-      //     runtime: "nodejs18.x",
-      //     permissions: ["dynamodb:UpdateItem", "cognito-idp:AdminGetUser"],
-      //   },
-      //   authorizer: "adminAuthApi",
-      // },
-      
-    },
+            // "POST /adminDashboard/farms": {
+            //   function: {
+            //     handler: "packages/functions/src/AdminDashboard/AddFarm.handler",
+            //     runtime: "nodejs18.x",
+            //     permissions: ["dynamodb:PutItem"],
+            //   },
+            //   authorizer: "adminAuthApi",
+            // },
+            "DELETE /adminDashboard/farms/{FarmID}": {
+                function: {
+                    handler: "packages/functions/src/AdminDashboard/DeleteFarm.handler",
+                    runtime: "nodejs18.x",
+                    permissions: ["dynamodb:DeleteItem", "dynamodb:GetItem"],
+                },
+                authorizer: "adminAuthApi",
+            },
+            // "POST /adminDashboard/farms/{FarmID}/zones": {
+            //   function: {
+            //     handler: "packages/functions/src/AdminDashboard/AddZone.handler",
+            //     runtime: "nodejs18.x",
+            //     permissions: ["dynamodb:PutItem"],
+            //   },
+            //   authorizer: "adminAuthApi",
+            // },
+            "DELETE /adminDashboard/farms/{FarmID}/zones/{ZoneID}": {
+                function: {
+                    handler: "packages/functions/src/AdminDashboard/DeleteZone.handler",
+                    runtime: "nodejs18.x",
+                    permissions: ["dynamodb:DeleteItem", "dynamodb:GetItem"],
+                },
+                authorizer: "adminAuthApi",
+            },
+            // "POST /adminDashboard/farms/{FarmID}/assign": {
+            //   function: {
+            //     handler: "packages/functions/src/AdminDashboard/AssignFarm.handler",
+            //     runtime: "nodejs18.x",
+            //     permissions: ["dynamodb:UpdateItem", "cognito-idp:AdminGetUser"],
+            //   },
+            //   authorizer: "adminAuthApi",
+            // },
+
+            
+           // Stats //
+
+
+            "GET /adminDashboard/stats": {
+                function: {
+                    handler: "packages/functions/src/AdminDashboard/getStats.handler",
+                    environment: {
+                        statsTable: statsTable.tableName,
+                        userTable: userTable.tableName,
+                        cropTable: cropTable.tableName
+                    },
+                    permissions: [statsTable, userTable, cropTable],
+                },
+                
+            },
+
+            "POST /adminDashboard/stats/updateWaterUsage": {
+                function: {
+                    handler: "packages/functions/src/AdminDashboard/updateWaterUsage.handler",
+                    environment: {
+                        statsTable: statsTable.tableName,
+                        userTable: userTable.tableName,
+                        cropTable: cropTable.tableName
+                    },
+                    permissions: [statsTable, userTable, cropTable],
+                },
+               
+            },
+
+            "GET /classification": {
+                function: {
+                    handler: "packages/functions/src/ClassificationHandler.getClassification",
+                    environment: {
+                        ClassificationTableName: aiResult.tableName, // Replace with your classification table
+                    },
+                    permissions: [aiResult], // Grant read access to the table
+                },
+            },
+        }
     });
 
     // Cache policy to use with CloudFront as reverse proxy to avoid CORS
@@ -229,6 +343,11 @@ export function ApiStack({stack}: StackContext) {
             "Content-Type",
             "Referer"
         ),
+    });
+
+    // Output the API URL
+    stack.addOutputs({
+        ApiEndpoint: api.url,
     });
 
     return {api, apiCachePolicy};

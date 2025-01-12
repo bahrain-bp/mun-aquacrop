@@ -1,9 +1,14 @@
 // app/screens/AuthScreen.tsx
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Image, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
 import axios from 'axios';
 import { storage } from '../utils/storage';
+import i18n from '../i18n'; // Import the shared i18n instance
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
+
+import CountrySelect from '../components/CountrySelect';
 
 const API_URL = process.env.EXPO_PUBLIC_API_ENDPOINT; // Replace with your actual API Gateway URL
 
@@ -15,32 +20,62 @@ const AuthScreen = () => {
   const [session, setSession] = useState('');
   const [sub, setSub] = useState('');
   const [loading, setLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('login');
+  const [countryCode, setCountryCode] = useState('BH');
+  const [callingCode, setCallingCode] = useState('+973');
+  const [countryFlag, setCountryFlag] = useState('🇧🇭');
+  const [countryPickerVisible, setCountryPickerVisible] = useState(false);
   const router = useRouter();
+  const [language, setLanguage] = useState(null);
+
+  // Load the language preference
+  useEffect(() => {
+    const loadLanguage = async () => {
+      try {
+        const savedLanguage = await AsyncStorage.getItem('language');
+        const activeLanguage = savedLanguage || 'en'; // Default to English if no preference exists
+        setLanguage(activeLanguage);
+        i18n.locale = activeLanguage;
+      } catch (error) {
+        console.error("Error loading language:", error);
+        setLanguage('en'); // Fallback to English on error
+        i18n.locale = 'en';
+      }
+    };
+
+    loadLanguage();
+  }, []);
+  
+  const onSelectCountry = (country: { code: string; dial_code: string; flag: string }) => {
+    setCountryCode(country.code);
+    setCallingCode(country.dial_code);
+    setCountryFlag(country.flag);
+  };
 
   const handleAuthentication = async () => {
     setLoading(true);
     try {
-      // Call the /auth/InitiateAuthentication endpoint
+      const fullPhoneNumber = `${callingCode}${phoneNumber}`;
       const response = await axios.post(
         `${API_URL}/auth/InitiateAuthentication`,
         {
-          phoneNumber,
+          phoneNumber: fullPhoneNumber,
           fullname,
+          isLogin: activeTab === 'login'
         }
       );
 
       const { session, challengeName, sub } = response.data;
 
       if (challengeName === 'CUSTOM_CHALLENGE') {
-        setSession(session); // Save the session to use in the challenge response
-        setSub(sub); // Save the sub to use in the challenge response
-        setIsChallengeStep(true); // Move to challenge step
-        Alert.alert('Challenge Sent', 'Please enter the verification code sent to your phone.');
-      } else {
-        Alert.alert('Error', 'Unexpected authentication flow.');
-      }
+        setSession(session);
+        setSub(sub);
+        setIsChallengeStep(true);
+      } 
     } catch (error) {
-      const errorMessage = axios.isAxiosError(error) && error.response?.data?.error ? error.response.data.error : 'Failed to initiate authentication.';
+      const errorMessage = axios.isAxiosError(error) && error.response?.data?.error 
+        ? error.response.data.error 
+        : 'Failed to initiate authentication.';
       Alert.alert('Error', errorMessage);
     } finally {
       setLoading(false);
@@ -63,14 +98,14 @@ const AuthScreen = () => {
       );
 
       const { idToken, accessToken } = response.data;
-        
+
 
       // Save the token using the unified storage utility
       const saveToken = async (idToken: string): Promise<void> => {
         try {
           await storage.setItem('idToken', idToken);
           await storage.setItem('accessToken', accessToken);
-          
+
           console.log('Token saved successfully!');
         } catch (error) {
           console.error('Error saving token:', error);
@@ -80,9 +115,7 @@ const AuthScreen = () => {
       await saveToken(idToken);
 
       if (idToken && accessToken) {
-        Alert.alert('Success', 'Authentication successful!');
-        // Navigate to the home screen
-        router.push('/screens/DashBoard');
+        router.replace ('/screens/DashBoard');
       } else {
         Alert.alert('Error', 'Unexpected response. Contact support.');
       }
@@ -94,70 +127,322 @@ const AuthScreen = () => {
     }
   };
 
-  return (
-    <View style={styles.container}>
-      {!isChallengeStep ? (
-        <>
-          <Text style={styles.label}>Enter Phone Number:</Text>
-          <TextInput
-            style={styles.input}
-            value={phoneNumber}
-            onChangeText={setPhoneNumber}
-            placeholder="+1234567890"
-            keyboardType="phone-pad"
-          />
-          <Text style={styles.label}>Enter Fullname:</Text>
-          <TextInput
-            style={styles.input}
-            value={fullname}
-            onChangeText={setFullname}
-            placeholder="Fullname"
-          />
-          <Button
-            title={loading ? 'Processing...' : 'Continue'}
-            onPress={handleAuthentication}
-            disabled={loading || !phoneNumber || !fullname}
-          />
-        </>
-      ) : (
-        <>
-          <Text style={styles.label}>Enter Verification Code:</Text>
-          <TextInput
-            style={styles.input}
-            value={challengeResponse}
-            onChangeText={setChallengeResponse}
-            placeholder="Verification Code"
-            keyboardType="numeric"
-          />
-          <Button
-            title={loading ? 'Verifying...' : 'Verify'}
-            onPress={handleVerifyChallenge}
-            disabled={loading || !challengeResponse}
-          />
-        </>
-      )}
+  const handleLoginSubmit = async () => {
+    if (!phoneNumber) {
+      Alert.alert('Error', 'Please enter your phone number');
+      return;
+    }
+    await handleAuthentication();
+  };
+
+  const handleRegisterSubmit = async () => {
+    if (!phoneNumber || !fullname) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+    await handleAuthentication();
+  };
+
+  const handleBack = () => {
+    setIsChallengeStep(false);
+    setChallengeResponse('');
+    setSession('');
+    setSub('');
+  };
+
+  const renderTabs = () => (
+    <View style={styles.tabContainer}>
+      <TouchableOpacity 
+        style={[styles.tab, activeTab === 'login' && styles.activeTab]}
+        onPress={() => setActiveTab('login')}
+      >
+        <Text style={[styles.tabText, activeTab === 'login' && styles.activeTabText]}>{i18n.t('login')}</Text>
+      </TouchableOpacity>
+      <TouchableOpacity 
+        style={[styles.tab, activeTab === 'register' && styles.activeTab]}
+        onPress={() => setActiveTab('register')}
+      >
+        <Text style={[styles.tabText, activeTab === 'register' && styles.activeTabText]}>{i18n.t('register')}</Text>
+      </TouchableOpacity>
     </View>
+  );
+
+  const renderPhoneInput = () => (
+    <View style={styles.phoneInputContainer}>
+      <TouchableOpacity
+        style={styles.countryPickerButton}
+        onPress={() => setCountryPickerVisible(true)}
+      >
+        <Text style={styles.flagText}>{countryFlag}</Text>
+        <Text style={styles.callingCodeText}>{callingCode}</Text>
+      </TouchableOpacity>
+      <TextInput
+        style={styles.phoneInput}
+        value={phoneNumber}
+        onChangeText={setPhoneNumber}
+        placeholder={i18n.t('loginph')}
+        keyboardType="phone-pad"
+      />
+      <CountrySelect
+        visible={countryPickerVisible}
+        onClose={() => setCountryPickerVisible(false)}
+        onSelect={onSelectCountry}
+      />
+    </View>
+  );
+
+  if (isChallengeStep) {
+    return (
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.container}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <Image 
+            source={{ uri: 'https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/saqi-logo-2' }}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+          <View style={styles.card}>
+
+            <TouchableOpacity style={styles.backButton} onPress={handleBack}>
+            <Text style={styles.backButtonText}>← Back</Text>
+            </TouchableOpacity>
+            <Text style={styles.title}>{i18n.t('ver')}</Text>
+            <Text style={styles.subtitle}>{i18n.t('vertxt')}</Text>
+
+            <TextInput
+              style={styles.input}
+              value={challengeResponse}
+              onChangeText={setChallengeResponse}
+              placeholder={i18n.t('entercodetxt')}
+              keyboardType="numeric"
+            />
+            <TouchableOpacity
+              style={styles.button}
+              onPress={handleVerifyChallenge}
+              disabled={loading || !challengeResponse}
+            >
+              <Text style={styles.buttonText}>{loading ? i18n.t('vering') : i18n.t('verbtn')}</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    );
+  }
+
+  return (
+    <KeyboardAvoidingView 
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={styles.container}
+    >
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Image 
+          source={{ uri: 'https://saqidev-mun-aquacrop-s3st-cropsimagesbucket37842e6-jwc87ujx6vua.s3.us-east-1.amazonaws.com/images/saqi-logo-2' }}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+        {renderTabs()}
+        <View style={styles.card}>
+          {activeTab === 'login' ? (
+            <>
+              <Text style={styles.title}>{i18n.t('wlbk')}</Text>
+              <Text style={styles.subtitle}>{i18n.t('logintxt')}</Text>
+              {renderPhoneInput()}
+              <TouchableOpacity onPress={() => setActiveTab('register')}>
+                <Text style={styles.redirectText}>{i18n.t('reglink')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.button}
+                onPress={handleLoginSubmit}
+                disabled={loading || !phoneNumber}
+              >
+                <Text style={styles.buttonText}>{loading ? i18n.t('proc') : i18n.t('loginbtn')}</Text>
+              </TouchableOpacity>
+            </>
+          ) : (
+            <>
+              <Text style={styles.title}>{i18n.t('crtacc')}</Text>
+              <Text style={styles.subtitle}>{i18n.t('regtxt')}</Text>
+              {renderPhoneInput()}
+              <TextInput
+                style={styles.input}
+                value={fullname}
+                onChangeText={setFullname}
+                placeholder={i18n.t('fullname')}
+              />
+              <TouchableOpacity
+                style={styles.button}
+                onPress={handleRegisterSubmit}
+                disabled={loading || !phoneNumber || !fullname}
+              >
+                <Text style={styles.buttonText}>{loading ? i18n.t('proc') : i18n.t('regbtn')}</Text>
+              </TouchableOpacity>
+            </>
+          )}
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    padding: 16,
-    backgroundColor: '#fff',
+    backgroundColor: '#F7F9FC',
   },
-  label: {
+  scrollContainer: {
+    flexGrow: 1,
+    alignItems: 'center',
+    padding: 20,
+    paddingTop: Platform.OS === 'ios' ? 60 : 40,
+  },
+  logo: {
+    width: 220,
+    height: 110,
+    marginBottom: 30,
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    marginBottom: 25,
+    borderRadius: 12,
+    backgroundColor: '#E8EDF3',
+    padding: 5,
+    width: '100%',
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 14,
+    alignItems: 'center',
+    borderRadius: 10,
+  },
+  activeTab: {
+    backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  tabText: {
     fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 8,
+    color: '#8895A7',
+    fontWeight: '600',
+  },
+  activeTabText: {
+    color: '#2D3748',
+    fontWeight: '700',
+  },
+  card: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    padding: 25,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 5,
+    width: '100%',
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '700',
+    marginBottom: 10,
+    textAlign: 'center',
+    color: '#1A202C',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#718096',
+    marginBottom: 25,
+    textAlign: 'center',
+    lineHeight: 22,
   },
   input: {
-    borderBottomWidth: 1,
-    borderColor: '#ccc',
-    marginBottom: 20,
-    padding: 8,
+    borderWidth: 1.5,
+    borderColor: '#E2E8F0',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
     fontSize: 16,
+    backgroundColor: '#F7FAFC',
+    color: '#2D3748',
+  },
+  button: {
+    backgroundColor: '#2B6CB0',
+    padding: 18,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginTop: 10,
+    shadowColor: '#2B6CB0',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4.65,
+    elevation: 8,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  redirectText: {
+    color: '#2B6CB0',
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 16, 
+    fontWeight: '600',
+    textDecorationLine: 'underline',
+  },
+  phoneInputContainer: {
+    flexDirection: 'row',
+    marginBottom: 16,
+    alignItems: 'center',
+  },
+  countryPickerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1.5,
+    borderColor: '#E2E8F0',
+    borderRadius: 12,
+    padding: 12,
+    backgroundColor: '#F7FAFC',
+    marginRight: 8,
+    minWidth: 100,
+  },
+  flagText: {
+    fontSize: 20,
+    marginRight: 8,
+  },
+  callingCodeText: {
+    fontSize: 16,
+    color: '#2D3748',
+  },
+  phoneInput: {
+    flex: 1,
+    borderWidth: 1.5,
+    borderColor: '#E2E8F0',
+    borderRadius: 12,
+    padding: 16,
+    fontSize: 16,
+    backgroundColor: '#F7FAFC',
+    color: '#2D3748',
+  },
+  backButton: {
+    position: 'absolute',
+    left: 25,
+    top: 25,
+    zIndex: 1,
+  },
+  backButtonText: {
+    fontSize: 16,
+    color: '#2B6CB0',
+    fontWeight: '600',
   },
 });
 
