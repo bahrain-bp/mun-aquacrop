@@ -2,9 +2,10 @@ import { useRouter } from 'expo-router';
 import * as Location from 'expo-location';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import React, { useEffect, useState, useRef } from 'react';
-import { Button, StyleSheet, Text, TouchableOpacity, View, Image, Alert } from 'react-native';
+import { Button, StyleSheet, Text, TouchableOpacity, View, Image, Alert, ActivityIndicator, Animated } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons'; // For icon support
 import { storage } from '../utils/storage';
+import { useTheme, themes } from '../components/ThemeContext';
 
 const API_URL = process.env.EXPO_PUBLIC_PROD_API_URL;
 
@@ -17,6 +18,9 @@ const UploadCrop: React.FC = () => {
     const [isUploading, setIsUploading] = useState(false);
     const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
     const [loading, setLoading] = useState(false); // State for loading during classification
+    const { isDarkMode } = useTheme();
+    const theme = isDarkMode ? themes.dark : themes.light;
+    const fadeAnim = useRef(new Animated.Value(0)).current;
 
     useEffect(() => {
         const getLocation = async () => {
@@ -35,6 +39,14 @@ const UploadCrop: React.FC = () => {
 
         getLocation();
     }, []);
+
+    useEffect(() => {
+        Animated.timing(fadeAnim, {
+            toValue: 1,
+            duration: 500,
+            useNativeDriver: true,
+        }).start();
+    }, [loading]);
 
     if (permission === null) {
         return <View />; // Loading state while waiting for permission response
@@ -254,44 +266,75 @@ const UploadCrop: React.FC = () => {
     if (loading) {
         // Display loading state when classification is being fetched
         return (
-            <View style={styles.container}>
-                <Text style={styles.message}>AI is processing your image...</Text>
-            </View>
+            <Animated.View style={[
+                styles.loadingContainer, 
+                { backgroundColor: theme.background },
+                { opacity: fadeAnim }
+            ]}>
+                <View style={[styles.loadingContent, { 
+                    backgroundColor: theme.card,
+                    shadowColor: theme.shadow,
+                }]}>
+                    {image && (
+                        <Image 
+                            source={{ uri: image }} 
+                            style={styles.loadingImagePreview}
+                        />
+                    )}
+                    <ActivityIndicator size="large" color={theme.accent} style={styles.loadingSpinner} />
+                    <Text style={[styles.loadingTitle, { color: theme.text }]}>AI Processing</Text>
+                    <Text style={[styles.loadingMessage, { color: theme.subText }]}>
+                        Our AI is analyzing your crop image{'\n'}
+                        This may take a few moments...
+                    </Text>
+                </View>
+            </Animated.View>
         );
     }
+
     return (
-        <View style={styles.container}>
+        <View style={[styles.container, { backgroundColor: theme.background }]}>
             {!image ? (
                 <CameraView style={styles.camera} type={facing} ref={cameraRef}>
                     <View style={styles.buttonContainer}>
-                        <TouchableOpacity style={styles.cameraButton} onPress={toggleCameraFacing}>
-                            <Ionicons name="camera-reverse" size={40} color="white" />
-                            <Text style={styles.buttonText}>Flip Camera</Text>
+                        <TouchableOpacity 
+                            style={[styles.cameraButton, { backgroundColor: theme.card + '80' }]} 
+                            onPress={toggleCameraFacing}
+                        >
+                            <Ionicons name="camera-reverse" size={40} color={theme.text} />
+                            <Text style={[styles.buttonText, { color: theme.text }]}>Flip Camera</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.cameraButton} onPress={takePicture}>
-                            <Ionicons name="camera" size={40} color="white" />
-                            <Text style={styles.buttonText}>Take Picture</Text>
+                        <TouchableOpacity 
+                            style={[styles.cameraButton, { backgroundColor: theme.card + '80' }]} 
+                            onPress={takePicture}
+                        >
+                            <Ionicons name="camera" size={40} color={theme.text} />
+                            <Text style={[styles.buttonText, { color: theme.text }]}>Take Picture</Text>
                         </TouchableOpacity>
                     </View>
                 </CameraView>
             ) : (
-                <View style={styles.previewContainer}>
+                <View style={[styles.previewContainer, { backgroundColor: theme.background }]}>
                     <Image source={{ uri: image }} style={styles.imagePreview} />
                     <View style={styles.previewButtons}>
                         <TouchableOpacity 
-                            style={[styles.actionButton, styles.retakeButton]} 
+                            style={[styles.actionButton, { backgroundColor: theme.border }]} 
                             onPress={retakePicture}
                         >
-                            <Ionicons name="reload" size={24} color="white" />
-                            <Text style={styles.buttonText}>Retake</Text>
+                            <Ionicons name="reload" size={24} color={theme.text} />
+                            <Text style={[styles.buttonText, { color: theme.text }]}>Retake</Text>
                         </TouchableOpacity>
                         <TouchableOpacity 
-                            style={[styles.actionButton, styles.saveButton]}
+                            style={[
+                                styles.actionButton, 
+                                { backgroundColor: theme.accent },
+                                isUploading && { opacity: 0.7 }
+                            ]}
                             onPress={savePicture}
                             disabled={isUploading}
                         >
-                            <Ionicons name="cloud-upload" size={24} color="white" />
-                            <Text style={styles.buttonText}>
+                            <Ionicons name="cloud-upload" size={24} color={theme.text} />
+                            <Text style={[styles.buttonText, { color: theme.text }]}>
                                 {isUploading ? 'Uploading...' : 'Save'}
                             </Text>
                         </TouchableOpacity>
@@ -387,6 +430,46 @@ const styles = StyleSheet.create({
         margin: 10,
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: 20,
+    },
+    loadingContent: {
+        alignItems: 'center',
+        padding: 20,
+        borderRadius: 15,
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+        elevation: 5,
+        width: '90%',
+    },
+    loadingImagePreview: {
+        width: '100%',
+        height: 200,
+        borderRadius: 10,
+        marginBottom: 20,
+    },
+    loadingSpinner: {
+        marginVertical: 20,
+    },
+    loadingTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 10,
+    },
+    loadingMessage: {
+        fontSize: 16,
+        color: '#666',
+        textAlign: 'center',
+        lineHeight: 24,
     },
 });
 
