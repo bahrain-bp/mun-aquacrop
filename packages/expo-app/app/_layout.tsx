@@ -37,6 +37,7 @@ export default function Layout() {
         <Stack.Screen name="screens/DashBoard" options={{ headerShown: false,title: i18n.t('dashboard') }} />
         <Stack.Screen name="screens/Recommendation" options={{ title: i18n.t('rectitle') }} />
         <Stack.Screen name="screens/Crop" options={{ title: i18n.t('crop') }} />
+        <Stack.Screen name="screens/UploadCrop" options={{ title: i18n.t('uploadtitle') }} />
 
       </Stack>
     </ThemeProvider>

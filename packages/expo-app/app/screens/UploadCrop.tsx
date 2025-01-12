@@ -26,7 +26,10 @@ const UploadCrop: React.FC = () => {
         const getLocation = async () => {
             const { status } = await Location.requestForegroundPermissionsAsync();
             if (status !== 'granted') {
-                Alert.alert('Permission Denied', 'Location access is required for this feature.');
+                Alert.alert(
+                    'Location Access Required',
+                    'Enable location services\nto get crop recommendations'
+                );
                 return;
             }
 
@@ -114,14 +117,13 @@ const UploadCrop: React.FC = () => {
     };
 
     const pollForClassification = async (fileName: string) => {
-        const timeout = 40000; // 40 seconds
+        const timeout = 25000; // 25 seconds
         const interval = 2000; // 2 seconds
         const startTime = Date.now();
 
         const checkRecord = async () => {
             const elapsed = Date.now() - startTime;
             if (elapsed > timeout) {
-                Alert.alert('Timeout', 'The AI could not classify the image.');
                 return null;
             }
 
@@ -202,12 +204,15 @@ const UploadCrop: React.FC = () => {
             });
 
             
-            Alert.alert('Success', 'Image uploaded successfully!');
+            
             setImage(null);
             return fileNameDB; // Return fileName for further use
         } catch (error) {
             console.error('Upload error:', error);
-            Alert.alert('Error', 'Failed to upload image');
+            Alert.alert(
+                'Upload Failed',
+                'Could not upload your image. Please check your internet connection and try again.'
+            );
         } finally {
             setIsUploading(false);
         }
@@ -242,10 +247,16 @@ const UploadCrop: React.FC = () => {
                         },
                     });
                 }else {
-                    Alert.alert('Error', 'The AI could not classify the image.');
+                    Alert.alert(
+                        'AI Analysis Failed',
+                        'Please ensure:\n• Image is clear\n• Plant is visible\n• Good lighting'
+                    );
                 }
             } else {
-                Alert.alert('Error', 'No image found to upload.');
+                Alert.alert(
+                    'No Image',
+                    'Take a picture first'
+                );
             }
             
         } catch(error: any) {
@@ -257,8 +268,8 @@ const UploadCrop: React.FC = () => {
 
         // Show an alert to the user
         Alert.alert(
-            'Error',
-            'Something went wrong while processing the image. Please try again later.'
+            'Processing Error',
+            'Connection issue detected.\nPlease try again later.'
         );
         }
     };
@@ -335,7 +346,7 @@ const UploadCrop: React.FC = () => {
                         >
                             <Ionicons name="cloud-upload" size={24} color={theme.text} />
                             <Text style={[styles.buttonText, { color: theme.text }]}>
-                                {isUploading ? 'Uploading...' : 'Save'}
+                                {isUploading ? 'Analyzing..' : 'Analyze'}
                             </Text>
                         </TouchableOpacity>
                     </View>
