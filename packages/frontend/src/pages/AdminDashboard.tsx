@@ -82,7 +82,7 @@ const DashboardContent: React.FC = () => {
                         value={loading ? '...' : stats.totalCrops.toString()}
                         color='#EC4899'
                     />
-                    <StatCard name='Weather' icon={Cloud} value='12.5' color='#10B981'/>
+                    <StatCard name='Weather' icon={Cloud} value='12.5°C' color='#10B981'/>
                 </motion.div>
 
                 <div className='grid grid-cols-1 lg:grid-cols-2 gap-8'>

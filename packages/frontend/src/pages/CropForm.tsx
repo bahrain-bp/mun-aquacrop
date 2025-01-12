@@ -49,7 +49,8 @@ const CropForm: React.FC = () => {
         handleSubmit,
         formState: {errors},
         setValue,
-        watch
+        watch,
+        getValues
     } = useForm<CropFormInputs>({
         defaultValues: {
             cropID: 0,
@@ -262,7 +263,8 @@ const CropForm: React.FC = () => {
                                         step="1"
                                         {...register("growthStage.ini", {
                                             required: "Initial growth stage is required",
-                                            valueAsNumber: true
+                                            valueAsNumber: true,
+                                            min: { value: 0, message: "Must be non-negative" }
                                         })}
                                         className="w-full p-3 mt-1 text-gray-800 rounded-md border border-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     />
@@ -276,7 +278,13 @@ const CropForm: React.FC = () => {
                                         step="1"
                                         {...register("growthStage.mid", {
                                             required: "Mid growth stage is required",
-                                            valueAsNumber: true
+                                            valueAsNumber: true,
+                                            validate: {
+                                                greaterThanIni: (value) => {
+                                                    const ini = getValues("growthStage.ini");
+                                                    return value > ini || "Must be greater than initial stage";
+                                                }
+                                            }
                                         })}
                                         className="w-full p-3 mt-1 text-gray-800 rounded-md border border-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     />
@@ -290,7 +298,13 @@ const CropForm: React.FC = () => {
                                         step="1"
                                         {...register("growthStage.final", {
                                             required: "Final growth stage is required",
-                                            valueAsNumber: true
+                                            valueAsNumber: true,
+                                            validate: {
+                                                greaterThanMid: (value) => {
+                                                    const mid = getValues("growthStage.mid");
+                                                    return value > mid || "Must be greater than mid stage";
+                                                }
+                                            }
                                         })}
                                         className="w-full p-3 mt-1 text-gray-800 rounded-md border border-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     />
@@ -311,8 +325,8 @@ const CropForm: React.FC = () => {
                                         step="0.01"
                                         {...register("kc.ini", {
                                             required: "Initial Kc is required",
-                                            min: {value: 0, message: "Must be a positive number"},
-                                            valueAsNumber: true
+                                            valueAsNumber: true,
+                                            min: { value: 0, message: "Must be positive" }
                                         })}
                                         className="w-full p-3 mt-1 text-gray-800 rounded-md border border-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     />
@@ -325,8 +339,8 @@ const CropForm: React.FC = () => {
                                         step="0.01"
                                         {...register("kc.mid", {
                                             required: "Mid Kc is required",
-                                            min: {value: 0, message: "Must be a positive number"},
-                                            valueAsNumber: true
+                                            valueAsNumber: true,
+                                            min: { value: 0, message: "Must be positive" }
                                         })}
                                         className="w-full p-3 mt-1 text-gray-800 rounded-md border border-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     />
@@ -339,8 +353,8 @@ const CropForm: React.FC = () => {
                                         step="0.01"
                                         {...register("kc.final", {
                                             required: "Final Kc is required",
-                                            min: {value: 0, message: "Must be a positive number"},
-                                            valueAsNumber: true
+                                            valueAsNumber: true,
+                                            min: { value: 0, message: "Must be positive" }
                                         })}
                                         className="w-full p-3 mt-1 text-gray-800 rounded-md border border-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                                     />
