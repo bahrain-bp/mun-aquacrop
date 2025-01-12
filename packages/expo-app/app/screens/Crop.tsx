@@ -358,8 +358,8 @@ const Crop: React.FC = () => {
         (selectedOption === 'growthStage' && isGrowthStageSelected);
         
     // testing
+    const [selected, setSelected] = React.useState("");
 
-    
     // testing end
 
     return (
